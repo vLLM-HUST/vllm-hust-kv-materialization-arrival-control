@@ -1,5 +1,15 @@
 # vLLM General Plugin Template
 
+## Bootstrap
+
+Preferred bootstrap:
+
+```bash
+make bootstrap-shared-env
+```
+
+That clones the shared `vllm-research` baseline and installs the template repository as the repo overlay.
+
 This repository is a minimal standalone template for building an independently
 publishable vLLM optimization plugin.
 

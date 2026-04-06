@@ -3,6 +3,9 @@ PIP ?= $(PYTHON) -m pip
 PYTEST ?= PYTHONPATH=src $(PYTHON) -m pytest -q
 RUFF ?= $(PYTHON) -m ruff
 BUILD ?= $(PYTHON) -m build
+SHARED_ENV_SCRIPT ?= /home/shuhao/llm-optimizations/scripts/bootstrap_shared_env.sh
+SHARED_PROFILE ?= vllm-research
+SHARED_ENV_NAME ?= vllm-exp
 
 PACKAGE_IMPORT := vllm_general_plugin_template
 BENCH_DIR := tests
@@ -10,7 +13,7 @@ PAPER_DIR :=
 
 .DEFAULT_GOAL := help
 
-.PHONY: help install-dev smoke test lint format build bench paper clean
+.PHONY: help bootstrap-shared-env install-dev smoke test lint format build bench paper clean
 
 help:
 	@printf '%s\n' \
@@ -24,6 +27,9 @@ help:
 		'  make bench        Show the benchmark workspace for this repo' \
 		'  make paper        Show the paper workspace for this repo' \
 		'  make clean        Remove common local build caches'
+
+bootstrap-shared-env:
+	$(SHARED_ENV_SCRIPT) --profile $(SHARED_PROFILE) --repo-root "$$PWD" --env-name '$(SHARED_ENV_NAME)'
 
 install-dev:
 	$(PIP) install -e ".[dev]"

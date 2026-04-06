@@ -15,6 +15,9 @@
 
 - Keep the template minimal and reusable.
 - Keep example plugin logic under `src/`.
+- When derived plugins need reusable scenario benchmark workloads, point them
+	at the sibling `llm-serving-workloads` repository/package as the workload
+	source of truth instead of teaching repo-local workload copies.
 - Record template changes in this repository's `CHANGELOG.md` only.
 - Do not write template-repo changes into `/home/shuhao/sagellm/CHANGELOG.md`.
 - Update `README.md` if the recommended plugin boundary changes.
