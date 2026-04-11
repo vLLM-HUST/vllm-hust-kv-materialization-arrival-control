@@ -2,16 +2,15 @@
 
 ## Upstream Safety Rule
 
-- This template must not encourage direct edits to `/home/shuhao/reference-repos/vllm`.
-- If a derived plugin eventually needs upstream-local changes, that derived repository should vendor or clone vLLM inside itself and patch there.
+- Do not edit `/home/shuhao/reference-repos/vllm` for this repository.
+- If the out-of-tree plugin boundary becomes insufficient, carry any unavoidable upstream-local work inside this repository under `vendor/` or `patches/`.
 
 ## Expected Workflow
 
-1. Keep the template minimal.
-2. Keep example logic under `src/`.
-3. Update `README.md` if the recommended plugin boundary changes.
-4. Record structure or workflow changes in this repository's `CHANGELOG.md` only.
-5. Do not record template-repo changes in `/home/shuhao/sagellm/CHANGELOG.md`.
+1. Keep plugin logic under `src/vllm_kv_materialization/`.
+2. Keep paper assets under `paper/` and experiment drivers under `paper/.../experiments/` or `scripts/`.
+3. Update `README.md` and `CHANGELOG.md` for visible workflow changes.
+4. Do not record this repository's changes in `/home/shuhao/sagellm/CHANGELOG.md`.
 
 ## Unified Local Commands
 
@@ -19,11 +18,10 @@
 make install-dev
 make smoke
 make test
-make lint
-make format
+make offline-experiment
+make experiment
+make pdf
 make build
-make bench
-make paper
 ```
 
 ## Testing

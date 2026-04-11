@@ -15,7 +15,7 @@ def _merge_plugins(existing: str | None, plugin_name: str) -> str:
 def main() -> None:
     os.environ["VLLM_PLUGINS"] = _merge_plugins(
         os.getenv("VLLM_PLUGINS"),
-        "general_plugin_template",
+        "kv_materialization",
     )
 
     from vllm.entrypoints.cli.main import main as vllm_main

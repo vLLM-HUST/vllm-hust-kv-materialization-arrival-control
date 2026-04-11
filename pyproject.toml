@@ -3,19 +3,24 @@ requires = ["setuptools>=77.0.3,<81.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "vllm-general-plugin-template"
+name = "vllm-kv-materialization"
 version = "0.1.0"
-description = "Minimal standalone template for vLLM optimization plugins"
+description = "Standalone vLLM plugin for adaptive KV materialization studies"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = []
 authors = [{name = "Shuhao Prototype"}]
 
+[project.urls]
+Repository = "https://github.com/Qixin-Gaoke/vllm-kv-materialization-plugin"
+Issues = "https://github.com/Qixin-Gaoke/vllm-kv-materialization-plugin/issues"
+
 [project.scripts]
-vllm-template-serve = "vllm_general_plugin_template.launcher:main"
+vllm-kv-materialization-serve = "vllm_kv_materialization.launcher:main"
+vllm-kv-materialization-offline = "vllm_kv_materialization.offline_experiment:main"
 
 [project.entry-points."vllm.general_plugins"]
-general_plugin_template = "vllm_general_plugin_template.plugin:register_plugin"
+kv_materialization = "vllm_kv_materialization.plugin:register_plugin"
 
 [project.optional-dependencies]
 dev = ["build>=1.2", "pytest>=8.0", "ruff>=0.11"]

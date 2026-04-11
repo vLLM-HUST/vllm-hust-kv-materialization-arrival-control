@@ -1,0 +1,6 @@
+{"trace_id":"chat-0","reusable_prefix_tokens":2048,"remote_kv_bytes":67108864,"transfer_time_ms":8.5,"recompute_time_ms":24.0,"queue_pressure":0.8,"ttft_sensitive":true,"reuse_confidence":0.9}
+{"trace_id":"chat-1","reusable_prefix_tokens":768,"remote_kv_bytes":33554432,"transfer_time_ms":7.8,"recompute_time_ms":15.2,"queue_pressure":0.6,"ttft_sensitive":true,"reuse_confidence":0.8}
+{"trace_id":"chat-2","reusable_prefix_tokens":384,"remote_kv_bytes":16777216,"transfer_time_ms":6.1,"recompute_time_ms":9.4,"queue_pressure":0.2,"ttft_sensitive":false,"reuse_confidence":0.5}
+{"trace_id":"rag-0","reusable_prefix_tokens":1536,"remote_kv_bytes":50331648,"transfer_time_ms":10.4,"recompute_time_ms":20.1,"queue_pressure":0.4,"ttft_sensitive":true,"reuse_confidence":0.7}
+{"trace_id":"code-0","reusable_prefix_tokens":512,"remote_kv_bytes":25165824,"transfer_time_ms":9.0,"recompute_time_ms":11.0,"queue_pressure":0.2,"ttft_sensitive":false,"reuse_confidence":0.6}
+{"trace_id":"doc-0","reusable_prefix_tokens":128,"remote_kv_bytes":8388608,"transfer_time_ms":5.0,"recompute_time_ms":4.5,"queue_pressure":0.1,"ttft_sensitive":true,"reuse_confidence":0.3}

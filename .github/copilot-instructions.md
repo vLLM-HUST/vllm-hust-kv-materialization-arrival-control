@@ -2,41 +2,32 @@
 
 ## Repository Role
 
-- Repository: `vllm-general-plugin-template`
-- Purpose: reusable standalone template for out-of-tree vLLM plugins
+- Repository: `vllm-kv-materialization-plugin`
+- Purpose: standalone vLLM adaptive KV materialization plugin and paper artifact
 
 ## Critical Boundary
 
-- Do **not** modify `/home/shuhao/reference-repos/vllm` when using this template.
-- If a future plugin built from this template truly requires upstream-local changes, clone or vendor vLLM inside the derived repository and patch there.
-- The template should teach clean plugin boundaries, not direct edits to the reference checkout.
+- Do **not** modify `/home/shuhao/reference-repos/vllm` for this repository's work.
+- Keep the reference vLLM checkout clean.
+- If upstream-local experimentation becomes unavoidable, do it inside this repository instead under `vendor/` or `patches/`.
 
 ## Working Rules
 
-- Keep the template minimal and reusable.
-- Keep example plugin logic under `src/`.
-- When derived plugins need reusable scenario benchmark workloads, point them
-	at the sibling `llm-serving-workloads` repository/package as the workload
-	source of truth instead of teaching repo-local workload copies.
-- Record template changes in this repository's `CHANGELOG.md` only.
-- Do not write template-repo changes into `/home/shuhao/sagellm/CHANGELOG.md`.
-- Update `README.md` if the recommended plugin boundary changes.
+- Keep plugin logic under `src/vllm_kv_materialization/`.
+- Keep paper materials under `paper/`.
+- Keep related-work PDFs under `paper/related_works/`.
+- Keep experiment drivers under `scripts/` and `paper/.../experiments/`.
+- Prefer the dedicated conda environment `vllm-kv-materialization-exp` for this repository.
+- When this repository uses scenario-grounded workloads, consume them from the sibling `llm-serving-workloads` repository/package.
+- Update this repository's `CHANGELOG.md` and `README.md` for user-visible behavior changes.
+- Do not write `vllm-kv-materialization-plugin` changes into `/home/shuhao/sagellm/CHANGELOG.md`.
 - Do not create `.venv` or `venv`.
 
-## Research Ideation Reference
+## Research Scope
 
-- When designing new plugin ideas from this template, you may consult
-	`/home/shuhao/private-materials` as private reference material.
-- Prioritize Shuhao's prior research results and technical summaries,
-	especially under `汇报材料/26年学术委员会演讲/`, `项目文档/内部项目/`,
-	`项目文档/纵向项目/`, `项目文档/横向项目/`, and `申报材料/`.
-- Use those materials to inspire reusable optimization patterns, evaluation
-	checklists, and problem framing for derived repositories.
-- Do **not** copy private material verbatim into this template, do **not** move
-	files out of `private-materials`, and do **not** present proposal content as
-	validated implementation results.
-- Translate any borrowed idea into clean, reusable plugin seams instead of
-	embedding repository-specific private context into the template itself.
+- Focus on request-arrival KV materialization decisions.
+- The main action space is `full_reuse`, `partial_reuse`, or `recompute`.
+- Do not reposition this repository as a decode-placement policy artifact or as another eviction-control line.
 
 ## Testing
 

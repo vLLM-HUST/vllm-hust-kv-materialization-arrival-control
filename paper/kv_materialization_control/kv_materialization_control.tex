@@ -1,0 +1,82 @@
+\documentclass[10pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{enumitem}
+
+\title{Adaptive KV Materialization for Multi-GPU vLLM Serving}
+\author{Prototype Draft}
+\date{}
+
+\begin{document}
+\maketitle
+
+\input{experiments/results/latest/offline_summary_macros.tex}
+
+\begin{abstract}
+Large language model serving systems increasingly rely on reusable KV and
+prefix state, but realizing that state is not free. This draft studies a
+single policy problem: when reusable state exists for a newly arrived request,
+should the system fully reuse it, partially materialize it, or recompute the
+prefix from scratch? We structure the repository around an experimental study
+first and a future vLLM plugin second.
+\end{abstract}
+
+\section{Problem}
+Existing serving work shows that reusable state can reduce prompt processing and
+improve latency, but reuse realization is not free. When state lives remotely,
+needs transfer, or requires nontrivial stitching, aggressive reuse can increase
+time to first token rather than reduce it. The practical question is therefore
+not whether reuse exists, but how much reusable state should be materialized at
+request arrival.
+
+\section{Hypothesis}
+The best materialization action depends on reuse volume, transfer cost, queue
+pressure, and request latency sensitivity.
+
+\section{Policy Surface}
+This repository studies a single-hook decision problem at request arrival.
+Given reusable state, the controller chooses one of three actions:
+
+\begin{itemize}[leftmargin=1.5em]
+\item \texttt{full\_reuse}: materialize the full reusable prefix,
+\item \texttt{partial\_reuse}: materialize only a prefix segment and recompute the rest,
+\item \texttt{recompute}: ignore reusable state and run the prompt path from scratch.
+\end{itemize}
+
+This keeps the study orthogonal to placement-policy work and orthogonal to
+eviction-policy work.
+
+\section{Offline Study Snapshot}
+The current repository ships a workload-driven offline study harness. On three
+representative cases derived from the shared \texttt{llm-serving-workloads}
+repository, the heuristic policy achieves mean TTFT \HeuristicMeanTTFT ms and
+p95 TTFT \HeuristicPNineFiveTTFT ms. The oracle action selector reaches mean
+TTFT \OracleMeanTTFT ms and p95 TTFT \OraclePNineFiveTTFT ms, which gives a
+useful upper bound on the remaining policy headroom while keeping the action
+space fixed to full reuse, partial reuse, and recompute.
+
+\input{experiments/results/latest/offline_summary_table.tex}
+
+\section{Plan}
+We compare full reuse, partial reuse, and recompute across workload families
+with strong state locality. The current repository step is workload-carrier
+evaluation through the shared \texttt{llm-serving-workloads} repository, with
+oracle and cost-misestimation sensitivity baselines added around the main
+heuristic. The next step is to wire the same decision interface into a vLLM
+plugin hook and validate online TTFT behavior.
+
+\section{Initial Contributions}
+\begin{enumerate}[leftmargin=1.5em]
+\item A standalone repository that packages the policy, experiment harness,
+and paper artifacts together.
+\item A first offline study pipeline that emits paper-consumable summaries.
+\item A narrow plugin target centered on request-arrival materialization
+instead of placement or eviction.
+\end{enumerate}
+
+\bibliographystyle{plain}
+\bibliography{kv_materialization_control}
+
+\end{document}

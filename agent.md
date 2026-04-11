@@ -2,21 +2,25 @@
 
 ## Repository Role
 
-- This repository is the canonical starting point for new standalone optimization repositories in the vLLM line.
-- Keep it minimal, reusable, and template-oriented.
+- Repository: `vllm-kv-materialization-plugin`
+- Purpose: standalone vLLM plugin and research artifact for adaptive KV materialization
+- Scope: out-of-tree plugin logic, trace-driven experiments, paper draft, and related-work archive
 
-## New Repository Rule
+## Working Rule
 
-- When a new optimization idea does not belong to an existing repository, start here.
-- Copy this repository into a new child repository, rename the package and plugin identifiers, then add the new repo-specific scope, experiments, and paper assets there.
-- Do not start a new optimization line by cloning another research repository unless the user explicitly requests that exception.
+- Keep the core plugin under `src/vllm_kv_materialization/`.
+- Keep experiment scripts under `scripts/` and `paper/.../experiments/`.
+- Keep paper material under `paper/`.
+- Keep related-work PDFs inside `paper/related_works/`.
+
+## Research Boundary
+
+- Focus on request-arrival materialization decisions: full reuse, partial reuse, or recompute.
+- Do not reframe this repository as another decode-placement or eviction-policy project.
+- Treat worker placement and eviction timing as background conditions unless a later result proves they must become first-class variables.
 
 ## Canonical Workflow
 
-- Prefer `make bootstrap-shared-env` for environment setup.
-- Prefer the repository root `Makefile` for smoke tests, unit tests, linting, packaging, and future template validation.
-
-## Design Memory
-
-- Use `/home/shuhao/sglang-dp-locality-plugin` as the repository-design reference when expanding this template's root layout, README structure, benchmark and paper navigation, or top-level conventions.
-- This template should absorb the reusable repository-design lessons from the most complete research repositories in the workspace, while staying generic enough for future plugin ideas.
+- Prefer the dedicated conda environment `vllm-kv-materialization-exp` for this repository.
+- Prefer `make bootstrap-env` or `bash scripts/setup_repo_env.sh` for environment setup.
+- Prefer the repository root `Makefile` for smoke tests, unit tests, offline experiments, live benchmarks, and packaging.

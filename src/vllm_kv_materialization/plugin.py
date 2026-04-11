@@ -10,8 +10,9 @@ _PATCHED = False
 def register_plugin() -> None:
     """Register the plugin.
 
-    This function must be re-entrant because vLLM can load general plugins in
-    multiple processes.
+    The current patch surface is intentionally minimal. It only marks plugin
+    availability so offline and future in-process experiments can verify that
+    the plugin was loaded correctly.
     """
 
     global _PATCHED
@@ -24,9 +25,7 @@ def register_plugin() -> None:
         logger.exception("Failed to import vLLM during plugin registration.")
         return
 
-    # This sample patch deliberately stays narrow. Replace it with a real
-    # optimization boundary such as a scheduler method or attention-layer path.
-    setattr(vllm_envs, "VLLM_GENERAL_PLUGIN_TEMPLATE_LOADED", True)
+    setattr(vllm_envs, "VLLM_KV_MATERIALIZATION_PLUGIN_LOADED", True)
 
     _PATCHED = True
-    logger.info("Registered vLLM general plugin template.")
+    logger.info("Registered vLLM KV materialization plugin.")
