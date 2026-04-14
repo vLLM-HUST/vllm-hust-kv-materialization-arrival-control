@@ -1,13 +1,13 @@
-\documentclass[10pt]{article}
+\documentclass[conference]{IEEEtran}
 
-\usepackage[margin=1in]{geometry}
 \usepackage{hyperref}
 \usepackage{booktabs}
 \usepackage{enumitem}
+\usepackage{cite}
 
-\title{Adaptive KV Materialization for Multi-GPU vLLM Serving}
-\author{Prototype Draft}
-\date{}
+\title{Adaptive KV Materialization Control for Multi-GPU LLM Serving}
+
+\author{\IEEEauthorblockN{Anonymous Artifact Draft}}
 
 \begin{document}
 \maketitle
@@ -15,29 +15,85 @@
 \input{experiments/results/latest/offline_summary_macros.tex}
 
 \begin{abstract}
-Large language model serving systems increasingly rely on reusable KV and
-prefix state, but realizing that state is not free. This draft studies a
-single policy problem: when reusable state exists for a newly arrived request,
-should the system fully reuse it, partially materialize it, or recompute the
-prefix from scratch? We structure the repository around an experimental study
-first and a future vLLM plugin second.
+Large language model serving stacks increasingly expose reusable KV or prefix
+state across requests, but converting that state into latency improvement is a
+systems problem rather than a free optimization. Reuse may require remote KV
+fetch, host-device transfer, format conversion, or partial reconstruction;
+under these costs, blindly materializing every available prefix can increase
+time-to-first-token instead of reducing it. This paper studies request-arrival
+KV materialization control: given reusable state for an incoming request,
+should the system fully materialize it, materialize only a profitable prefix
+segment, or recompute the prompt from scratch? We formulate this decision as a
+narrow three-action control surface and define the evaluation protocol that this
+artifact must satisfy. In the corrected evaluation plan, all quantitative
+results should be produced on a single concrete model configuration rather than
+mixing model-agnostic offline estimates with isolated live endpoint snapshots.
+For this repository, the intended model is Qwen2.5-7B-Instruct. The current
+artifact now contains three evidence layers with explicitly different status:
+an offline 15-workload decision study used as development scaffolding, a full
+15-workload live sweep on Qwen2.5-7B-Instruct used to validate workload
+coverage and expose deployment constraints, and a stronger runtime seam that
+already realizes prefix-cache control for \texttt{full\_reuse} and
+\texttt{recompute} while degrading \texttt{partial\_reuse} to anchor-scoped
+full reuse on the unmodified local vLLM path. We therefore present this paper
+as a systems formulation plus an honest artifact-status report, not as a final
+claim that all three actions have already been realized end to end.
 \end{abstract}
 
-\section{Problem}
-Existing serving work shows that reusable state can reduce prompt processing and
-improve latency, but reuse realization is not free. When state lives remotely,
-needs transfer, or requires nontrivial stitching, aggressive reuse can increase
-time to first token rather than reduce it. The practical question is therefore
-not whether reuse exists, but how much reusable state should be materialized at
-request arrival.
+\begin{IEEEkeywords}
+LLM serving, KV cache, prefix reuse, materialization control, time to first token
+\end{IEEEkeywords}
 
-\section{Hypothesis}
-The best materialization action depends on reuse volume, transfer cost, queue
-pressure, and request latency sensitivity.
+\section{Introduction}
+Recent LLM serving systems increasingly rely on prefix reuse, prompt caching,
+and reusable KV state to reduce prefill cost. However, a reusable prefix is not
+equivalent to a free latency reduction. In multi-GPU settings, reusable state
+may reside on another worker, may require transfer through interconnect or host
+memory, and may need partial rematerialization before decoding can start. As a
+result, the serving system faces a control problem: when a request arrives and
+some reusable state exists, how much of that state should be realized now?
 
-\section{Policy Surface}
-This repository studies a single-hook decision problem at request arrival.
-Given reusable state, the controller chooses one of three actions:
+Recent disaggregated and remote-KV serving efforts, including DistServe and
+Mooncake~\cite{distserve2024,mooncake2025}, make this cost visible rather than
+hiding it behind a monolithic ``cache hit'' abstraction. Once reuse requires
+transport, re-layout, or partial reconstruction, the runtime needs a policy
+that decides whether realizing the reusable state is worth the startup cost.
+
+However, a correct experimental paper on this topic must keep the evidence
+surface consistent. If the claim is about serving behavior on a concrete model,
+then all main experiments should be run on that same model rather than mixing
+trace-driven estimates with a separate live-model pilot. For this repository,
+the intended evaluation model is Qwen2.5-7B-Instruct, and the paper should be
+written to that standard.
+
+This repository focuses on a narrow but practically important control point:
+request-arrival KV materialization. Instead of treating reuse as a binary
+choice, we study a three-action decision surface. The controller can fully
+materialize the reusable prefix, partially materialize only a profitable
+segment, or ignore the reusable state and recompute the prompt from scratch.
+This formulation is intentionally orthogonal to placement and eviction policy.
+Placement affects where reusable state resides, and eviction affects whether it
+still exists; our question begins after reusable state is already available and
+asks whether realizing it is worth the cost.
+
+The systems hypothesis is straightforward: the best action depends on the
+tradeoff between recomputation work and realization overhead. Realization
+overhead can include transfer latency, bytes moved, device memory pressure, and
+stitching cost. Recompute cost depends on prompt length, model throughput, and
+request urgency. Because these factors vary across workloads, a serving stack
+needs an explicit materialization controller instead of a fixed ``always reuse''
+rule.
+
+In contrast to a broad scheduler redesign, this paper targets one narrow and
+measurable hook. The benefit of that choice is methodological: it keeps the
+artifact honest about what is being optimized, and it makes offline and online
+evidence easier to interpret.
+
+\section{Problem Formulation}
+We study a single-hook decision problem at request arrival. For each incoming
+request, the runtime observes a candidate reusable prefix together with signals
+about prefix length, estimated recomputation work, and estimated realization
+cost. The controller then chooses one of three actions:
 
 \begin{itemize}[leftmargin=1.5em]
 \item \texttt{full\_reuse}: materialize the full reusable prefix,
@@ -45,38 +101,221 @@ Given reusable state, the controller chooses one of three actions:
 \item \texttt{recompute}: ignore reusable state and run the prompt path from scratch.
 \end{itemize}
 
-This keeps the study orthogonal to placement-policy work and orthogonal to
-eviction-policy work.
+This decision surface is deliberately narrow. It avoids conflating multiple
+control layers and makes the evidence interpretable: if the controller helps,
+the gain comes from better request-arrival materialization decisions rather
+than from a hidden change in scheduler, placement, or eviction behavior.
+
+\subsection{Signals and Objective}
+The controller reasons over a small signal set: reusable prefix length,
+estimated transfer latency, estimated recomputation latency, queue pressure,
+and a confidence estimate for whether the candidate reusable state is likely to
+produce useful saved work. The objective is to minimize startup latency,
+represented primarily by TTFT, while keeping realized KV traffic proportional
+to actual benefit.
+
+\subsection{Why Partial Reuse Matters}
+The partial action is the key difference between a binary reuse controller and
+a materialization controller. In practice, the early segment of a reusable
+prefix may be worth loading while the tail segment is not, especially when
+transfer cost grows faster than the remaining recomputation avoided. A binary
+policy cannot express that breakpoint.
+
+\section{Design Perspective}
+The design goal is not to maximize reuse rate. The design goal is to minimize
+request latency subject to the actual cost of realizing reusable state. From
+this perspective, full reuse is only one candidate action, not the default
+answer. A partial action is useful when the early portion of a prefix has high
+reuse value but the tail has poor return once transfer and stitching overhead
+are considered. The recompute action remains necessary when realization cost
+dominates the saved prefill work.
+
+This framing is important for systems evaluation. A policy that increases
+nominal reuse coverage but also increases transfer volume or startup delay is
+not an optimization. We therefore evaluate the controller with both latency and
+cost-oriented metrics, rather than reuse ratio alone.
+
+This design perspective also sets the paper's evidence boundary. A strong
+offline result means the decision rule is plausible under workload-grounded
+cost assumptions. It does not automatically imply an end-to-end serving gain
+until the same rule is tested through the live vLLM plugin path. Conversely, a
+live run that only observes decisions without enforcing them is useful for
+validating workload entry, prompt geometry, and service-side constraints, but
+it is not yet evidence that the controller changed runtime behavior.
+
+\section{Methodology}
+The corrected methodology for this paper is straightforward: all main
+experiments should run on the same 7B model, Qwen2.5-7B-Instruct, under a
+single controlled vLLM serving environment. Shared workloads still enter from
+\texttt{llm-serving-workloads}, but the reported latency and throughput numbers
+should come from live model execution rather than from a separate model-agnostic
+cost proxy.
+
+This correction matters because request-arrival materialization is inherently
+model-coupled. The recomputation cost of a prefix, the effective TTFT regime,
+and the observed penalty of larger prompt contexts all depend on the serving
+stack and the deployed model. A trace-driven estimator may still be useful as
+development scaffolding, but it is not sufficient evidence for the final paper
+if the paper's claims are framed around a concrete 7B deployment.
+
+We compare fixed baselines that always recompute, always fully reuse, or apply
+a simple thresholded partial policy. We then evaluate an adaptive heuristic
+controller that estimates whether realization cost is justified. To bound the
+available policy headroom, we also report an oracle selector over the same
+three-action space. Finally, we include cost-misestimation sensitivity variants
+to test whether the heuristic remains stable when the runtime's cost model is
+inaccurate.
+
+The primary metrics are mean and tail TTFT, recomputed prompt tokens, and KV
+bytes realized or transferred. Together these metrics distinguish beneficial
+reuse from expensive reuse.
+
+\subsection{Workload Source of Truth}
+The study deliberately enters through the sibling
+\texttt{llm-serving-workloads} repository rather than a repo-local toy
+catalog. This keeps workload construction policy-neutral and prevents the paper
+from baking a one-off benchmark family directly into the optimization artifact.
+
+\subsection{Baselines}
+The baseline set is intentionally simple and interpretable: always recompute,
+always full reuse, and a fixed threshold-based partial policy. The adaptive
+heuristic is then compared against these baselines, while an oracle selector is
+used only to estimate remaining headroom within the same three-action space.
+
+\subsection{Current Evidence Scope}
+The repository currently contains two incomplete evidence layers: a 15-workload
+offline decision study and a live Qwen2.5-7B-Instruct evaluation stack. The
+offline study is still model-agnostic and therefore remains development
+scaffolding rather than final paper evidence. The live stack is now split into
+two phases. First, the repository contains a full 15-workload live sweep that
+enters through \texttt{llm-serving-workloads} and executes against a controlled
+Qwen2.5-7B-Instruct vLLM endpoint, but that sweep was collected under an
+observe-only path that logs decisions without enforcing them. Second, the
+repository now contains a stronger runtime seam that injects prefix-cache
+control into the local vLLM path: \texttt{full\_reuse} receives a stable
+anchor-scoped \texttt{cache\_salt}, \texttt{recompute} receives a unique
+request-scoped \texttt{cache\_salt}, and \texttt{partial\_reuse} is logged as
+unsupported and explicitly degraded to anchor-scoped full reuse on the current
+unmodified local path.
+
+This state is stronger than the earlier draft because runtime behavior is no
+longer purely hypothetical for the binary cases. It is still not the final
+three-action artifact claim, because exact online \texttt{partial\_reuse}
+would require a deeper runtime mechanism than the local prefix-cache seam
+currently provides.
+
+\section{Live 7B Evaluation Status}
+The corrected paper should be anchored on live experiments using a single
+controlled Qwen2.5-7B-Instruct deployment. The repository now satisfies that
+requirement at the evaluation-entry level: the canonical workload source of
+truth remains \texttt{llm-serving-workloads}, while the serving endpoint is a
+locally controlled vLLM instance configured specifically for this artifact.
+
+The checked-in live sweep covers 15 shared workload cases and 800 requests in
+total. Of these, 306 requests completed successfully and 494 failed before
+generation. The dominant failure mode was not server instability or plugin
+crash, but prompt-plus-output requests that exceeded the conservative
+\texttt{--max-model-len 8192} cap used by the current vLLM live deployment.
+Qwen2.5-7B-Instruct itself supports a larger context window, so this boundary
+should be interpreted as a property of the present serving configuration rather
+than of the model family. This matters for the
+paper's systems interpretation: the workload suite is broad enough to expose
+materialization opportunities, but it also exposes a deployment boundary that
+must be normalized before cross-workload TTFT comparisons are treated as final
+controller evidence.
+
+The live sweep therefore serves two concrete purposes. First, it validates that
+the workload suite can be driven from the shared workload repository through a
+single 7B serving stack instead of through disconnected repo-local scripts.
+Second, it reveals which workload families must be truncated, filtered, or run
+under a larger context configuration before the full matrix becomes a clean
+apples-to-apples policy comparison.
+
+\subsection{Runtime Control Status}
+The plugin is no longer limited to observe-only logging. On the current local
+vLLM path, the runtime hook now realizes two control outcomes directly through
+prefix-cache partitioning. For \texttt{full\_reuse}, requests sharing the same
+anchor receive a stable anchor-scoped \texttt{cache\_salt}, which allows reuse
+within that anchor's prefix-cache domain. For \texttt{recompute}, each request
+receives a unique request-scoped \texttt{cache\_salt}, which forces the prompt
+to bypass previously reusable prefix-cache state.
+
+The important limitation is \texttt{partial\_reuse}. The unmodified local
+prefix-cache seam cannot express an exact cutoff that materializes only a
+prefix segment while recomputing the suffix. Rather than hiding that gap, the
+plugin logs it explicitly: when the policy selects \texttt{partial\_reuse}, the
+runtime records the decision as unsupported on this path and degrades the
+effective online action to anchor-scoped \texttt{full\_reuse}. A focused smoke
+run on the shared session-affine multi-turn workload confirms that these
+runtime fields are emitted and that the controlled path is active online.
+
+This distinction is essential for paper truthfulness. The repository now has a
+real online control path for two of the three actions, but it does not yet have
+an end-to-end implementation of the full three-action materialization surface.
+Accordingly, the manuscript should describe the current system as a prefix-
+cache-integrated stepping stone rather than as a complete realized controller.
 
 \section{Offline Study Snapshot}
-The current repository ships a workload-driven offline study harness. On three
-representative cases derived from the shared \texttt{llm-serving-workloads}
-repository, the heuristic policy achieves mean TTFT \HeuristicMeanTTFT ms and
-p95 TTFT \HeuristicPNineFiveTTFT ms. The oracle action selector reaches mean
-TTFT \OracleMeanTTFT ms and p95 TTFT \OraclePNineFiveTTFT ms, which gives a
-useful upper bound on the remaining policy headroom while keeping the action
-space fixed to full reuse, partial reuse, and recompute.
+The checked-in offline study is best interpreted as preliminary development
+scaffolding rather than final paper evidence. It is useful for stress-testing
+the decision interface, checking workload coverage, and identifying scenarios
+where partial materialization might matter. It should not be presented as the
+main quantitative result section if the final paper standard is ``all
+experiments on Qwen2.5-7B-Instruct.''
 
-\input{experiments/results/latest/offline_summary_table.tex}
+Accordingly, the corrected manuscript should treat the offline study as a
+preparatory artifact and reserve the main evaluation section for live 7B-model
+results over the full shared workload suite.
 
-\section{Plan}
-We compare full reuse, partial reuse, and recompute across workload families
-with strong state locality. The current repository step is workload-carrier
-evaluation through the shared \texttt{llm-serving-workloads} repository, with
-oracle and cost-misestimation sensitivity baselines added around the main
-heuristic. The next step is to wire the same decision interface into a vLLM
-plugin hook and validate online TTFT behavior.
+\section{Artifact Boundary}
+This repository intentionally separates two evidence modes. The offline study is
+used to develop and debug the decision surface under controlled workload
+families. The online plugin path is the only acceptable source of final paper
+claims once the paper is written as a concrete 7B-model serving artifact. We do
+not present offline oracle results as deployed gains, and we do not treat the
+existence of reusable state as proof that materialization is beneficial.
 
-\section{Initial Contributions}
+\section{Current Contributions}
 \begin{enumerate}[leftmargin=1.5em]
-\item A standalone repository that packages the policy, experiment harness,
-and paper artifacts together.
-\item A first offline study pipeline that emits paper-consumable summaries.
-\item A narrow plugin target centered on request-arrival materialization
-instead of placement or eviction.
+\item A precise systems formulation of request-arrival KV materialization as a
+three-action control problem.
+\item A workload-driven evaluation protocol that keeps the workload source of
+truth in \texttt{llm-serving-workloads} while requiring final claims to be
+produced on a single 7B model.
+\item An explicit evidence boundary separating development-stage offline
+decision analysis, observe-only live workload validation, and runtime-enforced
+online control evidence.
+\item A narrow out-of-tree vLLM plugin target centered on materialization
+control rather than scheduler, placement, or eviction redesign, with an online
+prefix-cache seam that already realizes \texttt{full\_reuse} and
+\texttt{recompute} on the local controlled path.
 \end{enumerate}
 
-\bibliographystyle{plain}
+\section{Limitations and Next Step}
+The current paper state is closer to experimental validity than the earlier
+draft, but it still falls short of a final systems-paper standard. The runtime
+plugin now changes live vLLM behavior for \texttt{full\_reuse} and
+\texttt{recompute}, yet exact online \texttt{partial\_reuse} is still missing.
+In addition, the full 15-workload live sweep exposed substantial request
+rejections under the current conservative vLLM serving envelope, which fixed
+\texttt{--max-model-len} at 8192 and therefore under-ran the model's native
+context capability. The raw sweep cannot yet be presented as a clean final
+comparison table. The next
+milestones are therefore concrete:
+
+\begin{enumerate}[leftmargin=1.5em]
+\item implement a deeper runtime path, likely via a custom KV materialization
+or connector seam, that can realize exact online \texttt{partial\_reuse}
+rather than degrading it to anchor-scoped full reuse;
+\item normalize the 15-workload live matrix for the 7B deployment by resolving
+context-window violations through workload trimming or a matched serving
+configuration; and
+\item rerun the full shared workload suite under the runtime-enforced control
+path so every main evaluation claim in the paper comes from a unified live 7B
+experiment matrix rather than from observe-only instrumentation.
+\end{enumerate}
+
+\bibliographystyle{IEEEtran}
 \bibliography{kv_materialization_control}
 
 \end{document}

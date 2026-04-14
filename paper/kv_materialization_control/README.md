@@ -3,6 +3,11 @@
 This directory contains the paper skeleton and experiment notes for the vLLM KV
 materialization project.
 
+The workspace now supports two evidence modes from the same paper tree:
+
+- experimental mode: offline shared-workload study
+- optimization mode: live shared-workload benchmark over the out-of-tree plugin
+
 Primary claim direction:
 
 - reusable state is not free to realize
@@ -14,7 +19,7 @@ Primary claim direction:
 From the repository root:
 
 ```bash
-make experiment
+make study-experiment
 make pdf
 ```
 

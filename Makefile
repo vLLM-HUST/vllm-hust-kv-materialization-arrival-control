@@ -11,6 +11,8 @@ SHARED_ENV_SCRIPT ?= /home/shuhao/llm-optimizations/scripts/bootstrap_shared_env
 SHARED_SOURCE_ENV ?= llm-optimizations
 SHARED_ENV_NAME ?= $(CONDA_ENV)
 BOOTSTRAP_ENV ?= bash scripts/setup_repo_env.sh
+WORKLOAD_REPO ?= $(abspath $(CURDIR)/../llm-serving-workloads)
+SHARED_WORKLOAD_RESULTS_DIR ?= .benchmarks/results
 
 PACKAGE_IMPORT := vllm_kv_materialization
 BENCH_DIR := paper/kv_materialization_control/experiments
@@ -18,7 +20,7 @@ PAPER_DIR := paper/kv_materialization_control
 
 .DEFAULT_GOAL := help
 
-.PHONY: help bootstrap-env bootstrap-shared-env install-dev smoke test lint format build bench paper offline-experiment experiment paper-experiment live-benchmark pdf paper-pdf evidence clean
+.PHONY: help bootstrap-env bootstrap-shared-env install-dev smoke test shared-workloads-smoke shared-workloads-test lint format build bench paper offline-experiment experiment study-experiment shared-workloads-offline paper-experiment live-benchmark shared-workloads-live optimization-live pdf paper-pdf evidence clean
 
 help:
 	@printf '%s\n' \
@@ -27,9 +29,14 @@ help:
 		'  make install-dev  Install the package in editable mode with dev extras' \
 		'  make smoke        Import-check the top-level package' \
 		'  make test         Run the unit test suite' \
-		'  make offline-experiment  Run the offline materialization policy harness' \
-		'  make experiment   Run the paper offline study pipeline and refresh latest results' \
-		'  make live-benchmark MODEL=<model> [WORKLOAD=short_low]  Run a real-model endpoint benchmark' \
+		'  make shared-workloads-smoke Emit a generic shared workload compatibility report under .benchmarks/results' \
+		'  make shared-workloads-test  Run unit tests plus the shared workload compatibility report' \
+		'  make offline-experiment  Run the tiny policy harness' \
+		'  make study-experiment  Run the workload-driven experimental-paper pipeline' \
+		'  make experiment   Alias of make study-experiment' \
+		'  make shared-workloads-offline [WORKLOAD_CASES="..."]  Run shared workload cases through the offline study pipeline' \
+		'  make shared-workloads-live MODEL=<model> [WORKLOAD_CASE=<case>]  Run a shared-workload live benchmark' \
+		'  make optimization-live MODEL=<model> [WORKLOAD_CASE=<case>]  Alias of make shared-workloads-live' \
 		'  make pdf          Build the paper PDF after refreshing latest offline-study results' \
 		'  make evidence     Print the latest study summary paths' \
 		'  make lint         Run ruff checks' \
@@ -49,6 +56,11 @@ bootstrap-shared-env:
 	$(SHARED_ENV_SCRIPT) --profile generic --source-env '$(SHARED_SOURCE_ENV)' --repo-root "$$PWD" --env-name '$(SHARED_ENV_NAME)'
 
 install-dev:
+	@if [ -f '$(WORKLOAD_REPO)/pyproject.toml' ]; then \
+		$(PIP) install -e '$(WORKLOAD_REPO)'; \
+	else \
+		printf 'Skipping sibling llm-serving-workloads install: %s\n' '$(WORKLOAD_REPO)'; \
+	fi
 	$(PIP) install -e ".[dev]"
 
 smoke:
@@ -57,16 +69,33 @@ smoke:
 test:
 	$(PYTEST)
 
+shared-workloads-smoke:
+	@mkdir -p '$(SHARED_WORKLOAD_RESULTS_DIR)'
+	PYTHONPATH='$(WORKLOAD_REPO)/src:src' $(PYTHON) -m llm_serving_workloads.shared_workload_smoke \
+		--output-json '$(SHARED_WORKLOAD_RESULTS_DIR)/shared_workloads_smoke.json' \
+		--output-markdown '$(SHARED_WORKLOAD_RESULTS_DIR)/shared_workloads_smoke.md'
+
+shared-workloads-test: test shared-workloads-smoke
+
 offline-experiment:
 	PYTHONPATH=src $(PYTHON) -m vllm_kv_materialization.offline_experiment --policy heuristic --pretty
 
-experiment: paper-experiment
+study-experiment: shared-workloads-offline
+
+experiment: study-experiment
+
+shared-workloads-offline:
+	$(MAKE) -C $(PAPER_DIR) experiment PYTHON='$(PYTHON)' WORKLOAD_CASES='$(WORKLOAD_CASES)'
 
 paper-experiment:
 	$(MAKE) -C $(PAPER_DIR) experiment PYTHON='$(PYTHON)'
 
 live-benchmark:
-	$(MAKE) -C $(PAPER_DIR) live-benchmark PYTHON='$(PYTHON)' MODEL='$(MODEL)' WORKLOAD='$(WORKLOAD)'
+	$(MAKE) -C $(PAPER_DIR) live-benchmark PYTHON='$(PYTHON)' MODEL='$(MODEL)' WORKLOAD_CASE='$(WORKLOAD_CASE)' BASE_URL='$(BASE_URL)' REQUEST_RATE='$(REQUEST_RATE)' CONCURRENCY='$(CONCURRENCY)' SEED='$(SEED)' LABEL='$(LABEL)'
+
+shared-workloads-live: live-benchmark
+
+optimization-live: shared-workloads-live
 
 pdf: paper-pdf
 

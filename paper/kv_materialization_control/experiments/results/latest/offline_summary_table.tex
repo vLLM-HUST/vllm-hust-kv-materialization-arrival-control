@@ -1,15 +1,17 @@
 \begin{table}[t]
 \centering
+\setlength{\tabcolsep}{3pt}
+\footnotesize
 \caption{Offline study snapshot on workload-driven traces derived from llm-serving-workloads.}
-\begin{tabular}{lrrrr}
+\begin{tabular}{@{}lrrrr@{}}
 \toprule
-Policy & Mean TTFT & P95 TTFT & Mean recompute tok & Mean transfer KiB \\ 
+Policy & Mean & P95 & Recomp. & Xfer KiB \\ 
 \midrule
-always recompute & 12.847 & 24.286 & 620.76 & 0.0 \\
-always full reuse & 8.384 & 22.161 & 0 & 19864.333 \\
-threshold partial & 11.371 & 22.161 & 384.344 & 7565.333 \\
-heuristic & 8.411 & 22.161 & 1.083 & 19829.667 \\
-oracle ttft & 8.384 & 22.161 & 0 & 19864.333 \\
+always recompute & 18.982 & 61.033 & 893.827 & 0.0 \\
+always full reuse & 10.532 & 32.45 & 0 & 28602.48 \\
+threshold partial & 15.871 & 37.431 & 488.98 & 12955.12 \\
+heuristic & 11.525 & 34.532 & 20.723 & 27939.36 \\
+oracle ttft & 10.532 & 32.45 & 0 & 28602.48 \\
 \bottomrule
 \end{tabular}
 \end{table}

@@ -1,0 +1,15 @@
+{
+  "completed": 32,
+  "concurrency": 4,
+  "dataset_name": "session-affine-multi-turn",
+  "failures": [],
+  "mean_latency_ms": 263797.013,
+  "output_throughput_toks": 0.97,
+  "p95_latency_ms": 265539.554,
+  "request_rate": 24.0,
+  "request_throughput_rps": 0.015,
+  "requests": 32,
+  "workload_case": "shared_scenario_multi_turn_knowledge_service",
+  "workload_family": "session-affine-multi-turn",
+  "workload_label": "Scenario: multi-turn knowledge service"
+}

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import sys
 from dataclasses import asdict
 from dataclasses import replace
 from pathlib import Path
@@ -11,17 +10,11 @@ from statistics import mean
 from vllm_kv_materialization.policy import MaterializationDecision
 from vllm_kv_materialization.policy import MaterializationPolicy
 from vllm_kv_materialization.policy import MaterializationSignals
+from vllm_kv_materialization.shared_workloads import generate_case_requests
+from vllm_kv_materialization.shared_workloads import load_workloads_module
 
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
-WORKLOADS_SRC = REPO_ROOT.parent / "llm-serving-workloads" / "src"
-
-if WORKLOADS_SRC.is_dir() and str(WORKLOADS_SRC) not in sys.path:
-    sys.path.insert(0, str(WORKLOADS_SRC))
-
-from llm_serving_workloads import SHARED_BENCHMARK_CASE_CATALOG
-from llm_serving_workloads import generate_repo_local_workload_requests
-from llm_serving_workloads import normalize_repo_local_metadata
+WORKLOADS = load_workloads_module()
 
 
 CORE_POLICIES = (
@@ -38,14 +31,6 @@ SENSITIVITY_POLICIES = (
     "heuristic_recompute_underestimated",
     "heuristic_recompute_overestimated",
 )
-
-
-class WhitespaceTokenizer:
-    def encode(self, text: str, add_special_tokens: bool = False) -> list[str]:
-        del add_special_tokens
-        return text.split()
-
-
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Run the offline KV materialization study and emit paper-facing summaries."
@@ -76,22 +61,10 @@ def load_traces(path: Path) -> list[dict]:
 
 
 def workload_case_to_traces(case_id: str, *, seed: int) -> list[dict]:
-    if case_id not in SHARED_BENCHMARK_CASE_CATALOG:
+    if case_id not in WORKLOADS.SHARED_BENCHMARK_CASE_CATALOG:
         raise ValueError(f"unknown workload case: {case_id}")
 
-    case = dict(SHARED_BENCHMARK_CASE_CATALOG[case_id])
-    requests = generate_repo_local_workload_requests(
-        dataset_name=str(case["dataset_name"]),
-        tokenizer=WhitespaceTokenizer(),
-        dp_size=int(case.get("dp_size", 8)),
-        num_prompts=int(case.get("num_prompts", int(case["num_groups"]) * int(case["prompts_per_group"]))),
-        num_groups=int(case["num_groups"]),
-        system_prompt_len=int(case["system_prompt_len"]),
-        question_len=int(case["question_len"]),
-        output_len=int(case["output_len"]),
-        seed=seed,
-        **dict(case.get("benchmark_kwargs", {})),
-    )
+    requests = generate_case_requests(case_id, seed=seed)
 
     traces: list[dict] = []
     seen_primary: set[str] = set()
@@ -99,7 +72,7 @@ def workload_case_to_traces(case_id: str, *, seed: int) -> list[dict]:
     rank_counts: dict[int, int] = {}
 
     for index, request in enumerate(requests):
-        metadata = normalize_repo_local_metadata(request.repo_local_metadata)
+        metadata = WORKLOADS.normalize_repo_local_metadata(request.repo_local_metadata)
         secondary_seen = len(set(metadata.secondary_anchor_ids) & seen_secondary)
         secondary_total = max(len(metadata.secondary_anchor_ids), 1)
         overlap_ratio = secondary_seen / secondary_total
@@ -332,10 +305,12 @@ def render_table_tex(summary: dict) -> str:
     return (
         "\\begin{table}[t]\n"
         "\\centering\n"
+        "\\setlength{\\tabcolsep}{3pt}\n"
+        "\\footnotesize\n"
         "\\caption{Offline study snapshot on workload-driven traces derived from llm-serving-workloads.}\n"
-        "\\begin{tabular}{lrrrr}\n"
+        "\\begin{tabular}{@{}lrrrr@{}}\n"
         "\\toprule\n"
-        "Policy & Mean TTFT & P95 TTFT & Mean recompute tok & Mean transfer KiB \\\\ \n"
+        "Policy & Mean & P95 & Recomp. & Xfer KiB \\\\ \n"
         "\\midrule\n"
         f"{body}\n"
         "\\bottomrule\n"

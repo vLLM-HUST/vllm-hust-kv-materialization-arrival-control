@@ -13,8 +13,14 @@ The target question is deliberately narrow:
 The repository is structured to support two phases of work in one place:
 
 - an experimental study on reuse-benefit versus materialization-overhead
-- a future out-of-tree vLLM plugin that installs through
+- an optimization-facing out-of-tree vLLM plugin that installs through
   `vllm.general_plugins`
+
+The intended repository shape now mirrors the `sglang-dp-locality-plugin`
+pattern in this workspace: one repository carries the workload-grounded study,
+the out-of-tree optimization path, and the paper assets together, while shared
+scenario inputs enter from `llm-serving-workloads` rather than from repo-local
+benchmark copies.
 
 ## Upstream Safety Workflow
 
@@ -61,6 +67,22 @@ The current action space is:
 - `partial_reuse`
 - `recompute`
 
+## Dual Paper Modes
+
+This repository is now organized to support two paper surfaces without splitting
+the artifact:
+
+- experimental paper mode: workload-driven offline study over shared scenario
+  cases from `llm-serving-workloads`, focused on the decision surface and cost
+  tradeoffs of `full_reuse`, `partial_reuse`, and `recompute`
+- optimization paper mode: the same repository ships an installable vLLM plugin
+  boundary plus shared-workload live benchmarks that evaluate whether the policy
+  can be turned into an actual serving optimization
+
+The policy logic stays in one place, but the evaluation surface is explicit
+about whether a result is study-side evidence or runtime-facing optimization
+evidence.
+
 ## Repository Layout
 
 ```text
@@ -98,12 +120,30 @@ make bootstrap-env
 make install-dev
 make smoke
 make test
-make offline-experiment
-make experiment
-make live-benchmark MODEL=/home/shuhao/shared-models/Qwen2.5-7B-Instruct
+make shared-workloads-smoke
+make shared-workloads-test
+make study-experiment
+make shared-workloads-offline
+make shared-workloads-live MODEL=/home/shuhao/shared-models/Qwen2.5-7B-Instruct
 make pdf
 make paper
 make build
+```
+
+`shared-workloads-smoke` writes the standardized generic compatibility report
+under `.benchmarks/results`, while `shared-workloads-test` combines that report
+with the repository's unit test suite.
+
+Preferred shared-workload entry from the workload repository:
+
+```bash
+cd /home/shuhao/llm-serving-workloads
+make kv-materialization-study
+make kv-materialization-live \
+  BASE_URL=https://api.sage.org.ai/v1 \
+  OPENAI_API_KEY=<token> \
+  MODEL=/home/shuhao/shared-models/Qwen2.5-7B-Instruct \
+  WORKLOAD_CASE=shared_scenario_multi_turn_knowledge_service
 ```
 
 ## Usage
@@ -129,15 +169,31 @@ bash scripts/setup_repo_env.sh
 Run the paper-side study pipeline and build the PDF:
 
 ```bash
-make experiment
+make study-experiment
 make pdf
 ```
 
 Run a real-model benchmark once a vLLM environment and model path are available:
 
 ```bash
-make live-benchmark MODEL=/home/shuhao/shared-models/Qwen2.5-7B-Instruct WORKLOAD=short_low
+make shared-workloads-live \
+  BASE_URL=https://api.sage.org.ai/v1 \
+  OPENAI_API_KEY=<token> \
+  MODEL=/home/shuhao/shared-models/Qwen2.5-7B-Instruct \
+  WORKLOAD_CASE=shared_scenario_multi_turn_knowledge_service
 ```
+
+When launching a local vLLM server through
+`paper/kv_materialization_control/experiments/launch_vllm_kv_materialization_server.sh`,
+leave `MAX_MODEL_LEN` unset if you want the launcher to derive the default
+context window from `llm-serving-workloads` using `WORKLOAD_CASE`. The current
+shared workload catalog recommends `32768` for the Qwen2.5-7B-Instruct-centered
+workspace. Set `MAX_MODEL_LEN` manually only when you intentionally want a
+smaller serving envelope.
+
+For OpenAI-compatible remote endpoints, `BASE_URL` may be either the server root
+or a path that already ends with `/v1`. The live driver now normalizes both
+forms and forwards `OPENAI_API_KEY` plus `OPENAI_HTTP_USER_AGENT` when present.
 
 ## Paper And Experiments
 
@@ -157,6 +213,11 @@ The default offline study now derives representative workload cases from the
 sibling `llm-serving-workloads` repository instead of relying only on the
 checked-in sample JSONL, and it reports an oracle upper bound plus heuristic
 cost-misestimation sensitivity results alongside the main baselines.
+
+The live benchmark path now consumes named shared benchmark cases from
+`llm-serving-workloads` as well. The previous repo-local `short_low` and
+`long_medium` presets remain only as deprecated aliases inside the driver for
+compatibility.
 
 The live benchmark path writes endpoint results under:
 
@@ -179,3 +240,10 @@ Its question is orthogonal:
 
 That gives a single-hook policy problem with a moderate action space and a
 clean path from study to plugin.
+
+## Shared Workload Entry Convention
+
+All workload-driven tests for this repository should enter from
+`llm-serving-workloads` or through this repository's `shared-workloads-*`
+targets that are explicitly wired to that package. The repository should not
+grow a second local workload catalog.

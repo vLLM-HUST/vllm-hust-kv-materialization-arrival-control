@@ -17,6 +17,13 @@ Default offline pipeline:
 	- `shared_scenario_rag_followup_long_context`
 	- `shared_scenario_structured_agent_decode`
 
+Default live pipeline:
+
+- uses the same shared benchmark case catalog from `llm-serving-workloads`
+- defaults to `shared_scenario_multi_turn_knowledge_service`
+- can be launched either from this repository or from `llm-serving-workloads`
+  via `make kv-materialization-live`
+
 Primary metrics:
 
 - TTFT

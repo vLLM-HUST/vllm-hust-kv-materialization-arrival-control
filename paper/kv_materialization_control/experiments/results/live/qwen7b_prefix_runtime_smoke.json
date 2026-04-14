@@ -1,0 +1,15 @@
+{
+  "completed": 64,
+  "concurrency": 8,
+  "dataset_name": "session-affine-multi-turn",
+  "failures": [],
+  "mean_latency_ms": 2701.848,
+  "output_throughput_toks": 281.613,
+  "p95_latency_ms": 4938.308,
+  "request_rate": 24.0,
+  "request_throughput_rps": 2.933,
+  "requests": 64,
+  "workload_case": "shared_session_affine_multi_turn",
+  "workload_family": "session-affine-multi-turn",
+  "workload_label": "Shared workload: session-affine multi-turn"
+}

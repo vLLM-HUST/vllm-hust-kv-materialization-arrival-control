@@ -1,0 +1,15 @@
+{
+  "completed": 32,
+  "concurrency": 2,
+  "dataset_name": "sharegpt",
+  "failures": [],
+  "mean_latency_ms": 801.82,
+  "output_throughput_toks": 159.423,
+  "p95_latency_ms": 976.82,
+  "request_rate": 16.0,
+  "request_throughput_rps": 2.491,
+  "requests": 32,
+  "workload_case": "shared_public_sharegpt_boundary",
+  "workload_family": "sharegpt-public-boundary",
+  "workload_label": "Public boundary: ShareGPT conversation mix"
+}

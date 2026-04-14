@@ -1,0 +1,15 @@
+{
+  "completed": 32,
+  "concurrency": 4,
+  "dataset_name": "tool-scaffold-agent",
+  "failures": [],
+  "mean_latency_ms": 1819.455,
+  "output_throughput_toks": 280.104,
+  "p95_latency_ms": 2022.894,
+  "request_rate": 18.0,
+  "request_throughput_rps": 2.188,
+  "requests": 32,
+  "workload_case": "shared_scenario_structured_agent_decode",
+  "workload_family": "tool-scaffold-agent",
+  "workload_label": "Scenario: structured agent decode"
+}
