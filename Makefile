@@ -20,7 +20,7 @@ PAPER_DIR := paper/kv_materialization_control
 
 .DEFAULT_GOAL := help
 
-.PHONY: help bootstrap-env bootstrap-shared-env install-dev smoke test shared-workloads-smoke shared-workloads-test lint format build bench paper offline-experiment experiment study-experiment shared-workloads-offline paper-experiment live-benchmark shared-workloads-live optimization-live pdf paper-pdf evidence clean
+.PHONY: help bootstrap-env bootstrap-shared-env install-dev smoke test shared-workloads-smoke shared-workloads-test lint format build bench paper offline-experiment experiment decision-study study-experiment shared-workloads-offline paper-experiment runtime-boundary-live live-benchmark shared-workloads-live optimization-live pdf paper-pdf evidence clean
 
 help:
 	@printf '%s\n' \
@@ -32,11 +32,13 @@ help:
 		'  make shared-workloads-smoke Emit a generic shared workload compatibility report under .benchmarks/results' \
 		'  make shared-workloads-test  Run unit tests plus the shared workload compatibility report' \
 		'  make offline-experiment  Run the tiny policy harness' \
-		'  make study-experiment  Run the workload-driven experimental-paper pipeline' \
-		'  make experiment   Alias of make study-experiment' \
-		'  make shared-workloads-offline [WORKLOAD_CASES="..."]  Run shared workload cases through the offline study pipeline' \
-		'  make shared-workloads-live MODEL=<model> [WORKLOAD_CASE=<case>]  Run a shared-workload live benchmark' \
-		'  make optimization-live MODEL=<model> [WORKLOAD_CASE=<case>]  Alias of make shared-workloads-live' \
+		'  make decision-study [WORKLOAD_CASES="..."]  Run the workload-driven arrival-time decision study' \
+		'  make study-experiment  Compatibility alias of make decision-study' \
+		'  make experiment   Compatibility alias of make decision-study' \
+		'  make shared-workloads-offline [WORKLOAD_CASES="..."]  Compatibility alias of make decision-study' \
+		'  make runtime-boundary-live MODEL=<model> [WORKLOAD_CASE=<case>]  Run the live runtime-boundary benchmark' \
+		'  make shared-workloads-live MODEL=<model> [WORKLOAD_CASE=<case>]  Compatibility alias of make runtime-boundary-live' \
+		'  make optimization-live MODEL=<model> [WORKLOAD_CASE=<case>]  Compatibility alias of make runtime-boundary-live' \
 		'  make pdf          Build the paper PDF after refreshing latest offline-study results' \
 		'  make evidence     Print the latest study summary paths' \
 		'  make lint         Run ruff checks' \
@@ -80,22 +82,26 @@ shared-workloads-test: test shared-workloads-smoke
 offline-experiment:
 	PYTHONPATH=src $(PYTHON) -m vllm_kv_materialization.offline_experiment --policy heuristic --pretty
 
-study-experiment: shared-workloads-offline
+decision-study:
+	$(MAKE) -C $(PAPER_DIR) decision-study PYTHON='$(PYTHON)' WORKLOAD_CASES='$(WORKLOAD_CASES)'
 
-experiment: study-experiment
+study-experiment: decision-study
 
-shared-workloads-offline:
-	$(MAKE) -C $(PAPER_DIR) experiment PYTHON='$(PYTHON)' WORKLOAD_CASES='$(WORKLOAD_CASES)'
+experiment: decision-study
+
+shared-workloads-offline: decision-study
 
 paper-experiment:
-	$(MAKE) -C $(PAPER_DIR) experiment PYTHON='$(PYTHON)'
+	$(MAKE) -C $(PAPER_DIR) decision-study PYTHON='$(PYTHON)'
 
-live-benchmark:
-	$(MAKE) -C $(PAPER_DIR) live-benchmark PYTHON='$(PYTHON)' MODEL='$(MODEL)' WORKLOAD_CASE='$(WORKLOAD_CASE)' BASE_URL='$(BASE_URL)' REQUEST_RATE='$(REQUEST_RATE)' CONCURRENCY='$(CONCURRENCY)' SEED='$(SEED)' LABEL='$(LABEL)'
+runtime-boundary-live:
+	$(MAKE) -C $(PAPER_DIR) runtime-boundary-live PYTHON='$(PYTHON)' MODEL='$(MODEL)' WORKLOAD_CASE='$(WORKLOAD_CASE)' BASE_URL='$(BASE_URL)' REQUEST_RATE='$(REQUEST_RATE)' CONCURRENCY='$(CONCURRENCY)' SEED='$(SEED)' LABEL='$(LABEL)'
 
-shared-workloads-live: live-benchmark
+live-benchmark: runtime-boundary-live
 
-optimization-live: shared-workloads-live
+shared-workloads-live: runtime-boundary-live
+
+optimization-live: runtime-boundary-live
 
 pdf: paper-pdf
 

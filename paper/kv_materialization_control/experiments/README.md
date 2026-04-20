@@ -1,30 +1,65 @@
 # Experiment Notes
 
-Planned comparison surface:
+This artifact has two experiment paths, and they mean different things.
 
-- baseline: always recompute
-- baseline: always full reuse
-- baseline: fixed-threshold partial reuse
-- candidate: adaptive heuristic policy
-- baseline: oracle upper bound over the same three-action space
-- sensitivity: transfer and recompute cost misestimation around the heuristic
+## Decision Study
 
-Default offline pipeline:
+Canonical entry:
 
-- uses shared workload cases from `llm-serving-workloads`
-- current representative cases:
-	- `shared_scenario_multi_turn_knowledge_service`
-	- `shared_scenario_rag_followup_long_context`
-	- `shared_scenario_structured_agent_decode`
+```bash
+make decision-study
+```
 
-Default live pipeline:
+This path compares:
 
-- uses the same shared benchmark case catalog from `llm-serving-workloads`
-- defaults to `shared_scenario_multi_turn_knowledge_service`
-- can be launched either from this repository or from `llm-serving-workloads`
-  via `make kv-materialization-live`
+- `always_recompute`
+- `always_full_reuse`
+- `threshold_partial`
+- `heuristic`
+- `oracle_ttft`
+- heuristic cost-misestimation sensitivity variants
 
-Primary metrics:
+The default shared-workload matrix comes from `llm-serving-workloads` and now
+includes:
+
+- `shared_scenario_multi_turn_knowledge_service`
+- `shared_scenario_rag_followup_long_context`
+- `shared_scenario_structured_agent_decode`
+- `shared_prefix_multi_tenant_assistant`
+- `session_continuation_with_maintenance`
+- `dynamic_rag_corpus_update`
+
+Those cases give one matrix with exact continuation, long-context retrieval,
+schema-heavy structured decode, prefix-rich multi-tenancy, long-context
+continuation, and dynamic retrieval follow-up.
+
+Truthfulness boundary:
+
+- safe claim: how the three-action arrival-time decision surface behaves under
+	workload-grounded cost assumptions
+- unsafe claim: live serving improvement or complete runtime realization of all
+	three actions
+
+## Runtime Boundary Live
+
+Canonical entry:
+
+```bash
+make runtime-boundary-live MODEL=/home/shuhao/shared-models/Qwen2.5-7B-Instruct \
+	WORKLOAD_CASE=shared_prefix_multi_tenant_assistant
+```
+
+This path uses the same shared workload catalog but answers a different
+question: what can the current runtime seam realize online?
+
+Current truthful live interpretation:
+
+- `full_reuse`: supported
+- `recompute`: supported
+- `partial_reuse`: observed by the policy, but falls back to anchor-scoped
+	`full_reuse` on the current prefix-cache path
+
+## Primary Metrics
 
 - TTFT
 - prefill recompute tokens

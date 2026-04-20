@@ -1,146 +1,123 @@
-# Offline Study Summary
+# Arrival-Time Decision Study Summary
 
-- trace count: 800
-- trace source: llm-serving-workloads
-- workload cases: shared_session_affine_multi_turn, shared_session_affine_bursty, shared_rag_followup, shared_long_context_doc_analysis, shared_tool_scaffold_agent, shared_repo_aware_coding_assistant, shared_experiment_planning_assistant, shared_simulation_analysis_verification, shared_async_document_pipeline, shared_realtime_voice_assistant, shared_synthetic_shared_prefix_microbenchmark, shared_scenario_multi_turn_knowledge_service, shared_scenario_rag_followup_long_context, shared_scenario_structured_agent_decode, shared_public_sharegpt_boundary
+- trace count: 208
+- trace source: llm-serving-workloads shared benchmark catalog
+- workload cases: shared_scenario_multi_turn_knowledge_service, shared_scenario_rag_followup_long_context, shared_scenario_structured_agent_decode, shared_prefix_multi_tenant_assistant, session_continuation_with_maintenance, dynamic_rag_corpus_update
+- claim boundary: offline decision-surface evidence only; no live runtime-gain claim
 
 ## Overall Policies
 
 ## always_recompute
 
-- requests: 800
-- mean TTFT (ms): 18.982
-- p95 TTFT (ms): 61.033
-- mean recompute tokens: 893.827
+- requests: 208
+- mean TTFT (ms): 18.769
+- p95 TTFT (ms): 39.909
+- mean recompute tokens: 918.37
 - mean transferred KiB: 0.0
-- decisions: {'recompute': 800}
+- decisions: {'recompute': 208}
 
 ## always_full_reuse
 
-- requests: 800
-- mean TTFT (ms): 10.532
-- p95 TTFT (ms): 32.45
+- requests: 208
+- mean TTFT (ms): 9.912
+- p95 TTFT (ms): 21.1
 - mean recompute tokens: 0
-- mean transferred KiB: 28602.48
-- decisions: {'recompute': 50, 'full_reuse': 750}
+- mean transferred KiB: 29387.846
+- decisions: {'recompute': 18, 'full_reuse': 190}
 
 ## threshold_partial
 
-- requests: 800
-- mean TTFT (ms): 15.871
-- p95 TTFT (ms): 37.431
-- mean recompute tokens: 488.98
-- mean transferred KiB: 12955.12
-- decisions: {'recompute': 272, 'partial_reuse': 528}
+- requests: 208
+- mean TTFT (ms): 15.449
+- p95 TTFT (ms): 30.99
+- mean recompute tokens: 504.154
+- mean transferred KiB: 13254.923
+- decisions: {'recompute': 78, 'partial_reuse': 130}
 
 ## heuristic
 
-- requests: 800
-- mean TTFT (ms): 11.525
-- p95 TTFT (ms): 34.532
-- mean recompute tokens: 20.723
-- mean transferred KiB: 27939.36
-- decisions: {'recompute': 50, 'full_reuse': 635, 'partial_reuse': 115}
+- requests: 208
+- mean TTFT (ms): 10.782
+- p95 TTFT (ms): 22.161
+- mean recompute tokens: 18.644
+- mean transferred KiB: 28791.231
+- decisions: {'recompute': 18, 'full_reuse': 168, 'partial_reuse': 22}
 
 ## oracle_ttft
 
-- requests: 800
-- mean TTFT (ms): 10.532
-- p95 TTFT (ms): 32.45
+- requests: 208
+- mean TTFT (ms): 9.912
+- p95 TTFT (ms): 21.1
 - mean recompute tokens: 0
-- mean transferred KiB: 28602.48
-- decisions: {'recompute': 50, 'full_reuse': 750}
+- mean transferred KiB: 29387.846
+- decisions: {'recompute': 18, 'full_reuse': 190}
 
 ## heuristic_transfer_underestimated
 
-- requests: 800
-- mean TTFT (ms): 11.525
-- p95 TTFT (ms): 34.532
-- mean recompute tokens: 20.723
-- mean transferred KiB: 27939.36
-- decisions: {'recompute': 50, 'full_reuse': 635, 'partial_reuse': 115}
+- requests: 208
+- mean TTFT (ms): 10.782
+- p95 TTFT (ms): 22.161
+- mean recompute tokens: 18.644
+- mean transferred KiB: 28791.231
+- decisions: {'recompute': 18, 'full_reuse': 168, 'partial_reuse': 22}
 
 ## heuristic_transfer_overestimated
 
-- requests: 800
-- mean TTFT (ms): 11.538
-- p95 TTFT (ms): 34.532
-- mean recompute tokens: 20.927
-- mean transferred KiB: 27932.8
-- decisions: {'recompute': 52, 'full_reuse': 633, 'partial_reuse': 115}
+- requests: 208
+- mean TTFT (ms): 10.782
+- p95 TTFT (ms): 22.161
+- mean recompute tokens: 18.644
+- mean transferred KiB: 28791.231
+- decisions: {'recompute': 18, 'full_reuse': 168, 'partial_reuse': 22}
 
 ## heuristic_recompute_underestimated
 
-- requests: 800
-- mean TTFT (ms): 11.886
-- p95 TTFT (ms): 34.532
-- mean recompute tokens: 62.315
-- mean transferred KiB: 26608.4
-- decisions: {'recompute': 52, 'full_reuse': 599, 'partial_reuse': 149}
+- requests: 208
+- mean TTFT (ms): 10.782
+- p95 TTFT (ms): 22.161
+- mean recompute tokens: 18.644
+- mean transferred KiB: 28791.231
+- decisions: {'recompute': 18, 'full_reuse': 168, 'partial_reuse': 22}
 
 ## heuristic_recompute_overestimated
 
-- requests: 800
-- mean TTFT (ms): 11.525
-- p95 TTFT (ms): 34.532
-- mean recompute tokens: 20.723
-- mean transferred KiB: 27939.36
-- decisions: {'recompute': 50, 'full_reuse': 635, 'partial_reuse': 115}
+- requests: 208
+- mean TTFT (ms): 10.782
+- p95 TTFT (ms): 22.161
+- mean recompute tokens: 18.644
+- mean transferred KiB: 28791.231
+- decisions: {'recompute': 18, 'full_reuse': 168, 'partial_reuse': 22}
 
 ## Per-Case Snapshot
 
-### shared_async_document_pipeline
+### dynamic_rag_corpus_update
 
-- family: async-document-pipeline
-- requests: 80
-- heuristic p95 TTFT (ms): 8.936
-- oracle p95 TTFT (ms): 8.936
-
-### shared_experiment_planning_assistant
-
-- family: experiment-planning-assistant
-- requests: 64
-- heuristic p95 TTFT (ms): 14.964
-- oracle p95 TTFT (ms): 14.964
-
-### shared_long_context_doc_analysis
-
-- family: long-context-doc-analysis
-- requests: 48
-- heuristic p95 TTFT (ms): 59.478
-- oracle p95 TTFT (ms): 59.478
-
-### shared_public_sharegpt_boundary
-
-- family: sharegpt-public-boundary
+- family: dynamic-rag-corpus-update
+- decision role: dynamic_retrieval_followup_surface
 - requests: 32
-- heuristic p95 TTFT (ms): 5.966
-- oracle p95 TTFT (ms): 5.966
+- heuristic p95 TTFT (ms): 27.734
+- oracle p95 TTFT (ms): 21.1
 
-### shared_rag_followup
+### session_continuation_with_maintenance
 
-- family: rag-followup
-- requests: 64
-- heuristic p95 TTFT (ms): 32.45
-- oracle p95 TTFT (ms): 32.45
+- family: session-continuation-maintenance
+- decision role: long_context_continuation_surface
+- requests: 40
+- heuristic p95 TTFT (ms): 8.455
+- oracle p95 TTFT (ms): 7.702
 
-### shared_realtime_voice_assistant
+### shared_prefix_multi_tenant_assistant
 
-- family: realtime-voice-assistant
-- requests: 64
-- heuristic p95 TTFT (ms): 10.147
-- oracle p95 TTFT (ms): 10.147
-
-### shared_repo_aware_coding_assistant
-
-- family: repo-aware-coding-assistant
-- requests: 64
-- heuristic p95 TTFT (ms): 15.512
-- oracle p95 TTFT (ms): 15.512
+- family: shared-prefix-multi-tenant-assistant
+- decision role: prefix_rich_multi_tenant_surface
+- requests: 40
+- heuristic p95 TTFT (ms): 20.265
+- oracle p95 TTFT (ms): 20.265
 
 ### shared_scenario_multi_turn_knowledge_service
 
 - family: session-affine-multi-turn
+- decision role: exact_continuation_baseline
 - requests: 32
 - heuristic p95 TTFT (ms): 5.656
 - oracle p95 TTFT (ms): 5.656
@@ -148,6 +125,7 @@
 ### shared_scenario_rag_followup_long_context
 
 - family: rag-followup
+- decision role: retrieval_followup_long_context_boundary
 - requests: 32
 - heuristic p95 TTFT (ms): 22.161
 - oracle p95 TTFT (ms): 22.161
@@ -155,41 +133,7 @@
 ### shared_scenario_structured_agent_decode
 
 - family: tool-scaffold-agent
+- decision role: mixed_schema_and_transcript_overlap
 - requests: 32
 - heuristic p95 TTFT (ms): 5.264
 - oracle p95 TTFT (ms): 5.264
-
-### shared_session_affine_bursty
-
-- family: session-affine-bursty
-- requests: 64
-- heuristic p95 TTFT (ms): 10.621
-- oracle p95 TTFT (ms): 10.621
-
-### shared_session_affine_multi_turn
-
-- family: session-affine-multi-turn
-- requests: 64
-- heuristic p95 TTFT (ms): 7.655
-- oracle p95 TTFT (ms): 7.655
-
-### shared_simulation_analysis_verification
-
-- family: simulation-analysis-verification
-- requests: 64
-- heuristic p95 TTFT (ms): 10.384
-- oracle p95 TTFT (ms): 10.384
-
-### shared_synthetic_shared_prefix_microbenchmark
-
-- family: synthetic-shared-prefix
-- requests: 32
-- heuristic p95 TTFT (ms): 5.966
-- oracle p95 TTFT (ms): 5.966
-
-### shared_tool_scaffold_agent
-
-- family: tool-scaffold-agent
-- requests: 64
-- heuristic p95 TTFT (ms): 11.632
-- oracle p95 TTFT (ms): 11.632

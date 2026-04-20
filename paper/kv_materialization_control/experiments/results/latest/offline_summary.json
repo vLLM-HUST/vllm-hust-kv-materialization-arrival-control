@@ -1,333 +1,6 @@
 {
   "case_summaries": {
-    "shared_async_document_pipeline": {
-      "policies": {
-        "always_full_reuse": {
-          "decision_counts": {
-            "full_reuse": 79,
-            "recompute": 1
-          },
-          "mean_recompute_tokens": 0,
-          "mean_transferred_kib": 20586.4,
-          "mean_ttft_ms": 7.192,
-          "p95_ttft_ms": 8.936,
-          "requests": 80
-        },
-        "always_recompute": {
-          "decision_counts": {
-            "recompute": 80
-          },
-          "mean_recompute_tokens": 643.325,
-          "mean_transferred_kib": 0.0,
-          "mean_ttft_ms": 13.446,
-          "p95_ttft_ms": 15.034,
-          "requests": 80
-        },
-        "heuristic": {
-          "decision_counts": {
-            "full_reuse": 64,
-            "partial_reuse": 15,
-            "recompute": 1
-          },
-          "mean_recompute_tokens": 11.625,
-          "mean_transferred_kib": 20214.4,
-          "mean_ttft_ms": 7.699,
-          "p95_ttft_ms": 8.936,
-          "requests": 80
-        },
-        "heuristic_recompute_overestimated": {
-          "decision_counts": {
-            "full_reuse": 64,
-            "partial_reuse": 15,
-            "recompute": 1
-          },
-          "mean_recompute_tokens": 11.625,
-          "mean_transferred_kib": 20214.4,
-          "mean_ttft_ms": 7.699,
-          "p95_ttft_ms": 8.936,
-          "requests": 80
-        },
-        "heuristic_recompute_underestimated": {
-          "decision_counts": {
-            "full_reuse": 64,
-            "partial_reuse": 15,
-            "recompute": 1
-          },
-          "mean_recompute_tokens": 11.625,
-          "mean_transferred_kib": 20214.4,
-          "mean_ttft_ms": 7.699,
-          "p95_ttft_ms": 8.936,
-          "requests": 80
-        },
-        "heuristic_transfer_overestimated": {
-          "decision_counts": {
-            "full_reuse": 64,
-            "partial_reuse": 15,
-            "recompute": 1
-          },
-          "mean_recompute_tokens": 11.625,
-          "mean_transferred_kib": 20214.4,
-          "mean_ttft_ms": 7.699,
-          "p95_ttft_ms": 8.936,
-          "requests": 80
-        },
-        "heuristic_transfer_underestimated": {
-          "decision_counts": {
-            "full_reuse": 64,
-            "partial_reuse": 15,
-            "recompute": 1
-          },
-          "mean_recompute_tokens": 11.625,
-          "mean_transferred_kib": 20214.4,
-          "mean_ttft_ms": 7.699,
-          "p95_ttft_ms": 8.936,
-          "requests": 80
-        },
-        "oracle_ttft": {
-          "decision_counts": {
-            "full_reuse": 79,
-            "recompute": 1
-          },
-          "mean_recompute_tokens": 0,
-          "mean_transferred_kib": 20586.4,
-          "mean_ttft_ms": 7.192,
-          "p95_ttft_ms": 8.936,
-          "requests": 80
-        },
-        "threshold_partial": {
-          "decision_counts": {
-            "partial_reuse": 60,
-            "recompute": 20
-          },
-          "mean_recompute_tokens": 341.075,
-          "mean_transferred_kib": 9672.0,
-          "mean_ttft_ms": 11.451,
-          "p95_ttft_ms": 12.185,
-          "requests": 80
-        }
-      },
-      "requests": 80,
-      "workload_family": "async-document-pipeline"
-    },
-    "shared_experiment_planning_assistant": {
-      "policies": {
-        "always_full_reuse": {
-          "decision_counts": {
-            "full_reuse": 60,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 0,
-          "mean_transferred_kib": 27066.0,
-          "mean_ttft_ms": 9.662,
-          "p95_ttft_ms": 14.964,
-          "requests": 64
-        },
-        "always_recompute": {
-          "decision_counts": {
-            "recompute": 64
-          },
-          "mean_recompute_tokens": 845.812,
-          "mean_transferred_kib": 0.0,
-          "mean_ttft_ms": 18.467,
-          "p95_ttft_ms": 20.668,
-          "requests": 64
-        },
-        "heuristic": {
-          "decision_counts": {
-            "full_reuse": 48,
-            "partial_reuse": 12,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 28.062,
-          "mean_transferred_kib": 26168.0,
-          "mean_ttft_ms": 10.871,
-          "p95_ttft_ms": 14.964,
-          "requests": 64
-        },
-        "heuristic_recompute_overestimated": {
-          "decision_counts": {
-            "full_reuse": 48,
-            "partial_reuse": 12,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 28.062,
-          "mean_transferred_kib": 26168.0,
-          "mean_ttft_ms": 10.871,
-          "p95_ttft_ms": 14.964,
-          "requests": 64
-        },
-        "heuristic_recompute_underestimated": {
-          "decision_counts": {
-            "full_reuse": 48,
-            "partial_reuse": 12,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 28.062,
-          "mean_transferred_kib": 26168.0,
-          "mean_ttft_ms": 10.871,
-          "p95_ttft_ms": 14.964,
-          "requests": 64
-        },
-        "heuristic_transfer_overestimated": {
-          "decision_counts": {
-            "full_reuse": 48,
-            "partial_reuse": 12,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 28.062,
-          "mean_transferred_kib": 26168.0,
-          "mean_ttft_ms": 10.871,
-          "p95_ttft_ms": 14.964,
-          "requests": 64
-        },
-        "heuristic_transfer_underestimated": {
-          "decision_counts": {
-            "full_reuse": 48,
-            "partial_reuse": 12,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 28.062,
-          "mean_transferred_kib": 26168.0,
-          "mean_ttft_ms": 10.871,
-          "p95_ttft_ms": 14.964,
-          "requests": 64
-        },
-        "oracle_ttft": {
-          "decision_counts": {
-            "full_reuse": 60,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 0,
-          "mean_transferred_kib": 27066.0,
-          "mean_ttft_ms": 9.662,
-          "p95_ttft_ms": 14.964,
-          "requests": 64
-        },
-        "threshold_partial": {
-          "decision_counts": {
-            "partial_reuse": 48,
-            "recompute": 16
-          },
-          "mean_recompute_tokens": 449.062,
-          "mean_transferred_kib": 12696.0,
-          "mean_ttft_ms": 15.311,
-          "p95_ttft_ms": 16.242,
-          "requests": 64
-        }
-      },
-      "requests": 64,
-      "workload_family": "experiment-planning-assistant"
-    },
-    "shared_long_context_doc_analysis": {
-      "policies": {
-        "always_full_reuse": {
-          "decision_counts": {
-            "full_reuse": 44,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 0,
-          "mean_transferred_kib": 92672.0,
-          "mean_ttft_ms": 35.023,
-          "p95_ttft_ms": 59.478,
-          "requests": 48
-        },
-        "always_recompute": {
-          "decision_counts": {
-            "recompute": 48
-          },
-          "mean_recompute_tokens": 2896,
-          "mean_transferred_kib": 0.0,
-          "mean_ttft_ms": 66.256,
-          "p95_ttft_ms": 71.543,
-          "requests": 48
-        },
-        "heuristic": {
-          "decision_counts": {
-            "full_reuse": 36,
-            "partial_reuse": 8,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 100.667,
-          "mean_transferred_kib": 89450.667,
-          "mean_ttft_ms": 40.56,
-          "p95_ttft_ms": 59.478,
-          "requests": 48
-        },
-        "heuristic_recompute_overestimated": {
-          "decision_counts": {
-            "full_reuse": 36,
-            "partial_reuse": 8,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 100.667,
-          "mean_transferred_kib": 89450.667,
-          "mean_ttft_ms": 40.56,
-          "p95_ttft_ms": 59.478,
-          "requests": 48
-        },
-        "heuristic_recompute_underestimated": {
-          "decision_counts": {
-            "full_reuse": 20,
-            "partial_reuse": 24,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 708.667,
-          "mean_transferred_kib": 69994.667,
-          "mean_ttft_ms": 45.67,
-          "p95_ttft_ms": 59.478,
-          "requests": 48
-        },
-        "heuristic_transfer_overestimated": {
-          "decision_counts": {
-            "full_reuse": 36,
-            "partial_reuse": 8,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 100.667,
-          "mean_transferred_kib": 89450.667,
-          "mean_ttft_ms": 40.56,
-          "p95_ttft_ms": 59.478,
-          "requests": 48
-        },
-        "heuristic_transfer_underestimated": {
-          "decision_counts": {
-            "full_reuse": 36,
-            "partial_reuse": 8,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 100.667,
-          "mean_transferred_kib": 89450.667,
-          "mean_ttft_ms": 40.56,
-          "p95_ttft_ms": 59.478,
-          "requests": 48
-        },
-        "oracle_ttft": {
-          "decision_counts": {
-            "full_reuse": 44,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 0,
-          "mean_transferred_kib": 92672.0,
-          "mean_ttft_ms": 35.023,
-          "p95_ttft_ms": 59.478,
-          "requests": 48
-        },
-        "threshold_partial": {
-          "decision_counts": {
-            "partial_reuse": 44,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 1448.25,
-          "mean_transferred_kib": 46328.0,
-          "mean_ttft_ms": 50.825,
-          "p95_ttft_ms": 59.478,
-          "requests": 48
-        }
-      },
-      "requests": 48,
-      "workload_family": "long-context-doc-analysis"
-    },
-    "shared_public_sharegpt_boundary": {
+    "dynamic_rag_corpus_update": {
       "policies": {
         "always_full_reuse": {
           "decision_counts": {
@@ -335,79 +8,79 @@
             "recompute": 1
           },
           "mean_recompute_tokens": 0,
-          "mean_transferred_kib": 13597.0,
-          "mean_ttft_ms": 5.131,
-          "p95_ttft_ms": 5.966,
+          "mean_transferred_kib": 61342.0,
+          "mean_ttft_ms": 17.043,
+          "p95_ttft_ms": 21.1,
           "requests": 32
         },
         "always_recompute": {
           "decision_counts": {
             "recompute": 32
           },
-          "mean_recompute_tokens": 424.906,
+          "mean_recompute_tokens": 1916.938,
           "mean_transferred_kib": 0.0,
-          "mean_ttft_ms": 8.29,
-          "p95_ttft_ms": 8.791,
+          "mean_ttft_ms": 39.121,
+          "p95_ttft_ms": 40.48,
           "requests": 32
         },
         "heuristic": {
           "decision_counts": {
-            "full_reuse": 29,
-            "partial_reuse": 2,
+            "full_reuse": 24,
+            "partial_reuse": 7,
             "recompute": 1
           },
-          "mean_recompute_tokens": 2.406,
-          "mean_transferred_kib": 13520.0,
-          "mean_ttft_ms": 5.2,
-          "p95_ttft_ms": 5.966,
+          "mean_recompute_tokens": 47.281,
+          "mean_transferred_kib": 59829.0,
+          "mean_ttft_ms": 19.875,
+          "p95_ttft_ms": 27.734,
           "requests": 32
         },
         "heuristic_recompute_overestimated": {
           "decision_counts": {
-            "full_reuse": 29,
-            "partial_reuse": 2,
+            "full_reuse": 24,
+            "partial_reuse": 7,
             "recompute": 1
           },
-          "mean_recompute_tokens": 2.406,
-          "mean_transferred_kib": 13520.0,
-          "mean_ttft_ms": 5.2,
-          "p95_ttft_ms": 5.966,
+          "mean_recompute_tokens": 47.281,
+          "mean_transferred_kib": 59829.0,
+          "mean_ttft_ms": 19.875,
+          "p95_ttft_ms": 27.734,
           "requests": 32
         },
         "heuristic_recompute_underestimated": {
           "decision_counts": {
-            "full_reuse": 19,
-            "partial_reuse": 11,
-            "recompute": 2
+            "full_reuse": 24,
+            "partial_reuse": 7,
+            "recompute": 1
           },
-          "mean_recompute_tokens": 66.312,
-          "mean_transferred_kib": 11475.0,
-          "mean_ttft_ms": 5.873,
-          "p95_ttft_ms": 7.626,
+          "mean_recompute_tokens": 47.281,
+          "mean_transferred_kib": 59829.0,
+          "mean_ttft_ms": 19.875,
+          "p95_ttft_ms": 27.734,
           "requests": 32
         },
         "heuristic_transfer_overestimated": {
           "decision_counts": {
-            "full_reuse": 28,
-            "partial_reuse": 2,
-            "recompute": 2
+            "full_reuse": 24,
+            "partial_reuse": 7,
+            "recompute": 1
           },
-          "mean_recompute_tokens": 4.969,
-          "mean_transferred_kib": 13438.0,
-          "mean_ttft_ms": 5.357,
-          "p95_ttft_ms": 5.999,
+          "mean_recompute_tokens": 47.281,
+          "mean_transferred_kib": 59829.0,
+          "mean_ttft_ms": 19.875,
+          "p95_ttft_ms": 27.734,
           "requests": 32
         },
         "heuristic_transfer_underestimated": {
           "decision_counts": {
-            "full_reuse": 29,
-            "partial_reuse": 2,
+            "full_reuse": 24,
+            "partial_reuse": 7,
             "recompute": 1
           },
-          "mean_recompute_tokens": 2.406,
-          "mean_transferred_kib": 13520.0,
-          "mean_ttft_ms": 5.2,
-          "p95_ttft_ms": 5.966,
+          "mean_recompute_tokens": 47.281,
+          "mean_transferred_kib": 59829.0,
+          "mean_ttft_ms": 19.875,
+          "p95_ttft_ms": 27.734,
           "requests": 32
         },
         "oracle_ttft": {
@@ -416,351 +89,243 @@
             "recompute": 1
           },
           "mean_recompute_tokens": 0,
-          "mean_transferred_kib": 13597.0,
-          "mean_ttft_ms": 5.131,
-          "p95_ttft_ms": 5.966,
+          "mean_transferred_kib": 61342.0,
+          "mean_ttft_ms": 17.043,
+          "p95_ttft_ms": 21.1,
           "requests": 32
         },
         "threshold_partial": {
           "decision_counts": {
-            "recompute": 32
+            "partial_reuse": 28,
+            "recompute": 4
           },
-          "mean_recompute_tokens": 424.906,
-          "mean_transferred_kib": 0.0,
-          "mean_ttft_ms": 8.29,
-          "p95_ttft_ms": 8.791,
+          "mean_recompute_tokens": 965.094,
+          "mean_transferred_kib": 30459.0,
+          "mean_ttft_ms": 29.82,
+          "p95_ttft_ms": 36.676,
           "requests": 32
         }
       },
       "requests": 32,
-      "workload_family": "sharegpt-public-boundary"
+      "workload_family": "dynamic-rag-corpus-update"
     },
-    "shared_rag_followup": {
+    "session_continuation_with_maintenance": {
       "policies": {
         "always_full_reuse": {
           "decision_counts": {
-            "full_reuse": 56,
-            "recompute": 8
+            "full_reuse": 39,
+            "recompute": 1
           },
           "mean_recompute_tokens": 0,
-          "mean_transferred_kib": 54048.0,
-          "mean_ttft_ms": 21.216,
-          "p95_ttft_ms": 32.45,
-          "requests": 64
+          "mean_transferred_kib": 20869.6,
+          "mean_ttft_ms": 6.669,
+          "p95_ttft_ms": 7.702,
+          "requests": 40
         },
         "always_recompute": {
           "decision_counts": {
-            "recompute": 64
+            "recompute": 40
           },
-          "mean_recompute_tokens": 1689,
+          "mean_recompute_tokens": 652.175,
           "mean_transferred_kib": 0.0,
-          "mean_ttft_ms": 35.491,
-          "p95_ttft_ms": 36.806,
-          "requests": 64
+          "mean_ttft_ms": 13.083,
+          "p95_ttft_ms": 13.532,
+          "requests": 40
         },
         "heuristic": {
           "decision_counts": {
-            "full_reuse": 48,
-            "partial_reuse": 8,
-            "recompute": 8
+            "full_reuse": 35,
+            "partial_reuse": 4,
+            "recompute": 1
           },
-          "mean_recompute_tokens": 20.75,
-          "mean_transferred_kib": 53384.0,
-          "mean_ttft_ms": 23.23,
-          "p95_ttft_ms": 32.45,
-          "requests": 64
+          "mean_recompute_tokens": 13.2,
+          "mean_transferred_kib": 20447.2,
+          "mean_ttft_ms": 7.137,
+          "p95_ttft_ms": 8.455,
+          "requests": 40
         },
         "heuristic_recompute_overestimated": {
           "decision_counts": {
-            "full_reuse": 48,
-            "partial_reuse": 8,
-            "recompute": 8
+            "full_reuse": 35,
+            "partial_reuse": 4,
+            "recompute": 1
           },
-          "mean_recompute_tokens": 20.75,
-          "mean_transferred_kib": 53384.0,
-          "mean_ttft_ms": 23.23,
-          "p95_ttft_ms": 32.45,
-          "requests": 64
+          "mean_recompute_tokens": 13.2,
+          "mean_transferred_kib": 20447.2,
+          "mean_ttft_ms": 7.137,
+          "p95_ttft_ms": 8.455,
+          "requests": 40
         },
         "heuristic_recompute_underestimated": {
           "decision_counts": {
-            "full_reuse": 48,
-            "partial_reuse": 8,
-            "recompute": 8
+            "full_reuse": 35,
+            "partial_reuse": 4,
+            "recompute": 1
           },
-          "mean_recompute_tokens": 20.75,
-          "mean_transferred_kib": 53384.0,
-          "mean_ttft_ms": 23.23,
-          "p95_ttft_ms": 32.45,
-          "requests": 64
+          "mean_recompute_tokens": 13.2,
+          "mean_transferred_kib": 20447.2,
+          "mean_ttft_ms": 7.137,
+          "p95_ttft_ms": 8.455,
+          "requests": 40
         },
         "heuristic_transfer_overestimated": {
           "decision_counts": {
-            "full_reuse": 48,
-            "partial_reuse": 8,
-            "recompute": 8
+            "full_reuse": 35,
+            "partial_reuse": 4,
+            "recompute": 1
           },
-          "mean_recompute_tokens": 20.75,
-          "mean_transferred_kib": 53384.0,
-          "mean_ttft_ms": 23.23,
-          "p95_ttft_ms": 32.45,
-          "requests": 64
+          "mean_recompute_tokens": 13.2,
+          "mean_transferred_kib": 20447.2,
+          "mean_ttft_ms": 7.137,
+          "p95_ttft_ms": 8.455,
+          "requests": 40
         },
         "heuristic_transfer_underestimated": {
           "decision_counts": {
-            "full_reuse": 48,
-            "partial_reuse": 8,
-            "recompute": 8
+            "full_reuse": 35,
+            "partial_reuse": 4,
+            "recompute": 1
           },
-          "mean_recompute_tokens": 20.75,
-          "mean_transferred_kib": 53384.0,
-          "mean_ttft_ms": 23.23,
-          "p95_ttft_ms": 32.45,
-          "requests": 64
+          "mean_recompute_tokens": 13.2,
+          "mean_transferred_kib": 20447.2,
+          "mean_ttft_ms": 7.137,
+          "p95_ttft_ms": 8.455,
+          "requests": 40
         },
         "oracle_ttft": {
           "decision_counts": {
-            "full_reuse": 56,
-            "recompute": 8
+            "full_reuse": 39,
+            "recompute": 1
           },
           "mean_recompute_tokens": 0,
-          "mean_transferred_kib": 54048.0,
-          "mean_ttft_ms": 21.216,
-          "p95_ttft_ms": 32.45,
-          "requests": 64
+          "mean_transferred_kib": 20869.6,
+          "mean_ttft_ms": 6.669,
+          "p95_ttft_ms": 7.702,
+          "requests": 40
         },
         "threshold_partial": {
           "decision_counts": {
-            "partial_reuse": 48,
-            "recompute": 16
+            "partial_reuse": 32,
+            "recompute": 8
           },
-          "mean_recompute_tokens": 863.25,
-          "mean_transferred_kib": 26424.0,
-          "mean_ttft_ms": 30.262,
-          "p95_ttft_ms": 33.525,
-          "requests": 64
+          "mean_recompute_tokens": 342.375,
+          "mean_transferred_kib": 9913.6,
+          "mean_ttft_ms": 10.837,
+          "p95_ttft_ms": 12.591,
+          "requests": 40
         }
       },
-      "requests": 64,
-      "workload_family": "rag-followup"
+      "requests": 40,
+      "workload_family": "session-continuation-maintenance"
     },
-    "shared_realtime_voice_assistant": {
+    "shared_prefix_multi_tenant_assistant": {
       "policies": {
         "always_full_reuse": {
           "decision_counts": {
-            "full_reuse": 62,
-            "recompute": 2
+            "full_reuse": 37,
+            "recompute": 3
           },
           "mean_recompute_tokens": 0,
-          "mean_transferred_kib": 24802.0,
-          "mean_ttft_ms": 8.165,
-          "p95_ttft_ms": 10.147,
-          "requests": 64
+          "mean_transferred_kib": 35199.2,
+          "mean_ttft_ms": 11.119,
+          "p95_ttft_ms": 20.265,
+          "requests": 40
         },
         "always_recompute": {
           "decision_counts": {
-            "recompute": 64
+            "recompute": 40
           },
-          "mean_recompute_tokens": 775.062,
+          "mean_recompute_tokens": 1099.975,
           "mean_transferred_kib": 0.0,
-          "mean_ttft_ms": 15.523,
-          "p95_ttft_ms": 17.143,
-          "requests": 64
+          "mean_ttft_ms": 22.388,
+          "p95_ttft_ms": 23.898,
+          "requests": 40
         },
         "heuristic": {
           "decision_counts": {
-            "full_reuse": 50,
-            "partial_reuse": 12,
-            "recompute": 2
+            "full_reuse": 30,
+            "partial_reuse": 7,
+            "recompute": 3
           },
-          "mean_recompute_tokens": 22.219,
-          "mean_transferred_kib": 24091.0,
-          "mean_ttft_ms": 9.048,
-          "p95_ttft_ms": 10.147,
-          "requests": 64
+          "mean_recompute_tokens": 43.325,
+          "mean_transferred_kib": 33812.8,
+          "mean_ttft_ms": 12.845,
+          "p95_ttft_ms": 20.265,
+          "requests": 40
         },
         "heuristic_recompute_overestimated": {
           "decision_counts": {
-            "full_reuse": 50,
-            "partial_reuse": 12,
-            "recompute": 2
+            "full_reuse": 30,
+            "partial_reuse": 7,
+            "recompute": 3
           },
-          "mean_recompute_tokens": 22.219,
-          "mean_transferred_kib": 24091.0,
-          "mean_ttft_ms": 9.048,
-          "p95_ttft_ms": 10.147,
-          "requests": 64
+          "mean_recompute_tokens": 43.325,
+          "mean_transferred_kib": 33812.8,
+          "mean_ttft_ms": 12.845,
+          "p95_ttft_ms": 20.265,
+          "requests": 40
         },
         "heuristic_recompute_underestimated": {
           "decision_counts": {
-            "full_reuse": 50,
-            "partial_reuse": 12,
-            "recompute": 2
+            "full_reuse": 30,
+            "partial_reuse": 7,
+            "recompute": 3
           },
-          "mean_recompute_tokens": 22.219,
-          "mean_transferred_kib": 24091.0,
-          "mean_ttft_ms": 9.048,
-          "p95_ttft_ms": 10.147,
-          "requests": 64
+          "mean_recompute_tokens": 43.325,
+          "mean_transferred_kib": 33812.8,
+          "mean_ttft_ms": 12.845,
+          "p95_ttft_ms": 20.265,
+          "requests": 40
         },
         "heuristic_transfer_overestimated": {
           "decision_counts": {
-            "full_reuse": 50,
-            "partial_reuse": 12,
-            "recompute": 2
+            "full_reuse": 30,
+            "partial_reuse": 7,
+            "recompute": 3
           },
-          "mean_recompute_tokens": 22.219,
-          "mean_transferred_kib": 24091.0,
-          "mean_ttft_ms": 9.048,
-          "p95_ttft_ms": 10.147,
-          "requests": 64
+          "mean_recompute_tokens": 43.325,
+          "mean_transferred_kib": 33812.8,
+          "mean_ttft_ms": 12.845,
+          "p95_ttft_ms": 20.265,
+          "requests": 40
         },
         "heuristic_transfer_underestimated": {
           "decision_counts": {
-            "full_reuse": 50,
-            "partial_reuse": 12,
-            "recompute": 2
+            "full_reuse": 30,
+            "partial_reuse": 7,
+            "recompute": 3
           },
-          "mean_recompute_tokens": 22.219,
-          "mean_transferred_kib": 24091.0,
-          "mean_ttft_ms": 9.048,
-          "p95_ttft_ms": 10.147,
-          "requests": 64
+          "mean_recompute_tokens": 43.325,
+          "mean_transferred_kib": 33812.8,
+          "mean_ttft_ms": 12.845,
+          "p95_ttft_ms": 20.265,
+          "requests": 40
         },
         "oracle_ttft": {
           "decision_counts": {
-            "full_reuse": 62,
-            "recompute": 2
+            "full_reuse": 37,
+            "recompute": 3
           },
           "mean_recompute_tokens": 0,
-          "mean_transferred_kib": 24802.0,
-          "mean_ttft_ms": 8.165,
-          "p95_ttft_ms": 10.147,
-          "requests": 64
+          "mean_transferred_kib": 35199.2,
+          "mean_ttft_ms": 11.119,
+          "p95_ttft_ms": 20.265,
+          "requests": 40
         },
         "threshold_partial": {
           "decision_counts": {
-            "partial_reuse": 48,
-            "recompute": 16
+            "partial_reuse": 30,
+            "recompute": 10
           },
-          "mean_recompute_tokens": 412.312,
-          "mean_transferred_kib": 11608.0,
-          "mean_ttft_ms": 13.092,
-          "p95_ttft_ms": 13.95,
-          "requests": 64
+          "mean_recompute_tokens": 584.725,
+          "mean_transferred_kib": 16488.0,
+          "mean_ttft_ms": 18.351,
+          "p95_ttft_ms": 21.669,
+          "requests": 40
         }
       },
-      "requests": 64,
-      "workload_family": "realtime-voice-assistant"
-    },
-    "shared_repo_aware_coding_assistant": {
-      "policies": {
-        "always_full_reuse": {
-          "decision_counts": {
-            "full_reuse": 60,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 0,
-          "mean_transferred_kib": 27482.0,
-          "mean_ttft_ms": 10.52,
-          "p95_ttft_ms": 15.512,
-          "requests": 64
-        },
-        "always_recompute": {
-          "decision_counts": {
-            "recompute": 64
-          },
-          "mean_recompute_tokens": 858.812,
-          "mean_transferred_kib": 0.0,
-          "mean_ttft_ms": 19.038,
-          "p95_ttft_ms": 21.449,
-          "requests": 64
-        },
-        "heuristic": {
-          "decision_counts": {
-            "full_reuse": 56,
-            "partial_reuse": 4,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 11.875,
-          "mean_transferred_kib": 27102.0,
-          "mean_ttft_ms": 10.977,
-          "p95_ttft_ms": 15.512,
-          "requests": 64
-        },
-        "heuristic_recompute_overestimated": {
-          "decision_counts": {
-            "full_reuse": 56,
-            "partial_reuse": 4,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 11.875,
-          "mean_transferred_kib": 27102.0,
-          "mean_ttft_ms": 10.977,
-          "p95_ttft_ms": 15.512,
-          "requests": 64
-        },
-        "heuristic_recompute_underestimated": {
-          "decision_counts": {
-            "full_reuse": 56,
-            "partial_reuse": 4,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 11.875,
-          "mean_transferred_kib": 27102.0,
-          "mean_ttft_ms": 10.977,
-          "p95_ttft_ms": 15.512,
-          "requests": 64
-        },
-        "heuristic_transfer_overestimated": {
-          "decision_counts": {
-            "full_reuse": 56,
-            "partial_reuse": 4,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 11.875,
-          "mean_transferred_kib": 27102.0,
-          "mean_ttft_ms": 10.977,
-          "p95_ttft_ms": 15.512,
-          "requests": 64
-        },
-        "heuristic_transfer_underestimated": {
-          "decision_counts": {
-            "full_reuse": 56,
-            "partial_reuse": 4,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 11.875,
-          "mean_transferred_kib": 27102.0,
-          "mean_ttft_ms": 10.977,
-          "p95_ttft_ms": 15.512,
-          "requests": 64
-        },
-        "oracle_ttft": {
-          "decision_counts": {
-            "full_reuse": 60,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 0,
-          "mean_transferred_kib": 27482.0,
-          "mean_ttft_ms": 10.52,
-          "p95_ttft_ms": 15.512,
-          "requests": 64
-        },
-        "threshold_partial": {
-          "decision_counts": {
-            "partial_reuse": 48,
-            "recompute": 16
-          },
-          "mean_recompute_tokens": 445.812,
-          "mean_transferred_kib": 13216.0,
-          "mean_ttft_ms": 16.105,
-          "p95_ttft_ms": 17.246,
-          "requests": 64
-        }
-      },
-      "requests": 64,
-      "workload_family": "repo-aware-coding-assistant"
+      "requests": 40,
+      "workload_family": "shared-prefix-multi-tenant-assistant"
     },
     "shared_scenario_multi_turn_knowledge_service": {
       "policies": {
@@ -1077,674 +642,121 @@
       },
       "requests": 32,
       "workload_family": "tool-scaffold-agent"
-    },
-    "shared_session_affine_bursty": {
-      "policies": {
-        "always_full_reuse": {
-          "decision_counts": {
-            "full_reuse": 60,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 0,
-          "mean_transferred_kib": 20706.0,
-          "mean_ttft_ms": 6.55,
-          "p95_ttft_ms": 10.621,
-          "requests": 64
-        },
-        "always_recompute": {
-          "decision_counts": {
-            "recompute": 64
-          },
-          "mean_recompute_tokens": 647.062,
-          "mean_transferred_kib": 0.0,
-          "mean_ttft_ms": 12.75,
-          "p95_ttft_ms": 15.891,
-          "requests": 64
-        },
-        "heuristic": {
-          "decision_counts": {
-            "full_reuse": 48,
-            "partial_reuse": 12,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 19.875,
-          "mean_transferred_kib": 20070.0,
-          "mean_ttft_ms": 7.229,
-          "p95_ttft_ms": 10.621,
-          "requests": 64
-        },
-        "heuristic_recompute_overestimated": {
-          "decision_counts": {
-            "full_reuse": 48,
-            "partial_reuse": 12,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 19.875,
-          "mean_transferred_kib": 20070.0,
-          "mean_ttft_ms": 7.229,
-          "p95_ttft_ms": 10.621,
-          "requests": 64
-        },
-        "heuristic_recompute_underestimated": {
-          "decision_counts": {
-            "full_reuse": 48,
-            "partial_reuse": 12,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 19.875,
-          "mean_transferred_kib": 20070.0,
-          "mean_ttft_ms": 7.229,
-          "p95_ttft_ms": 10.621,
-          "requests": 64
-        },
-        "heuristic_transfer_overestimated": {
-          "decision_counts": {
-            "full_reuse": 48,
-            "partial_reuse": 12,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 19.875,
-          "mean_transferred_kib": 20070.0,
-          "mean_ttft_ms": 7.229,
-          "p95_ttft_ms": 10.621,
-          "requests": 64
-        },
-        "heuristic_transfer_underestimated": {
-          "decision_counts": {
-            "full_reuse": 48,
-            "partial_reuse": 12,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 19.875,
-          "mean_transferred_kib": 20070.0,
-          "mean_ttft_ms": 7.229,
-          "p95_ttft_ms": 10.621,
-          "requests": 64
-        },
-        "oracle_ttft": {
-          "decision_counts": {
-            "full_reuse": 60,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 0,
-          "mean_transferred_kib": 20706.0,
-          "mean_ttft_ms": 6.55,
-          "p95_ttft_ms": 10.621,
-          "requests": 64
-        },
-        "threshold_partial": {
-          "decision_counts": {
-            "partial_reuse": 48,
-            "recompute": 16
-          },
-          "mean_recompute_tokens": 345.719,
-          "mean_transferred_kib": 9643.0,
-          "mean_ttft_ms": 10.518,
-          "p95_ttft_ms": 12.366,
-          "requests": 64
-        }
-      },
-      "requests": 64,
-      "workload_family": "session-affine-bursty"
-    },
-    "shared_session_affine_multi_turn": {
-      "policies": {
-        "always_full_reuse": {
-          "decision_counts": {
-            "full_reuse": 63,
-            "recompute": 1
-          },
-          "mean_recompute_tokens": 0,
-          "mean_transferred_kib": 19493.5,
-          "mean_ttft_ms": 6.066,
-          "p95_ttft_ms": 7.655,
-          "requests": 64
-        },
-        "always_recompute": {
-          "decision_counts": {
-            "recompute": 64
-          },
-          "mean_recompute_tokens": 609.172,
-          "mean_transferred_kib": 0.0,
-          "mean_ttft_ms": 11.836,
-          "p95_ttft_ms": 13.49,
-          "requests": 64
-        },
-        "heuristic": {
-          "decision_counts": {
-            "full_reuse": 51,
-            "partial_reuse": 12,
-            "recompute": 1
-          },
-          "mean_recompute_tokens": 17.25,
-          "mean_transferred_kib": 18941.5,
-          "mean_ttft_ms": 6.634,
-          "p95_ttft_ms": 7.655,
-          "requests": 64
-        },
-        "heuristic_recompute_overestimated": {
-          "decision_counts": {
-            "full_reuse": 51,
-            "partial_reuse": 12,
-            "recompute": 1
-          },
-          "mean_recompute_tokens": 17.25,
-          "mean_transferred_kib": 18941.5,
-          "mean_ttft_ms": 6.634,
-          "p95_ttft_ms": 7.655,
-          "requests": 64
-        },
-        "heuristic_recompute_underestimated": {
-          "decision_counts": {
-            "full_reuse": 51,
-            "partial_reuse": 12,
-            "recompute": 1
-          },
-          "mean_recompute_tokens": 17.25,
-          "mean_transferred_kib": 18941.5,
-          "mean_ttft_ms": 6.634,
-          "p95_ttft_ms": 7.655,
-          "requests": 64
-        },
-        "heuristic_transfer_overestimated": {
-          "decision_counts": {
-            "full_reuse": 51,
-            "partial_reuse": 12,
-            "recompute": 1
-          },
-          "mean_recompute_tokens": 17.25,
-          "mean_transferred_kib": 18941.5,
-          "mean_ttft_ms": 6.634,
-          "p95_ttft_ms": 7.655,
-          "requests": 64
-        },
-        "heuristic_transfer_underestimated": {
-          "decision_counts": {
-            "full_reuse": 51,
-            "partial_reuse": 12,
-            "recompute": 1
-          },
-          "mean_recompute_tokens": 17.25,
-          "mean_transferred_kib": 18941.5,
-          "mean_ttft_ms": 6.634,
-          "p95_ttft_ms": 7.655,
-          "requests": 64
-        },
-        "oracle_ttft": {
-          "decision_counts": {
-            "full_reuse": 63,
-            "recompute": 1
-          },
-          "mean_recompute_tokens": 0,
-          "mean_transferred_kib": 19493.5,
-          "mean_ttft_ms": 6.066,
-          "p95_ttft_ms": 7.655,
-          "requests": 64
-        },
-        "threshold_partial": {
-          "decision_counts": {
-            "partial_reuse": 48,
-            "recompute": 16
-          },
-          "mean_recompute_tokens": 327.172,
-          "mean_transferred_kib": 9024.0,
-          "mean_ttft_ms": 9.926,
-          "p95_ttft_ms": 10.772,
-          "requests": 64
-        }
-      },
-      "requests": 64,
-      "workload_family": "session-affine-multi-turn"
-    },
-    "shared_simulation_analysis_verification": {
-      "policies": {
-        "always_full_reuse": {
-          "decision_counts": {
-            "full_reuse": 61,
-            "recompute": 3
-          },
-          "mean_recompute_tokens": 0,
-          "mean_transferred_kib": 24529.0,
-          "mean_ttft_ms": 8.666,
-          "p95_ttft_ms": 10.384,
-          "requests": 64
-        },
-        "always_recompute": {
-          "decision_counts": {
-            "recompute": 64
-          },
-          "mean_recompute_tokens": 766.531,
-          "mean_transferred_kib": 0.0,
-          "mean_ttft_ms": 16.091,
-          "p95_ttft_ms": 18.275,
-          "requests": 64
-        },
-        "heuristic": {
-          "decision_counts": {
-            "full_reuse": 49,
-            "partial_reuse": 12,
-            "recompute": 3
-          },
-          "mean_recompute_tokens": 24.5,
-          "mean_transferred_kib": 23745.0,
-          "mean_ttft_ms": 9.612,
-          "p95_ttft_ms": 10.384,
-          "requests": 64
-        },
-        "heuristic_recompute_overestimated": {
-          "decision_counts": {
-            "full_reuse": 49,
-            "partial_reuse": 12,
-            "recompute": 3
-          },
-          "mean_recompute_tokens": 24.5,
-          "mean_transferred_kib": 23745.0,
-          "mean_ttft_ms": 9.612,
-          "p95_ttft_ms": 10.384,
-          "requests": 64
-        },
-        "heuristic_recompute_underestimated": {
-          "decision_counts": {
-            "full_reuse": 49,
-            "partial_reuse": 12,
-            "recompute": 3
-          },
-          "mean_recompute_tokens": 24.5,
-          "mean_transferred_kib": 23745.0,
-          "mean_ttft_ms": 9.612,
-          "p95_ttft_ms": 10.384,
-          "requests": 64
-        },
-        "heuristic_transfer_overestimated": {
-          "decision_counts": {
-            "full_reuse": 49,
-            "partial_reuse": 12,
-            "recompute": 3
-          },
-          "mean_recompute_tokens": 24.5,
-          "mean_transferred_kib": 23745.0,
-          "mean_ttft_ms": 9.612,
-          "p95_ttft_ms": 10.384,
-          "requests": 64
-        },
-        "heuristic_transfer_underestimated": {
-          "decision_counts": {
-            "full_reuse": 49,
-            "partial_reuse": 12,
-            "recompute": 3
-          },
-          "mean_recompute_tokens": 24.5,
-          "mean_transferred_kib": 23745.0,
-          "mean_ttft_ms": 9.612,
-          "p95_ttft_ms": 10.384,
-          "requests": 64
-        },
-        "oracle_ttft": {
-          "decision_counts": {
-            "full_reuse": 61,
-            "recompute": 3
-          },
-          "mean_recompute_tokens": 0,
-          "mean_transferred_kib": 24529.0,
-          "mean_ttft_ms": 8.666,
-          "p95_ttft_ms": 10.384,
-          "requests": 64
-        },
-        "threshold_partial": {
-          "decision_counts": {
-            "partial_reuse": 48,
-            "recompute": 16
-          },
-          "mean_recompute_tokens": 408.031,
-          "mean_transferred_kib": 11472.0,
-          "mean_ttft_ms": 13.516,
-          "p95_ttft_ms": 14.534,
-          "requests": 64
-        }
-      },
-      "requests": 64,
-      "workload_family": "simulation-analysis-verification"
-    },
-    "shared_synthetic_shared_prefix_microbenchmark": {
-      "policies": {
-        "always_full_reuse": {
-          "decision_counts": {
-            "full_reuse": 31,
-            "recompute": 1
-          },
-          "mean_recompute_tokens": 0,
-          "mean_transferred_kib": 13597.0,
-          "mean_ttft_ms": 5.131,
-          "p95_ttft_ms": 5.966,
-          "requests": 32
-        },
-        "always_recompute": {
-          "decision_counts": {
-            "recompute": 32
-          },
-          "mean_recompute_tokens": 424.906,
-          "mean_transferred_kib": 0.0,
-          "mean_ttft_ms": 8.29,
-          "p95_ttft_ms": 8.791,
-          "requests": 32
-        },
-        "heuristic": {
-          "decision_counts": {
-            "full_reuse": 29,
-            "partial_reuse": 2,
-            "recompute": 1
-          },
-          "mean_recompute_tokens": 2.406,
-          "mean_transferred_kib": 13520.0,
-          "mean_ttft_ms": 5.2,
-          "p95_ttft_ms": 5.966,
-          "requests": 32
-        },
-        "heuristic_recompute_overestimated": {
-          "decision_counts": {
-            "full_reuse": 29,
-            "partial_reuse": 2,
-            "recompute": 1
-          },
-          "mean_recompute_tokens": 2.406,
-          "mean_transferred_kib": 13520.0,
-          "mean_ttft_ms": 5.2,
-          "p95_ttft_ms": 5.966,
-          "requests": 32
-        },
-        "heuristic_recompute_underestimated": {
-          "decision_counts": {
-            "full_reuse": 19,
-            "partial_reuse": 11,
-            "recompute": 2
-          },
-          "mean_recompute_tokens": 66.312,
-          "mean_transferred_kib": 11475.0,
-          "mean_ttft_ms": 5.873,
-          "p95_ttft_ms": 7.626,
-          "requests": 32
-        },
-        "heuristic_transfer_overestimated": {
-          "decision_counts": {
-            "full_reuse": 28,
-            "partial_reuse": 2,
-            "recompute": 2
-          },
-          "mean_recompute_tokens": 4.969,
-          "mean_transferred_kib": 13438.0,
-          "mean_ttft_ms": 5.357,
-          "p95_ttft_ms": 5.999,
-          "requests": 32
-        },
-        "heuristic_transfer_underestimated": {
-          "decision_counts": {
-            "full_reuse": 29,
-            "partial_reuse": 2,
-            "recompute": 1
-          },
-          "mean_recompute_tokens": 2.406,
-          "mean_transferred_kib": 13520.0,
-          "mean_ttft_ms": 5.2,
-          "p95_ttft_ms": 5.966,
-          "requests": 32
-        },
-        "oracle_ttft": {
-          "decision_counts": {
-            "full_reuse": 31,
-            "recompute": 1
-          },
-          "mean_recompute_tokens": 0,
-          "mean_transferred_kib": 13597.0,
-          "mean_ttft_ms": 5.131,
-          "p95_ttft_ms": 5.966,
-          "requests": 32
-        },
-        "threshold_partial": {
-          "decision_counts": {
-            "recompute": 32
-          },
-          "mean_recompute_tokens": 424.906,
-          "mean_transferred_kib": 0.0,
-          "mean_ttft_ms": 8.29,
-          "p95_ttft_ms": 8.791,
-          "requests": 32
-        }
-      },
-      "requests": 32,
-      "workload_family": "synthetic-shared-prefix"
-    },
-    "shared_tool_scaffold_agent": {
-      "policies": {
-        "always_full_reuse": {
-          "decision_counts": {
-            "full_reuse": 60,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 0,
-          "mean_transferred_kib": 20774.0,
-          "mean_ttft_ms": 7.843,
-          "p95_ttft_ms": 11.632,
-          "requests": 64
-        },
-        "always_recompute": {
-          "decision_counts": {
-            "recompute": 64
-          },
-          "mean_recompute_tokens": 649.188,
-          "mean_transferred_kib": 0.0,
-          "mean_ttft_ms": 14.02,
-          "p95_ttft_ms": 15.543,
-          "requests": 64
-        },
-        "heuristic": {
-          "decision_counts": {
-            "full_reuse": 48,
-            "partial_reuse": 12,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 20.438,
-          "mean_transferred_kib": 20120.0,
-          "mean_ttft_ms": 8.607,
-          "p95_ttft_ms": 11.632,
-          "requests": 64
-        },
-        "heuristic_recompute_overestimated": {
-          "decision_counts": {
-            "full_reuse": 48,
-            "partial_reuse": 12,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 20.438,
-          "mean_transferred_kib": 20120.0,
-          "mean_ttft_ms": 8.607,
-          "p95_ttft_ms": 11.632,
-          "requests": 64
-        },
-        "heuristic_recompute_underestimated": {
-          "decision_counts": {
-            "full_reuse": 48,
-            "partial_reuse": 12,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 20.438,
-          "mean_transferred_kib": 20120.0,
-          "mean_ttft_ms": 8.607,
-          "p95_ttft_ms": 11.632,
-          "requests": 64
-        },
-        "heuristic_transfer_overestimated": {
-          "decision_counts": {
-            "full_reuse": 48,
-            "partial_reuse": 12,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 20.438,
-          "mean_transferred_kib": 20120.0,
-          "mean_ttft_ms": 8.607,
-          "p95_ttft_ms": 11.632,
-          "requests": 64
-        },
-        "heuristic_transfer_underestimated": {
-          "decision_counts": {
-            "full_reuse": 48,
-            "partial_reuse": 12,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 20.438,
-          "mean_transferred_kib": 20120.0,
-          "mean_ttft_ms": 8.607,
-          "p95_ttft_ms": 11.632,
-          "requests": 64
-        },
-        "oracle_ttft": {
-          "decision_counts": {
-            "full_reuse": 60,
-            "recompute": 4
-          },
-          "mean_recompute_tokens": 0,
-          "mean_transferred_kib": 20774.0,
-          "mean_ttft_ms": 7.843,
-          "p95_ttft_ms": 11.632,
-          "requests": 64
-        },
-        "threshold_partial": {
-          "decision_counts": {
-            "partial_reuse": 48,
-            "recompute": 16
-          },
-          "mean_recompute_tokens": 346.938,
-          "mean_transferred_kib": 9672.0,
-          "mean_ttft_ms": 11.878,
-          "p95_ttft_ms": 12.525,
-          "requests": 64
-        }
-      },
-      "requests": 64,
-      "workload_family": "tool-scaffold-agent"
     }
   },
   "policies": {
     "always_full_reuse": {
       "decision_counts": {
-        "full_reuse": 750,
-        "recompute": 50
+        "full_reuse": 190,
+        "recompute": 18
       },
       "mean_recompute_tokens": 0,
-      "mean_transferred_kib": 28602.48,
-      "mean_ttft_ms": 10.532,
-      "p95_ttft_ms": 32.45,
-      "requests": 800
+      "mean_transferred_kib": 29387.846,
+      "mean_ttft_ms": 9.912,
+      "p95_ttft_ms": 21.1,
+      "requests": 208
     },
     "always_recompute": {
       "decision_counts": {
-        "recompute": 800
+        "recompute": 208
       },
-      "mean_recompute_tokens": 893.827,
+      "mean_recompute_tokens": 918.37,
       "mean_transferred_kib": 0.0,
-      "mean_ttft_ms": 18.982,
-      "p95_ttft_ms": 61.033,
-      "requests": 800
+      "mean_ttft_ms": 18.769,
+      "p95_ttft_ms": 39.909,
+      "requests": 208
     },
     "heuristic": {
       "decision_counts": {
-        "full_reuse": 635,
-        "partial_reuse": 115,
-        "recompute": 50
+        "full_reuse": 168,
+        "partial_reuse": 22,
+        "recompute": 18
       },
-      "mean_recompute_tokens": 20.723,
-      "mean_transferred_kib": 27939.36,
-      "mean_ttft_ms": 11.525,
-      "p95_ttft_ms": 34.532,
-      "requests": 800
+      "mean_recompute_tokens": 18.644,
+      "mean_transferred_kib": 28791.231,
+      "mean_ttft_ms": 10.782,
+      "p95_ttft_ms": 22.161,
+      "requests": 208
     },
     "heuristic_recompute_overestimated": {
       "decision_counts": {
-        "full_reuse": 635,
-        "partial_reuse": 115,
-        "recompute": 50
+        "full_reuse": 168,
+        "partial_reuse": 22,
+        "recompute": 18
       },
-      "mean_recompute_tokens": 20.723,
-      "mean_transferred_kib": 27939.36,
-      "mean_ttft_ms": 11.525,
-      "p95_ttft_ms": 34.532,
-      "requests": 800
+      "mean_recompute_tokens": 18.644,
+      "mean_transferred_kib": 28791.231,
+      "mean_ttft_ms": 10.782,
+      "p95_ttft_ms": 22.161,
+      "requests": 208
     },
     "heuristic_recompute_underestimated": {
       "decision_counts": {
-        "full_reuse": 599,
-        "partial_reuse": 149,
-        "recompute": 52
+        "full_reuse": 168,
+        "partial_reuse": 22,
+        "recompute": 18
       },
-      "mean_recompute_tokens": 62.315,
-      "mean_transferred_kib": 26608.4,
-      "mean_ttft_ms": 11.886,
-      "p95_ttft_ms": 34.532,
-      "requests": 800
+      "mean_recompute_tokens": 18.644,
+      "mean_transferred_kib": 28791.231,
+      "mean_ttft_ms": 10.782,
+      "p95_ttft_ms": 22.161,
+      "requests": 208
     },
     "heuristic_transfer_overestimated": {
       "decision_counts": {
-        "full_reuse": 633,
-        "partial_reuse": 115,
-        "recompute": 52
+        "full_reuse": 168,
+        "partial_reuse": 22,
+        "recompute": 18
       },
-      "mean_recompute_tokens": 20.927,
-      "mean_transferred_kib": 27932.8,
-      "mean_ttft_ms": 11.538,
-      "p95_ttft_ms": 34.532,
-      "requests": 800
+      "mean_recompute_tokens": 18.644,
+      "mean_transferred_kib": 28791.231,
+      "mean_ttft_ms": 10.782,
+      "p95_ttft_ms": 22.161,
+      "requests": 208
     },
     "heuristic_transfer_underestimated": {
       "decision_counts": {
-        "full_reuse": 635,
-        "partial_reuse": 115,
-        "recompute": 50
+        "full_reuse": 168,
+        "partial_reuse": 22,
+        "recompute": 18
       },
-      "mean_recompute_tokens": 20.723,
-      "mean_transferred_kib": 27939.36,
-      "mean_ttft_ms": 11.525,
-      "p95_ttft_ms": 34.532,
-      "requests": 800
+      "mean_recompute_tokens": 18.644,
+      "mean_transferred_kib": 28791.231,
+      "mean_ttft_ms": 10.782,
+      "p95_ttft_ms": 22.161,
+      "requests": 208
     },
     "oracle_ttft": {
       "decision_counts": {
-        "full_reuse": 750,
-        "recompute": 50
+        "full_reuse": 190,
+        "recompute": 18
       },
       "mean_recompute_tokens": 0,
-      "mean_transferred_kib": 28602.48,
-      "mean_ttft_ms": 10.532,
-      "p95_ttft_ms": 32.45,
-      "requests": 800
+      "mean_transferred_kib": 29387.846,
+      "mean_ttft_ms": 9.912,
+      "p95_ttft_ms": 21.1,
+      "requests": 208
     },
     "threshold_partial": {
       "decision_counts": {
-        "partial_reuse": 528,
-        "recompute": 272
+        "partial_reuse": 130,
+        "recompute": 78
       },
-      "mean_recompute_tokens": 488.98,
-      "mean_transferred_kib": 12955.12,
-      "mean_ttft_ms": 15.871,
-      "p95_ttft_ms": 37.431,
-      "requests": 800
+      "mean_recompute_tokens": 504.154,
+      "mean_transferred_kib": 13254.923,
+      "mean_ttft_ms": 15.449,
+      "p95_ttft_ms": 30.99,
+      "requests": 208
     }
   },
-  "trace_count": 800,
-  "trace_source": "llm-serving-workloads",
+  "trace_count": 208,
+  "trace_source": "llm-serving-workloads shared benchmark catalog",
   "workload_cases": [
-    "shared_session_affine_multi_turn",
-    "shared_session_affine_bursty",
-    "shared_rag_followup",
-    "shared_long_context_doc_analysis",
-    "shared_tool_scaffold_agent",
-    "shared_repo_aware_coding_assistant",
-    "shared_experiment_planning_assistant",
-    "shared_simulation_analysis_verification",
-    "shared_async_document_pipeline",
-    "shared_realtime_voice_assistant",
-    "shared_synthetic_shared_prefix_microbenchmark",
     "shared_scenario_multi_turn_knowledge_service",
     "shared_scenario_rag_followup_long_context",
     "shared_scenario_structured_agent_decode",
-    "shared_public_sharegpt_boundary"
+    "shared_prefix_multi_tenant_assistant",
+    "session_continuation_with_maintenance",
+    "dynamic_rag_corpus_update"
   ]
 }

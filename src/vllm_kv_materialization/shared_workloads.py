@@ -11,11 +11,32 @@ from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-EXPERIMENT_ARTICLE_CASE_IDS = (
+
+DECISION_SURFACE_CASE_IDS = (
 	"shared_scenario_multi_turn_knowledge_service",
 	"shared_scenario_rag_followup_long_context",
 	"shared_scenario_structured_agent_decode",
+	"shared_prefix_multi_tenant_assistant",
+	"session_continuation_with_maintenance",
+	"dynamic_rag_corpus_update",
 )
+
+DECISION_SURFACE_CASE_ROLES = {
+	"shared_scenario_multi_turn_knowledge_service": "exact_continuation_baseline",
+	"shared_scenario_rag_followup_long_context": "retrieval_followup_long_context_boundary",
+	"shared_scenario_structured_agent_decode": "mixed_schema_and_transcript_overlap",
+	"shared_prefix_multi_tenant_assistant": "prefix_rich_multi_tenant_surface",
+	"session_continuation_with_maintenance": "long_context_continuation_surface",
+	"dynamic_rag_corpus_update": "dynamic_retrieval_followup_surface",
+}
+
+RUNTIME_BOUNDARY_CASE_IDS = (
+	"shared_prefix_multi_tenant_assistant",
+	"session_continuation_with_maintenance",
+	"dynamic_rag_corpus_update",
+)
+
+EXPERIMENT_ARTICLE_CASE_IDS = DECISION_SURFACE_CASE_IDS
 
 DEFAULT_LIVE_WORKLOAD_CASE = EXPERIMENT_ARTICLE_CASE_IDS[0]
 
@@ -246,8 +267,11 @@ def build_live_workload(
 
 
 __all__ = [
+	"DECISION_SURFACE_CASE_IDS",
+	"DECISION_SURFACE_CASE_ROLES",
 	"DEFAULT_LIVE_WORKLOAD_CASE",
 	"EXPERIMENT_ARTICLE_CASE_IDS",
+	"RUNTIME_BOUNDARY_CASE_IDS",
 	"SharedLiveRequest",
 	"SharedLiveWorkload",
 	"WhitespaceTokenizer",

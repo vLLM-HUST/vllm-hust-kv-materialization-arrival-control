@@ -1,36 +1,100 @@
 # vLLM KV Materialization Plugin
 
-This repository is a standalone research plugin for vLLM focused on adaptive
-KV materialization at request arrival.
+This repository studies one narrow control point in vLLM serving: arrival-time
+KV materialization decisions.
 
-The target question is deliberately narrow:
+For an incoming request with reusable prefix or KV state already available, the
+controller chooses exactly one action:
 
-- when reusable KV or prefix state exists,
-- should vLLM fully reuse it,
-- partially materialize it,
-- or recompute from scratch?
+- `full_reuse`
+- `partial_reuse`
+- `recompute`
 
-The repository is structured to support two phases of work in one place:
+Everything in this repository should stay subordinate to that question. This is
+not a general admission-control repository, not an online memory-evolution
+repository, and not a generic state-management repository.
 
-- an experimental study on reuse-benefit versus materialization-overhead
-- an optimization-facing out-of-tree vLLM plugin that installs through
-  `vllm.general_plugins`
+## Scope
 
-The intended repository shape now mirrors the `sglang-dp-locality-plugin`
-pattern in this workspace: one repository carries the workload-grounded study,
-the out-of-tree optimization path, and the paper assets together, while shared
-scenario inputs enter from `llm-serving-workloads` rather than from repo-local
-benchmark copies.
+This artifact studies:
 
-## Upstream Safety Workflow
+- whether reusable state should be fully materialized, partially materialized,
+  or ignored at request arrival
+- how that three-action decision surface behaves across shared workload
+  families with different overlap geometry and startup-latency pressure
+- how much of that decision surface is currently realizable through the current
+  out-of-tree vLLM runtime seam
 
-- Keep `/home/shuhao/reference-repos/vllm` untouched.
-- Use the dedicated repo clone and environment for this project.
-- If an upstream-local delta becomes unavoidable, carry it inside this
-  repository under `vendor/` or `patches/` instead of modifying the shared
-  reference checkout.
+This artifact does not study:
 
-## Bootstrap
+- general admission or queue-gating policy
+- online memory evolution, writeback, or long-horizon state lifecycle control
+- a broad scheduler or placement redesign
+
+## Truthfulness Boundary
+
+This repository keeps two evidence layers separate.
+
+- `decision-study`: offline, workload-grounded analysis of the three-action
+  arrival-time decision surface
+- `runtime-boundary-live`: live execution against a vLLM-compatible endpoint to
+  show what the current runtime seam can and cannot realize online
+
+The offline study supports claims about decision structure, sensitivity, and
+workload coverage. It does not imply deployed runtime gains.
+
+The live path is truthfulness-safe only when described as a runtime realization
+boundary:
+
+- `full_reuse` is realized through anchor-scoped prefix-cache reuse
+- `recompute` is realized through request-scoped prefix-cache bypass
+- `partial_reuse` is observed by the policy but currently falls back to
+  anchor-scoped `full_reuse` on the unmodified prefix-cache path
+
+## Partial Reuse Boundary
+
+`partial_reuse` is the key action for this artifact, so its boundary stays
+explicit.
+
+Offline meaning:
+
+- reuse only a profitable prefix segment
+- recompute the remaining suffix
+- compare that hybrid action against `full_reuse` and `recompute`
+
+Current live-path taxonomy:
+
+- observed decision: `partial_reuse`
+- runtime support tier: `fallback_to_supported_runtime_action`
+- fallback reason:
+  `exact_partial_segment_materialization_unavailable_on_prefix_cache_path`
+- effective live action: anchor-scoped `full_reuse`
+
+That fallback is a real limitation of the current runtime path and should be
+described as such, not widened into a generic “state-management” claim.
+
+## Workload Source Of Truth
+
+All workload-driven paths must enter through `llm-serving-workloads`. This
+repository should not grow a second local workload catalog.
+
+The default arrival-time decision matrix now covers six shared cases from the
+sibling workload repository:
+
+- `shared_scenario_multi_turn_knowledge_service`
+- `shared_scenario_rag_followup_long_context`
+- `shared_scenario_structured_agent_decode`
+- `shared_prefix_multi_tenant_assistant`
+- `session_continuation_with_maintenance`
+- `dynamic_rag_corpus_update`
+
+Those cases deliberately cover:
+
+- prefix-rich multi-tenant overlap
+- long-context continuation under maintenance-style continuity
+- dynamic retrieval follow-up under evolving corpus state
+
+## Canonical Paths
 
 Preferred bootstrap:
 
@@ -38,103 +102,25 @@ Preferred bootstrap:
 make bootstrap-env
 ```
 
-Default assumptions for this repository:
-
-- shared clone source env: `llm-optimizations`
-- dedicated environment name: `vllm-kv-materialization-exp`
-- local model examples should prefer `/home/shuhao/shared-models/<model>`
-
-This repository now assumes day-to-day commands run inside the dedicated conda
-environment `vllm-kv-materialization-exp`, either explicitly or through the
-top-level `Makefile` targets, which default to `conda run -n vllm-kv-materialization-exp ...`.
-
-## Current Scope
-
-The first iteration is intentionally experimental-study-first.
-
-The codebase includes:
-
-- a small installable plugin registration surface
-- a lightweight offline policy model for KV materialization decisions
-- experiment scripts for trace-driven comparison
-- experiment scripts for real-model OpenAI-compatible endpoint benchmarking
-- a paper-side offline study pipeline that writes paper-ready summaries
-- a paper skeleton and related-work archive
-
-The current action space is:
-
-- `full_reuse`
-- `partial_reuse`
-- `recompute`
-
-## Dual Paper Modes
-
-This repository is now organized to support two paper surfaces without splitting
-the artifact:
-
-- experimental paper mode: workload-driven offline study over shared scenario
-  cases from `llm-serving-workloads`, focused on the decision surface and cost
-  tradeoffs of `full_reuse`, `partial_reuse`, and `recompute`
-- optimization paper mode: the same repository ships an installable vLLM plugin
-  boundary plus shared-workload live benchmarks that evaluate whether the policy
-  can be turned into an actual serving optimization
-
-The policy logic stays in one place, but the evaluation surface is explicit
-about whether a result is study-side evidence or runtime-facing optimization
-evidence.
-
-## Repository Layout
-
-```text
-vllm-kv-materialization-plugin/
-├── CHANGELOG.md
-├── CONTRIBUTING.md
-├── Makefile
-├── README.md
-├── agent.md
-├── proposal/
-├── pyproject.toml
-├── scripts/
-├── src/
-│   └── vllm_kv_materialization/
-├── paper/
-│   ├── kv_materialization_control/
-│   └── related_works/
-├── tests/
-└── vendor/
-```
-
-## Why This Can Be A Separate Repository
-
-vLLM supports out-of-tree plugins through the `vllm.general_plugins` entry-point
-group and the `VLLM_PLUGINS` environment variable.
-
-This repository uses that plugin boundary so the policy logic, experiments, and
-paper can evolve independently from upstream vLLM.
-
-## Common Commands
+Canonical repository-local entrypoints:
 
 ```bash
-make help
-make bootstrap-env
-make install-dev
-make smoke
-make test
-make shared-workloads-smoke
-make shared-workloads-test
-make study-experiment
-make shared-workloads-offline
-make shared-workloads-live MODEL=/home/shuhao/shared-models/Qwen2.5-7B-Instruct
+make decision-study
+make runtime-boundary-live MODEL=/home/shuhao/shared-models/Qwen2.5-7B-Instruct \
+  WORKLOAD_CASE=shared_prefix_multi_tenant_assistant
 make pdf
-make paper
-make build
 ```
 
-`shared-workloads-smoke` writes the standardized generic compatibility report
-under `.benchmarks/results`, while `shared-workloads-test` combines that report
-with the repository's unit test suite.
+Compatibility aliases remain available:
 
-Preferred shared-workload entry from the workload repository:
+- `make study-experiment`
+- `make experiment`
+- `make shared-workloads-offline`
+- `make live-benchmark`
+- `make shared-workloads-live`
+- `make optimization-live`
+
+Preferred workload-entry wrapper from `llm-serving-workloads`:
 
 ```bash
 cd /home/shuhao/llm-serving-workloads
@@ -143,8 +129,27 @@ make kv-materialization-live \
   BASE_URL=https://api.sage.org.ai/v1 \
   OPENAI_API_KEY=<token> \
   MODEL=/home/shuhao/shared-models/Qwen2.5-7B-Instruct \
-  WORKLOAD_CASE=shared_scenario_multi_turn_knowledge_service
+  WORKLOAD_CASE=shared_prefix_multi_tenant_assistant
 ```
+
+## Common Commands
+
+```bash
+make help
+make install-dev
+make smoke
+make test
+make shared-workloads-smoke
+make shared-workloads-test
+make offline-experiment
+make decision-study
+make runtime-boundary-live MODEL=/home/shuhao/shared-models/Qwen2.5-7B-Instruct
+make pdf
+make build
+```
+
+`shared-workloads-smoke` writes the standardized compatibility report under
+`.benchmarks/results`.
 
 ## Usage
 
@@ -154,96 +159,41 @@ Run vLLM with the plugin enabled through the wrapper launcher:
 vllm-kv-materialization-serve serve --model <model>
 ```
 
-Run the offline experiment harness:
+Run the toy policy harness:
 
 ```bash
 vllm-kv-materialization-offline --policy heuristic
 ```
 
-The canonical repo-local bootstrap helper is:
-
-```bash
-bash scripts/setup_repo_env.sh
-```
-
-Run the paper-side study pipeline and build the PDF:
-
-```bash
-make study-experiment
-make pdf
-```
-
-Run a real-model benchmark once a vLLM environment and model path are available:
-
-```bash
-make shared-workloads-live \
-  BASE_URL=https://api.sage.org.ai/v1 \
-  OPENAI_API_KEY=<token> \
-  MODEL=/home/shuhao/shared-models/Qwen2.5-7B-Instruct \
-  WORKLOAD_CASE=shared_scenario_multi_turn_knowledge_service
-```
-
 When launching a local vLLM server through
 `paper/kv_materialization_control/experiments/launch_vllm_kv_materialization_server.sh`,
-leave `MAX_MODEL_LEN` unset if you want the launcher to derive the default
-context window from `llm-serving-workloads` using `WORKLOAD_CASE`. The current
-shared workload catalog recommends `32768` for the Qwen2.5-7B-Instruct-centered
-workspace. Set `MAX_MODEL_LEN` manually only when you intentionally want a
-smaller serving envelope.
+leave `MAX_MODEL_LEN` unset if you want the launcher to derive the serving
+window from `llm-serving-workloads` via `WORKLOAD_CASE`.
 
-For OpenAI-compatible remote endpoints, `BASE_URL` may be either the server root
-or a path that already ends with `/v1`. The live driver now normalizes both
-forms and forwards `OPENAI_API_KEY` plus `OPENAI_HTTP_USER_AGENT` when present.
+For OpenAI-compatible endpoints, `BASE_URL` may be either the server root or a
+path that already ends with `/v1`. The live driver normalizes both forms and
+forwards `OPENAI_API_KEY` plus `OPENAI_HTTP_USER_AGENT` when present.
 
 ## Paper And Experiments
 
-The paper workspace lives under:
+Paper assets live under:
 
 - `paper/kv_materialization_control/`
 - `paper/kv_materialization_control/experiments/`
 - `paper/related_works/`
 
-The experiment pipeline currently emits:
+The decision-study pipeline emits paper-facing summaries under
+`paper/kv_materialization_control/experiments/results/latest/`.
 
-- `paper/kv_materialization_control/experiments/results/latest/offline_summary.json`
-- `paper/kv_materialization_control/experiments/results/latest/offline_summary.md`
-- `paper/kv_materialization_control/experiments/results/latest/offline_summary_table.tex`
+The runtime-boundary live path writes endpoint summaries under
+`paper/kv_materialization_control/experiments/results/live/`.
 
-The default offline study now derives representative workload cases from the
-sibling `llm-serving-workloads` repository instead of relying only on the
-checked-in sample JSONL, and it reports an oracle upper bound plus heuristic
-cost-misestimation sensitivity results alongside the main baselines.
+## Repository Boundary
 
-The live benchmark path now consumes named shared benchmark cases from
-`llm-serving-workloads` as well. The previous repo-local `short_low` and
-`long_medium` presets remain only as deprecated aliases inside the driver for
-compatibility.
+Keep `/home/shuhao/reference-repos/vllm` untouched. If an upstream-local delta
+becomes unavoidable, carry it inside this repository under `vendor/` or
+`patches/`.
 
-The live benchmark path writes endpoint results under:
-
-- `paper/kv_materialization_control/experiments/results/live/`
-
-The current proposal materials live under:
-
-- `proposal/topic.md`
-
-## Research Framing
-
-This repository is intentionally not a placement-policy clone of DP-locality
-work and not an eviction-policy clone of prior KV-retention work.
-
-Its question is orthogonal:
-
-- given reusable state,
-- how much of that state should be materialized,
-- and when is reuse not worth its realization overhead?
-
-That gives a single-hook policy problem with a moderate action space and a
-clean path from study to plugin.
-
-## Shared Workload Entry Convention
-
-All workload-driven tests for this repository should enter from
-`llm-serving-workloads` or through this repository's `shared-workloads-*`
-targets that are explicitly wired to that package. The repository should not
-grow a second local workload catalog.
+This repository exists because vLLM supports out-of-tree plugins through
+`vllm.general_plugins`. That seam is the right place to study arrival-time
+materialization decisions without turning this repo into an upstream fork.

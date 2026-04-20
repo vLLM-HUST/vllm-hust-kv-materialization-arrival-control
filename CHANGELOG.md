@@ -15,6 +15,8 @@
 - Added explicit dual-mode workflows for experimental-paper reruns and optimization-paper live benchmarks.
 - Added OpenAI-compatible live endpoint support for `OPENAI_API_KEY`, custom `User-Agent`, and endpoint roots that already include `/v1`.
 - Added standard `shared-workloads-smoke` and `shared-workloads-test` root targets, plus a `.benchmarks/` placeholder workspace for standardized shared workload smoke artifacts.
+- Added explicit decision-surface workload coverage for prefix-rich multi-tenant, long-context continuation, and dynamic retrieval follow-up shared cases from `llm-serving-workloads`.
+- Added explicit live runtime fallback taxonomy fields so `partial_reuse` degradations are logged as unsupported exact segment materialization rather than implied as native runtime support.
 
 ### Changed
 
@@ -24,3 +26,5 @@
 - Changed the live benchmark path from repo-local workload presets to named shared workload cases, with compatibility aliases retained only in the driver.
 - Changed the recommended workspace entry so workload-driven tests start from `llm-serving-workloads` or repository targets explicitly wired to it.
 - Changed the repo-local vLLM launcher so `MAX_MODEL_LEN` now defaults from `llm-serving-workloads` shared `serving_hints` via `WORKLOAD_CASE`, instead of hard-coding a separate repository-local context-window default.
+- Changed the canonical experiment naming to `decision-study` and `runtime-boundary-live`, while retaining older names as compatibility aliases.
+- Changed the README and paper framing to keep the repo scoped to arrival-time materialization decisions, explicitly excluding general admission and online memory evolution.

@@ -4,6 +4,8 @@ from vllm_kv_materialization.live_control import HEADER_PRIMARY_ANCHOR
 from vllm_kv_materialization.live_control import HEADER_REUSE_CONFIDENCE
 from vllm_kv_materialization.live_control import HEADER_SHARED_PREFIX_TOKENS
 from vllm_kv_materialization.live_control import HEADER_TURN_INDEX
+from vllm_kv_materialization.live_control import PARTIAL_REUSE_FALLBACK_REASON
+from vllm_kv_materialization.live_control import RUNTIME_SUPPORT_FALLBACK
 from vllm_kv_materialization.live_control import apply_runtime_control
 from vllm_kv_materialization.live_control import bind_request_headers
 from vllm_kv_materialization.live_control import compute_runtime_control
@@ -90,7 +92,10 @@ def test_compute_runtime_control_marks_partial_as_degraded_full_reuse(monkeypatc
     assert observation.decision == "partial_reuse"
     assert observation.runtime_effective_decision == "full_reuse"
     assert plan.decision_supported is False
-    assert "partial_reuse_degraded" in observation.runtime_control_path
+    assert observation.runtime_support_tier == RUNTIME_SUPPORT_FALLBACK
+    assert observation.runtime_fallback_reason == PARTIAL_REUSE_FALLBACK_REASON
+    assert plan.fallback_reason == PARTIAL_REUSE_FALLBACK_REASON
+    assert "partial_reuse_fallback" in observation.runtime_control_path
 
 
 def test_apply_runtime_control_injects_cache_salt() -> None:
@@ -102,6 +107,8 @@ def test_apply_runtime_control_injects_cache_salt() -> None:
         control_path=plan.control_path,
         cache_salt="kvmat:anchor:test",
         decision_supported=plan.decision_supported,
+        support_tier=plan.support_tier,
+        fallback_reason=plan.fallback_reason,
     )
 
     controlled = apply_runtime_control(prompt, plan)

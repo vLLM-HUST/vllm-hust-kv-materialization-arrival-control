@@ -43,6 +43,12 @@ DEFAULT_TRANSFER_BANDWIDTH_GBPS = 25.0
 DEFAULT_PREFILL_MS_PER_1K = 14.0
 DEFAULT_QUEUE_PRESSURE = 0.0
 
+RUNTIME_SUPPORT_NATIVE = "native_runtime_action"
+RUNTIME_SUPPORT_FALLBACK = "fallback_to_supported_runtime_action"
+PARTIAL_REUSE_FALLBACK_REASON = (
+    "exact_partial_segment_materialization_unavailable_on_prefix_cache_path"
+)
+
 
 @dataclass(frozen=True, slots=True)
 class RuntimeControlPlan:
@@ -51,6 +57,8 @@ class RuntimeControlPlan:
     control_path: str
     cache_salt: str | None
     decision_supported: bool
+    support_tier: str
+    fallback_reason: str | None
 
 
 @dataclass(frozen=True, slots=True)
@@ -79,6 +87,8 @@ class LiveObservation:
     runtime_control_path: str
     runtime_cache_salt: str | None
     runtime_decision_supported: bool
+    runtime_support_tier: str
+    runtime_fallback_reason: str | None
 
 
 def bind_request_headers(headers: Mapping[str, str] | None) -> contextvars.Token[dict[str, str]]:
@@ -176,8 +186,7 @@ def estimate_signals(headers: Mapping[str, str], prompt_tokens: int, output_toke
     if primary_anchor_id:
         with _ANCHOR_LOCK:
             anchor_seen_count = _ANCHOR_SEEN_COUNTS.get(primary_anchor_id, 0)
-            _ANCHOR_SEEN_COUNS = _ANCHOR_SEEN_COUNTS
-            _ANCHOR_SEEN_COUNS[primary_anchor_id] = anchor_seen_count + 1
+            _ANCHOR_SEEN_COUNTS[primary_anchor_id] = anchor_seen_count + 1
 
     reuse_confidence = _header_float(
         headers,
@@ -270,6 +279,8 @@ def compute_runtime_control(
             control_path="request_scoped_prefix_cache_bypass",
             cache_salt=_make_request_scoped_salt(primary_anchor_id, workload_case, request_id),
             decision_supported=True,
+            support_tier=RUNTIME_SUPPORT_NATIVE,
+            fallback_reason=None,
         )
     elif outcome.decision.value == "full_reuse":
         plan = RuntimeControlPlan(
@@ -278,14 +289,18 @@ def compute_runtime_control(
             control_path="anchor_scoped_prefix_cache",
             cache_salt=_make_anchor_scoped_salt(primary_anchor_id, workload_case),
             decision_supported=True,
+            support_tier=RUNTIME_SUPPORT_NATIVE,
+            fallback_reason=None,
         )
     else:
         plan = RuntimeControlPlan(
             observed_decision=outcome.decision.value,
             effective_decision="full_reuse",
-            control_path="partial_reuse_degraded_to_anchor_scoped_full_reuse",
+            control_path="partial_reuse_fallback_to_anchor_scoped_full_reuse",
             cache_salt=_make_anchor_scoped_salt(primary_anchor_id, workload_case),
             decision_supported=False,
+            support_tier=RUNTIME_SUPPORT_FALLBACK,
+            fallback_reason=PARTIAL_REUSE_FALLBACK_REASON,
         )
 
     observation = LiveObservation(
@@ -313,6 +328,8 @@ def compute_runtime_control(
         runtime_control_path=plan.control_path,
         runtime_cache_salt=plan.cache_salt,
         runtime_decision_supported=plan.decision_supported,
+        runtime_support_tier=plan.support_tier,
+        runtime_fallback_reason=plan.fallback_reason,
     )
     return observation, plan
 

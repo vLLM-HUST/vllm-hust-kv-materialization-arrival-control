@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from vllm_kv_materialization.shared_workloads import build_live_workload
+from vllm_kv_materialization.shared_workloads import DECISION_SURFACE_CASE_IDS
+from vllm_kv_materialization.shared_workloads import DECISION_SURFACE_CASE_ROLES
 from vllm_kv_materialization.shared_workloads import DEFAULT_LIVE_WORKLOAD_CASE
 from vllm_kv_materialization.shared_workloads import EXPERIMENT_ARTICLE_CASE_IDS
 from vllm_kv_materialization.shared_workloads import generate_case_requests
@@ -12,6 +14,8 @@ def test_default_experiment_cases_exist_in_shared_catalog() -> None:
 	workloads = load_workloads_module()
 	for case_id in EXPERIMENT_ARTICLE_CASE_IDS:
 		assert case_id in workloads.SHARED_BENCHMARK_CASE_CATALOG
+		assert case_id in DECISION_SURFACE_CASE_IDS
+		assert case_id in DECISION_SURFACE_CASE_ROLES
 
 
 def test_generate_case_requests_uses_shared_workload_cases() -> None:
@@ -41,6 +45,12 @@ def test_build_live_workload_preserves_shared_case_metadata() -> None:
 	assert workload.requests[0].arrival_gap_s == 0.0
 	assert workload.requests[1].arrival_gap_s > 0.0
 	assert workload.requests[0].workload_family == "rag-followup"
+
+
+def test_decision_surface_includes_new_state_management_cases() -> None:
+	assert "shared_prefix_multi_tenant_assistant" in DECISION_SURFACE_CASE_IDS
+	assert "session_continuation_with_maintenance" in DECISION_SURFACE_CASE_IDS
+	assert "dynamic_rag_corpus_update" in DECISION_SURFACE_CASE_IDS
 
 
 def test_generate_public_microbenchmark_case_requests() -> None:

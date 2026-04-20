@@ -1,31 +1,36 @@
 # KV Materialization Control Paper Workspace
 
-This directory contains the paper skeleton and experiment notes for the vLLM KV
-materialization project.
+This paper workspace is for a decision artifact, not a generic state-management
+paper.
 
-The workspace now supports two evidence modes from the same paper tree:
+The paper's core question is:
 
-- experimental mode: offline shared-workload study
-- optimization mode: live shared-workload benchmark over the out-of-tree plugin
+- at request arrival, when reusable state already exists,
+- should the system choose `full_reuse`, `partial_reuse`, or `recompute`?
 
-Primary claim direction:
+The paper should stay focused on that three-action surface.
 
-- reusable state is not free to realize
-- the right policy is not always full reuse
-- partial reuse can outperform both full reuse and recompute in mixed workloads
+## Evidence Layers
+
+This directory keeps two evidence layers separate.
+
+- `decision-study`: workload-grounded offline analysis of the arrival-time
+	decision surface
+- `runtime-boundary-live`: live execution against a vLLM-compatible endpoint to
+	document which actions the current runtime seam actually realizes
+
+The manuscript should not blur those layers into a single end-to-end claim.
 
 ## Local Workflow
 
 From the repository root:
 
 ```bash
-make study-experiment
+make decision-study
 make pdf
 ```
 
-The experiment target refreshes `experiments/results/latest/` and emits both
-JSON and LaTeX-friendly summaries consumed by the draft.
+The decision-study target refreshes `experiments/results/latest/` and emits the
+JSON, Markdown, and LaTeX-friendly summaries consumed by the draft.
 
-For real-model serving experiments, see:
-
-- `experiments/LIVE_EXPERIMENTS.md`
+For live runtime-boundary runs, see `experiments/LIVE_EXPERIMENTS.md`.

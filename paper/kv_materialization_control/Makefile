@@ -6,28 +6,33 @@ RESULT_DIR := $(EXPERIMENT_DIR)/results/latest
 PAPER_TEX := kv_materialization_control.tex
 PAPER_PDF := kv_materialization_control.pdf
 DEFAULT_WORKLOAD_CASES := shared_scenario_multi_turn_knowledge_service shared_scenario_rag_followup_long_context shared_scenario_structured_agent_decode
+DEFAULT_DECISION_WORKLOAD_CASES := shared_scenario_multi_turn_knowledge_service shared_scenario_rag_followup_long_context shared_scenario_structured_agent_decode shared_prefix_multi_tenant_assistant session_continuation_with_maintenance dynamic_rag_corpus_update
 DEFAULT_LIVE_WORKLOAD_CASE := shared_scenario_multi_turn_knowledge_service
 
 .DEFAULT_GOAL := help
 
-.PHONY: help experiment live-benchmark optimization-live pdf clean evidence-bundle submission-plan
+.PHONY: help experiment decision-study live-benchmark runtime-boundary-live optimization-live pdf clean evidence-bundle submission-plan
 
 help:
 	@printf '%s\n' \
 		'Paper targets:' \
-		'  make experiment      Run the workload-driven offline study and refresh latest paper-facing artifacts' \
-		'  make live-benchmark  Run a shared-workload live benchmark against a vLLM endpoint' \
-		'  make optimization-live Alias of make live-benchmark' \
+		'  make decision-study      Run the workload-driven arrival-time decision study and refresh paper artifacts' \
+		'  make experiment          Compatibility alias of make decision-study' \
+		'  make runtime-boundary-live Run a shared-workload live runtime-boundary benchmark against a vLLM endpoint' \
+		'  make live-benchmark      Compatibility alias of make runtime-boundary-live' \
+		'  make optimization-live   Compatibility alias of make runtime-boundary-live' \
 		'  make pdf             Build the paper PDF with tectonic' \
 		'  make evidence-bundle Show the latest generated evidence files' \
 		'  make submission-plan Print the paper submission plan note'
 
-experiment:
+decision-study:
 	PYTHONPATH=$(ROOT_DIR)/src $(PYTHON) $(EXPERIMENT_DIR)/run_offline_study.py \
-		$(foreach case,$(if $(WORKLOAD_CASES),$(WORKLOAD_CASES),$(DEFAULT_WORKLOAD_CASES)),--workload-case $(case)) \
+		$(foreach case,$(if $(WORKLOAD_CASES),$(WORKLOAD_CASES),$(DEFAULT_DECISION_WORKLOAD_CASES)),--workload-case $(case)) \
 		--output-dir $(RESULT_DIR)
 
-live-benchmark:
+experiment: decision-study
+
+runtime-boundary-live:
 	@test -n "$(MODEL)" || { echo 'MODEL is required. Usage: make live-benchmark MODEL=/path/to/model [WORKLOAD_CASE=shared_scenario_multi_turn_knowledge_service]' >&2; exit 2; }
 	PYTHONPATH=$(ROOT_DIR)/src $(PYTHON) $(EXPERIMENT_DIR)/run_openai_workloads.py \
 		--base-url "$${BASE_URL:-http://127.0.0.1:8011}" \
@@ -40,9 +45,11 @@ live-benchmark:
 		$(if $(SEED),--seed $(SEED),) \
 		--output $(EXPERIMENT_DIR)/results/live/$${LABEL:-$${WORKLOAD_CASE:-$(DEFAULT_LIVE_WORKLOAD_CASE)}}.json
 
-optimization-live: live-benchmark
+live-benchmark: runtime-boundary-live
 
-pdf: experiment
+optimization-live: runtime-boundary-live
+
+pdf: decision-study
 	cd $(CURDIR) && $(TECTONIC) --keep-logs $(PAPER_TEX)
 
 submission-plan:

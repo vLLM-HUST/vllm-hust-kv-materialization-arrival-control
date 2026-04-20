@@ -2,16 +2,16 @@
 \centering
 \setlength{\tabcolsep}{3pt}
 \footnotesize
-\caption{Offline study snapshot on workload-driven traces derived from llm-serving-workloads.}
+\caption{Arrival-time decision-study snapshot on workload-driven traces derived from llm-serving-workloads.}
 \begin{tabular}{@{}lrrrr@{}}
 \toprule
 Policy & Mean & P95 & Recomp. & Xfer KiB \\ 
 \midrule
-always recompute & 18.982 & 61.033 & 893.827 & 0.0 \\
-always full reuse & 10.532 & 32.45 & 0 & 28602.48 \\
-threshold partial & 15.871 & 37.431 & 488.98 & 12955.12 \\
-heuristic & 11.525 & 34.532 & 20.723 & 27939.36 \\
-oracle ttft & 10.532 & 32.45 & 0 & 28602.48 \\
+always recompute & 18.769 & 39.909 & 918.37 & 0.0 \\
+always full reuse & 9.912 & 21.1 & 0 & 29387.846 \\
+threshold partial & 15.449 & 30.99 & 504.154 & 13254.923 \\
+heuristic & 10.782 & 22.161 & 18.644 & 28791.231 \\
+oracle ttft & 9.912 & 21.1 & 0 & 29387.846 \\
 \bottomrule
 \end{tabular}
 \end{table}

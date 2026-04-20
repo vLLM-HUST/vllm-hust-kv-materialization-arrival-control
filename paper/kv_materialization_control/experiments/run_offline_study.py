@@ -10,6 +10,7 @@ from statistics import mean
 from vllm_kv_materialization.policy import MaterializationDecision
 from vllm_kv_materialization.policy import MaterializationPolicy
 from vllm_kv_materialization.policy import MaterializationSignals
+from vllm_kv_materialization.shared_workloads import DECISION_SURFACE_CASE_ROLES
 from vllm_kv_materialization.shared_workloads import generate_case_requests
 from vllm_kv_materialization.shared_workloads import load_workloads_module
 
@@ -254,11 +255,12 @@ def summarize_by_case(per_policy_records: dict[str, list[dict]], family_by_case:
 
 
 def render_markdown(summary: dict) -> str:
-    lines = ["# Offline Study Summary", ""]
+    lines = ["# Arrival-Time Decision Study Summary", ""]
     lines.append(f"- trace count: {summary['trace_count']}")
     lines.append(f"- trace source: {summary['trace_source']}")
     if summary.get("workload_cases"):
         lines.append(f"- workload cases: {', '.join(summary['workload_cases'])}")
+    lines.append("- claim boundary: offline decision-surface evidence only; no live runtime-gain claim")
     lines.append("")
     lines.append("## Overall Policies")
     lines.append("")
@@ -282,6 +284,9 @@ def render_markdown(summary: dict) -> str:
             lines.append(f"### {case_id}")
             lines.append("")
             lines.append(f"- family: {case_summary['workload_family']}")
+            role = DECISION_SURFACE_CASE_ROLES.get(case_id)
+            if role is not None:
+                lines.append(f"- decision role: {role}")
             lines.append(f"- requests: {case_summary['requests']}")
             heuristic_metrics = case_summary["policies"].get("heuristic")
             oracle_metrics = case_summary["policies"].get("oracle_ttft")
@@ -307,7 +312,7 @@ def render_table_tex(summary: dict) -> str:
         "\\centering\n"
         "\\setlength{\\tabcolsep}{3pt}\n"
         "\\footnotesize\n"
-        "\\caption{Offline study snapshot on workload-driven traces derived from llm-serving-workloads.}\n"
+        "\\caption{Arrival-time decision-study snapshot on workload-driven traces derived from llm-serving-workloads.}\n"
         "\\begin{tabular}{@{}lrrrr@{}}\n"
         "\\toprule\n"
         "Policy & Mean & P95 & Recomp. & Xfer KiB \\\\ \n"
@@ -345,7 +350,7 @@ def main() -> None:
         traces.extend(load_traces(trace_path))
         trace_source = f"jsonl:{trace_path.name}"
     else:
-        trace_source = "llm-serving-workloads"
+        trace_source = "llm-serving-workloads shared benchmark catalog"
 
     for case_id in workload_cases:
         traces.extend(workload_case_to_traces(case_id, seed=args.seed))
