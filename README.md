@@ -106,7 +106,7 @@ Canonical repository-local entrypoints:
 
 ```bash
 make decision-study
-make runtime-boundary-live MODEL=/home/shuhao/shared-models/Qwen2.5-7B-Instruct \
+make runtime-boundary-live MODEL=/path/to/shared-models/Qwen2.5-7B-Instruct \
   WORKLOAD_CASE=shared_prefix_multi_tenant_assistant
 make pdf
 ```
@@ -123,12 +123,12 @@ Compatibility aliases remain available:
 Preferred workload-entry wrapper from `llm-serving-workloads`:
 
 ```bash
-cd /home/shuhao/llm-serving-workloads
+cd /path/to/llm-serving-workloads
 make kv-materialization-study
 make kv-materialization-live \
   BASE_URL=https://api.sage.org.ai/v1 \
   OPENAI_API_KEY=<token> \
-  MODEL=/home/shuhao/shared-models/Qwen2.5-7B-Instruct \
+  MODEL=/path/to/shared-models/Qwen2.5-7B-Instruct \
   WORKLOAD_CASE=shared_prefix_multi_tenant_assistant
 ```
 
@@ -143,7 +143,7 @@ make shared-workloads-smoke
 make shared-workloads-test
 make offline-experiment
 make decision-study
-make runtime-boundary-live MODEL=/home/shuhao/shared-models/Qwen2.5-7B-Instruct
+make runtime-boundary-live MODEL=/path/to/shared-models/Qwen2.5-7B-Instruct
 make pdf
 make build
 ```
@@ -190,7 +190,7 @@ The runtime-boundary live path writes endpoint summaries under
 
 ## Repository Boundary
 
-Keep `/home/shuhao/reference-repos/vllm` untouched. If an upstream-local delta
+Keep the shared external `reference-repos/vllm` checkout untouched. If an upstream-local delta
 becomes unavoidable, carry it inside this repository under `vendor/` or
 `patches/`.
 
