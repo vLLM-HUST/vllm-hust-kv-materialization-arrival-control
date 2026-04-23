@@ -7,6 +7,8 @@ dist/
 *.egg-info/
 *.pyc
 *.pyo
+.tectonic-cache/
+*.build.log
 *.log
 *.orig
 *.rej

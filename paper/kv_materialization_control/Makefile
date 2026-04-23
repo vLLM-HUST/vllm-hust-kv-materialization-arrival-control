@@ -1,6 +1,9 @@
 PYTHON ?= python3
 TECTONIC ?= tectonic
 ROOT_DIR := $(abspath ../..)
+LLM_OPTIMIZATIONS_ROOT ?= $(abspath $(ROOT_DIR)/../llm-optimizations)
+LLM_OPTIMIZATIONS_PDF_DIR ?= $(LLM_OPTIMIZATIONS_ROOT)/docs/papers
+LLM_OPTIMIZATIONS_PDF_NAME ?= kv-materialization__kv_materialization_control.pdf
 EXPERIMENT_DIR := $(CURDIR)/experiments
 RESULT_DIR := $(EXPERIMENT_DIR)/results/latest
 PAPER_TEX := kv_materialization_control.tex
@@ -51,6 +54,11 @@ optimization-live: runtime-boundary-live
 
 pdf: decision-study
 	cd $(CURDIR) && $(TECTONIC) --keep-logs $(PAPER_TEX)
+	@if [ -d "$(LLM_OPTIMIZATIONS_ROOT)" ] && [ -f "$(PAPER_PDF)" ]; then \
+		mkdir -p "$(LLM_OPTIMIZATIONS_PDF_DIR)"; \
+		cp "$(PAPER_PDF)" "$(LLM_OPTIMIZATIONS_PDF_DIR)/$(LLM_OPTIMIZATIONS_PDF_NAME)"; \
+		printf 'Copied PDF to %s\n' "$(LLM_OPTIMIZATIONS_PDF_DIR)/$(LLM_OPTIMIZATIONS_PDF_NAME)"; \
+	fi
 
 submission-plan:
 	@cat $(EXPERIMENT_DIR)/submission_plan.md
