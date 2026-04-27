@@ -17,6 +17,7 @@
 - Added standard `shared-workloads-smoke` and `shared-workloads-test` root targets, plus a `.benchmarks/` placeholder workspace for standardized shared workload smoke artifacts.
 - Added explicit decision-surface workload coverage for prefix-rich multi-tenant, long-context continuation, and dynamic retrieval follow-up shared cases from `llm-serving-workloads`.
 - Added explicit live runtime fallback taxonomy fields so `partial_reuse` degradations are logged as unsupported exact segment materialization rather than implied as native runtime support.
+- Added a detailed Chinese `HANDOFF.md` so the repository can be handed to a student with a clear paper-oriented plan, especially around the unresolved `partial_reuse` runtime boundary.
 
 ### Changed
 
@@ -28,3 +29,6 @@
 - Changed the repo-local vLLM launcher so `MAX_MODEL_LEN` now defaults from `llm-serving-workloads` shared `serving_hints` via `WORKLOAD_CASE`, instead of hard-coding a separate repository-local context-window default.
 - Changed the canonical experiment naming to `decision-study` and `runtime-boundary-live`, while retaining older names as compatibility aliases.
 - Changed the README and paper framing to keep the repo scoped to arrival-time materialization decisions, explicitly excluding general admission and online memory evolution.
+- Changed package metadata and repository URLs for transfer readiness to the `intellistream` organization.
+- Changed docs to remove user-specific absolute path examples and source-organization-specific live endpoint examples.
+- Added explicit ownership and transfer targets in `README.md` for `caozhe` and `xuheng li`.

@@ -126,11 +126,21 @@ Preferred workload-entry wrapper from `llm-serving-workloads`:
 cd /path/to/llm-serving-workloads
 make kv-materialization-study
 make kv-materialization-live \
-  BASE_URL=https://api.sage.org.ai/v1 \
+  BASE_URL=https://<openai-compatible-endpoint>/v1 \
   OPENAI_API_KEY=<token> \
   MODEL=/path/to/shared-models/Qwen2.5-7B-Instruct \
   WORKLOAD_CASE=shared_prefix_multi_tenant_assistant
 ```
+
+## Ownership And Transfer
+
+- target owners: `caozhe`, `xuheng li`
+- target organization: `intellistream`
+- transfer readiness: keep repository docs and scripts free of user-specific
+  absolute paths and source-organization hardcoding
+
+For graduate-student takeover and paper-oriented follow-up, start from
+`HANDOFF.md`.
 
 ## Common Commands
 
