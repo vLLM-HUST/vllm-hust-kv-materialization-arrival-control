@@ -9,11 +9,14 @@ description = "Standalone vLLM plugin for adaptive KV materialization studies"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = []
-authors = [{name = "Shuhao Prototype"}]
+authors = [
+	{name = "caozhe"},
+	{name = "xuheng li"},
+]
 
 [project.urls]
-Repository = "https://github.com/Qixin-Gaoke/vllm-kv-materialization-plugin"
-Issues = "https://github.com/Qixin-Gaoke/vllm-kv-materialization-plugin/issues"
+Repository = "https://github.com/intellistream/vllm-kv-materialization-plugin"
+Issues = "https://github.com/intellistream/vllm-kv-materialization-plugin/issues"
 
 [project.scripts]
 vllm-kv-materialization-serve = "vllm_kv_materialization.launcher:main"
