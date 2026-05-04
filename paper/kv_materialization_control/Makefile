@@ -55,9 +55,12 @@ optimization-live: runtime-boundary-live
 pdf: decision-study
 	cd $(CURDIR) && $(TECTONIC) --keep-logs $(PAPER_TEX)
 	@if [ -d "$(LLM_OPTIMIZATIONS_ROOT)" ] && [ -f "$(PAPER_PDF)" ]; then \
-		mkdir -p "$(LLM_OPTIMIZATIONS_PDF_DIR)"; \
-		cp "$(PAPER_PDF)" "$(LLM_OPTIMIZATIONS_PDF_DIR)/$(LLM_OPTIMIZATIONS_PDF_NAME)"; \
-		printf 'Copied PDF to %s\n' "$(LLM_OPTIMIZATIONS_PDF_DIR)/$(LLM_OPTIMIZATIONS_PDF_NAME)"; \
+		python3 "$(LLM_OPTIMIZATIONS_ROOT)/scripts/export_paper_pdf.py" \
+			--workspace-file "$(LLM_OPTIMIZATIONS_ROOT)/llm-optimizations.code-workspace" \
+			--repo-root "$(ROOT_DIR)" \
+			--source-pdf "$(PAPER_PDF)" \
+			--output-name "$(LLM_OPTIMIZATIONS_PDF_NAME)" \
+			--destination-dir "$(LLM_OPTIMIZATIONS_PDF_DIR)"; \
 	fi
 
 submission-plan:
