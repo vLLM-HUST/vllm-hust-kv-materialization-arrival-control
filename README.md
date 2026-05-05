@@ -14,6 +14,17 @@ Everything in this repository should stay subordinate to that question. This is
 not a general admission-control repository, not an online memory-evolution
 repository, and not a generic state-management repository.
 
+## Reference Paper
+
+- Short label: `LEAP / SIGMOD 2024`
+- Full paper: `Predictive and Near-Optimal Sampling for View Materialization in Video Databases`
+
+Chinese guidance for student follow-up:
+
+- 学这篇的地方：把 materialization 写成一个有成本约束的 selective decision problem，强调“现在值不值得物化”而不是泛化成所有状态管理都归这个仓库。
+- 不要直接照搬的地方：LEAP 面向视频数据库 view materialization；当前仓库面向 arrival-time KV materialization，动作集合是 `full_reuse / partial_reuse / recompute`。
+- 写作时更适合继承的是：选择性物化的决策逻辑、收益与代价的平衡表达、以及“部分物化当前为什么还只停在 boundary”这种边界诚实写法。
+
 ## Scope
 
 This artifact studies:
