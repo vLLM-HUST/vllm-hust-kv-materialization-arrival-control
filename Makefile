@@ -56,10 +56,12 @@ bootstrap-env:
 
 bootstrap-shared-env:
 	$(SHARED_ENV_SCRIPT) --profile generic --source-env '$(SHARED_SOURCE_ENV)' --repo-root "$$PWD" --env-name '$(SHARED_ENV_NAME)'
+	@$(MAKE) install-dev CONDA_ENV='$(SHARED_ENV_NAME)'
+	@printf '%s\n' 'Bootstrap complete and dev dependencies installed.'
 
 install-dev:
 	@if [ -f '$(WORKLOAD_REPO)/pyproject.toml' ]; then \
-		$(PIP) install -e '$(WORKLOAD_REPO)'; \
+		$(PIP) install -e '$(WORKLOAD_REPO)' || printf '%s\n' 'Skipping sibling llm-serving-workloads editable install; shared-workload entrypoints will use WORKLOAD_REPO/src directly.'; \
 	else \
 		printf 'Skipping sibling llm-serving-workloads install: %s\n' '$(WORKLOAD_REPO)'; \
 	fi
@@ -73,7 +75,7 @@ test:
 
 shared-workloads-smoke:
 	@mkdir -p '$(SHARED_WORKLOAD_RESULTS_DIR)'
-	PYTHONPATH='$(WORKLOAD_REPO)/src:src' $(PYTHON) -m llm_serving_workloads.shared_workload_smoke \
+	$(CONDA_RUN) env PYTHONPATH='$(WORKLOAD_REPO)/src:src' python -m llm_serving_workloads.shared_workload_smoke \
 		--output-json '$(SHARED_WORKLOAD_RESULTS_DIR)/shared_workloads_smoke.json' \
 		--output-markdown '$(SHARED_WORKLOAD_RESULTS_DIR)/shared_workloads_smoke.md'
 
