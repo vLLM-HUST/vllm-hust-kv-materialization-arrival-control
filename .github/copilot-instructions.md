@@ -34,3 +34,9 @@
 ```bash
 PYTHONPATH=src pytest -q
 ```
+
+## Conda Execution Rule
+
+- Run repo-local experiments, benchmarks, paper artifact generation, smoke checks, and tests in the dedicated conda environment `vllm-kv-materialization-exp`.
+- Prefer explicit `conda run -n vllm-kv-materialization-exp ...` over relying on shell activation or the ambient `python`.
+- If a repo-local command omits `conda run`, treat it as shorthand for running inside `vllm-kv-materialization-exp`.
