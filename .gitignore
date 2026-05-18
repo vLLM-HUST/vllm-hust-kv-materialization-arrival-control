@@ -15,3 +15,20 @@ dist/
 .ipynb_checkpoints/
 scratch/
 tmp/
+/.cache/
+
+# Generated proposal artifacts
+/proposal/*.pdf
+/proposal/topic-preview*.png
+
+# Generated experiment outputs
+/paper/kv_materialization_control/experiments/results/full_catalog_*/
+/paper/kv_materialization_control/experiments/results/live/
+/paper/kv_materialization_control/experiments/results/latest/offline_details.json
+/paper/kv_materialization_control/experiments/results/latest/offline_summary.json
+/paper/kv_materialization_control/experiments/results/latest/offline_summary.md
+/paper/kv_materialization_control/experiments/results/latest/offline_summary_macros.tex
+/paper/kv_materialization_control/experiments/results/latest/offline_summary_table.tex
+/paper/kv_materialization_control/experiments/results/latest/offline_decision_mix_figure.tex
+/paper/kv_materialization_control/experiments/results/latest/offline_workload_key_table.tex
+/paper/kv_materialization_control/kv_materialization_control.pdf
