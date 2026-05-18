@@ -59,8 +59,9 @@ boundary:
 
 - `full_reuse` is realized through anchor-scoped prefix-cache reuse
 - `recompute` is realized through request-scoped prefix-cache bypass
-- `partial_reuse` is observed by the policy but currently falls back to
-  anchor-scoped `full_reuse` on the unmodified prefix-cache path
+- `partial_reuse` is realized only at hash-block granularity on the current
+  prefix-cache path; exact token-level segmented materialization is still not
+  available
 
 ## Partial Reuse Boundary
 
@@ -69,17 +70,52 @@ explicit.
 
 Offline meaning:
 
-- reuse only a profitable prefix segment
+- choose a profitable cut point, reuse the high-confidence prefix segment, and
+  recompute the remaining suffix
 - recompute the remaining suffix
 - compare that hybrid action against `full_reuse` and `recompute`
+
+Current offline evaluator semantics:
+
+- `partial_reuse` is no longer modeled as a fixed half-prefix proxy
+- the evaluator estimates a confidence-aware reuse frontier and discounts the
+  value of low-confidence tail tokens
+- the policy and oracle both optimize the partial cut point against that same
+  cost model, so `partial_reuse` now means "reuse up to the best boundary" and
+  not simply "reuse some arbitrary fraction"
 
 Current live-path taxonomy:
 
 - observed decision: `partial_reuse`
-- runtime support tier: `fallback_to_supported_runtime_action`
-- fallback reason:
-  `exact_partial_segment_materialization_unavailable_on_prefix_cache_path`
-- effective live action: anchor-scoped `full_reuse`
+- runtime support tier:
+  `native_runtime_action` for block-aligned partial reuse, otherwise
+  `fallback_to_supported_runtime_action`
+- fallback reason taxonomy:
+  `partial_reuse_cut_point_realigned_to_runtime_hash_blocks` when the offline
+  cut point is rounded down to a realizable full-block boundary,
+  `block_aligned_partial_reuse_dominated_by_full_reuse` when that realizable
+  boundary is no longer better than `full_reuse`, and
+  `block_aligned_partial_reuse_collapses_to_recompute` when it is no longer
+  better than `recompute`
+- effective live action: block-aligned `partial_reuse`, anchor-scoped
+  `full_reuse`, or request-scoped `recompute`, depending on the best
+  realizable runtime action after block alignment
+- the live control seam preserves the offline cut point inside a dedicated
+  materialization-control `extra_args` payload, then aligns it to the runtime
+  hash-block boundary before the carrier runtime applies the corresponding
+  prefix-cache policy
+- on the current carrier seam, effective `partial_reuse` now caps both
+  prefix-cache lookup and shared-cache commit at the aligned reuse boundary,
+  so the recomputed tail is executed for the current request but is not
+  materialized back into the shared prefix-cache namespace
+- a true connector-backed KV transfer/materialization path still requires an
+  explicit global `kv_transfer_config`; request-local control metadata alone
+  does not create a `KVConnector`
+- carrier-side runtime changes must live under
+  [carrier/vllm-hust](/workspace/vllm-kv-materialization-plugin/carrier/vllm-hust)
+  rather than the shared workspace checkout; the current carrier copy already
+  contains a segmented-prefix hook that caps prefix-cache lookup at the allowed
+  full-block prefix derived from `target_reuse_tokens`
 
 That fallback is a real limitation of the current runtime path and should be
 described as such, not widened into a generic “state-management” claim.
@@ -87,23 +123,14 @@ described as such, not widened into a generic “state-management” claim.
 ## Workload Source Of Truth
 
 All workload-driven paths must enter through `llm-serving-workloads`. This
-repository should not grow a second local workload catalog.
+repository should not grow a second local workload catalog or a repo-local
+default case subset.
 
-The default arrival-time decision matrix now covers six shared cases from the
-sibling workload repository:
-
-- `shared_scenario_multi_turn_knowledge_service`
-- `shared_scenario_rag_followup_long_context`
-- `shared_scenario_structured_agent_decode`
-- `shared_prefix_multi_tenant_assistant`
-- `session_continuation_with_maintenance`
-- `dynamic_rag_corpus_update`
-
-Those cases deliberately cover:
-
-- prefix-rich multi-tenant overlap
-- long-context continuation under maintenance-style continuity
-- dynamic retrieval follow-up under evolving corpus state
+The default arrival-time decision matrix now follows the shared benchmark case
+order exported by the sibling workload repository. In other words, this
+repository's default decision-study workload set is whatever
+`llm-serving-workloads` currently exposes as its default shared benchmark case
+catalog, rather than a second hardcoded list carried locally.
 
 ## Canonical Paths
 
@@ -146,7 +173,7 @@ make kv-materialization-live \
 ## Ownership And Transfer
 
 - target owners: `caozhe`, `xuheng li`
-- target organization: `intellistream`
+- target organization: `Qixin-Gaoke`
 - transfer readiness: keep repository docs and scripts free of user-specific
   absolute paths and source-organization hardcoding
 
@@ -190,6 +217,13 @@ When launching a local vLLM server through
 `paper/kv_materialization_control/experiments/launch_vllm_kv_materialization_server.sh`,
 leave `MAX_MODEL_LEN` unset if you want the launcher to derive the serving
 window from `llm-serving-workloads` via `WORKLOAD_CASE`.
+
+That launcher now defaults to the repo-local
+[carrier/vllm-hust](/workspace/vllm-kv-materialization-plugin/carrier/vllm-hust)
+runtime path, auto-detects a usable conda bootstrap and environment, and uses
+writable temporary cache roots for live runs. Override `CONDA_SH`, `ENV_NAME`,
+`VLLM_KV_MATERIALIZATION_XDG_CACHE_HOME`, or
+`VLLM_KV_MATERIALIZATION_HF_HOME` when you need a different local setup.
 
 For OpenAI-compatible endpoints, `BASE_URL` may be either the server root or a
 path that already ends with `/v1`. The live driver normalizes both forms and

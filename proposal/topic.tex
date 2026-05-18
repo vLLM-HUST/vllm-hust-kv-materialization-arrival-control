@@ -1,0 +1,337 @@
+\documentclass[aspectratio=169,UTF8,11pt]{ctexbeamer}
+
+\usetheme{Boadilla}
+\usecolortheme{default}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{pgfplots}
+\usepackage{tikz}
+
+\pgfplotsset{compat=1.18}
+
+\definecolor{ProposalBlue}{RGB}{18,52,86}
+\definecolor{ProposalBlueLight}{RGB}{227,235,245}
+\definecolor{ProposalRed}{RGB}{176,54,44}
+\definecolor{ProposalGold}{RGB}{186,132,34}
+\definecolor{ProposalGreen}{RGB}{56,120,92}
+
+\setbeamercolor{structure}{fg=ProposalBlue}
+\setbeamercolor{title}{fg=white,bg=ProposalBlue}
+\setbeamercolor{frametitle}{fg=ProposalBlue,bg=ProposalBlueLight}
+\setbeamercolor{block title}{fg=white,bg=ProposalBlue}
+\setbeamercolor{block body}{fg=black,bg=ProposalBlueLight!55}
+\setbeamercolor{alerted text}{fg=ProposalRed}
+
+\title[KV物化控制]{面向多GPU大模型服务的自适应KV物化控制}
+\subtitle{为什么“有可复用状态”不等于“应该直接复用”}
+\author[KV Materialization]{vLLM KV Materialization Plugin}
+\date[2026年5月]{2026年5月}
+
+\begin{document}
+
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+\begin{frame}{研究问题}
+  \begin{itemize}
+    \item 现代LLM服务系统越来越容易暴露可复用的前缀或KV状态。
+    \item 但\alert{可复用状态的存在}并不自动意味着\alert{端到端延迟下降}。
+    \item 真正把这些状态“兑现”为收益，可能需要跨worker传输、主机到设备搬运、部分重构以及额外的元数据管理。
+  \end{itemize}
+
+  \vspace{0.5em}
+  \begin{block}{核心系统问题}
+    当一个请求到达时，面对已有可复用状态，系统究竟应该：
+    \[
+      \texttt{full\_reuse} \qquad \texttt{partial\_reuse} \qquad \texttt{recompute}
+    \]
+  \end{block}
+\end{frame}
+
+\begin{frame}{研究范围与论文主张}
+  \begin{itemize}
+    \item 本仓库只研究一个很窄的控制点：\alert{请求到达时的KV物化决策}。
+    \item 不把问题扩展成调度器重写、placement策略、eviction控制或decode backend选择。
+    \item placement、迁移、内存压力只作为\alert{代价模型背景变量}存在，而不是本文主体。
+  \end{itemize}
+
+  \vspace{0.5em}
+  \begin{block}{论文主张}
+    reuse 不是“发现了就该用”，而是一个需要被\alert{控制}的系统决策问题。
+  \end{block}
+\end{frame}
+
+\begin{frame}{三动作决策面}
+  \begin{itemize}
+    \item \texttt{full\_reuse}：直接兑现已有前缀/KV状态。
+    \item \texttt{partial\_reuse}：只复用高价值前缀段，剩余尾部重新计算。
+    \item \texttt{recompute}：放弃兑现已有状态，直接重算。
+  \end{itemize}
+
+  \vspace{0.5em}
+  \begin{block}{当前offline语义}
+    \texttt{partial\_reuse} 已从“固定半截复用”改成\alert{切点优化问题}：
+    \[
+      r^* = \arg\min_r\; \bigl(\mathrm{materialization\_cost}(r) + \mathrm{recompute\_cost}(\mathrm{tail}(r))\bigr)
+    \]
+  \end{block}
+
+  \begin{itemize}
+    \item 这样 policy、baseline 和 oracle 共享同一套三动作含义。
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{证据边界必须分开}
+  \begin{columns}[T]
+    \begin{column}{0.49\textwidth}
+      \begin{block}{Offline决策研究}
+        \begin{itemize}
+          \item 解释三动作在不同工作负载下何时更优
+          \item 关注决策结构、敏感性和headroom
+          \item oracle 只作为上界，不作为可部署结果
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.49\textwidth}
+      \begin{block}{Online运行时验证}
+        \begin{itemize}
+          \item 检查当前插件与runtime seam到底能兑现多少
+          \item 允许出现负结果或边界结果
+          \item 不能把offline优势直接写成live收益
+        \end{itemize}
+      \end{block}
+    \end{column}
+  \end{columns}
+
+  \vspace{0.5em}
+  \alert{一句话：offline证明“值得控制”，live验证“当前系统能否真正做到”。}
+\end{frame}
+
+\begin{frame}{当前系统已经做到什么}
+  \begin{itemize}
+    \item 已完成三动作 offline policy 与 evaluator。
+    \item 已接入 \texttt{llm-serving-workloads} 作为共享 workload source of truth。
+    \item 已有插件侧 live control：从请求头估计信号、做决策、设置 cache salt、传递 cut point。
+    \item 已在 \texttt{carrier/vllm-hust} 中实现第一版 segmented prefix seam：根据 \texttt{target\_reuse\_tokens} 截断 prefix-cache lookup。
+  \end{itemize}
+
+  \vspace{0.5em}
+  \begin{block}{当前truthfulness boundary}
+    现在的online \texttt{partial\_reuse} 已能以\alert{block对齐后的prefix-cache动作}执行，
+    但还不是 exact token-level 的完整 segmented materialization path。
+  \end{block}
+\end{frame}
+
+\begin{frame}{真实实验设置}
+  \begin{itemize}
+    \item 模型：Qwen2.5-7B-Instruct
+    \item 运行环境：carrier内本地 vLLM runtime，开启 prefix caching
+    \item Ascend live路径实际 block size 会固定到 \textbf{128}，因此 partial cut point 必须先做 block 对齐
+    \item 本轮对比对象：
+    \begin{itemize}
+      \item \textbf{基线参数}：\texttt{floor=256}，\texttt{confidence\_penalty=4.0}
+      \item \textbf{调参参数}：\texttt{floor=128}，\texttt{confidence\_penalty=8.0}
+    \end{itemize}
+    \item 代表场景：
+    \begin{itemize}
+      \item \texttt{shared\_scenario\_multi\_turn\_knowledge\_service}
+      \item \texttt{shared\_tool\_scaffold\_agent}
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{真实实验结果一：知识服务场景}
+  \begin{columns}[T]
+    \begin{column}{0.57\textwidth}
+      \begin{tikzpicture}
+        \begin{axis}[
+          ybar,
+          width=\linewidth,
+          height=0.58\textheight,
+          bar width=18pt,
+          ymin=0,
+          symbolic x coords={基线参数,调参参数},
+          xtick=data,
+          ylabel={平均延迟(ms)},
+          nodes near coords,
+          nodes near coords align={vertical},
+          every node near coord/.append style={font=\tiny, rotate=90, anchor=west},
+          enlarge x limits=0.28,
+          axis line style={draw=black!40},
+          tick style={draw=black!40}
+        ]
+          \addplot[fill=ProposalGreen] coordinates {(基线参数,3289.302) (调参参数,3860.692)};
+        \end{axis}
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.43\textwidth}
+      \small
+      \begin{tabular}{lrr}
+        \toprule
+        指标 & 基线参数 & 调参参数 \\
+        \midrule
+        p95(ms) & 3642 & 4170 \\
+        RPS & 1.209 & 1.031 \\
+        toks/s & 77.40 & 66.00 \\
+        \bottomrule
+      \end{tabular}
+
+      \vspace{0.7em}
+      \begin{block}{结论}
+        把 \texttt{partial\_reuse} 推得更激进后，平均延迟和 p95 都继续恶化，说明这类场景仍需要 \texttt{recompute}/\texttt{full\_reuse} 的保护。
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{真实实验结果二：Tool-Scaffold场景}
+  \begin{columns}[T]
+    \begin{column}{0.57\textwidth}
+      \begin{tikzpicture}
+        \begin{axis}[
+          ybar,
+          width=\linewidth,
+          height=0.58\textheight,
+          bar width=18pt,
+          ymin=0,
+          symbolic x coords={基线参数,调参参数},
+          xtick=data,
+          ylabel={平均延迟(ms)},
+          nodes near coords,
+          nodes near coords align={vertical},
+          every node near coord/.append style={font=\tiny, rotate=90, anchor=west},
+          enlarge x limits=0.28,
+          axis line style={draw=black!40},
+          tick style={draw=black!40}
+        ]
+          \addplot[fill=ProposalGreen] coordinates {(基线参数,8856.437) (调参参数,11068.224)};
+        \end{axis}
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.43\textwidth}
+      \small
+      \begin{tabular}{lrr}
+        \toprule
+        指标 & 基线参数 & 调参参数 \\
+        \midrule
+        p95(ms) & 10628 & 12187 \\
+        RPS & 0.896 & 0.717 \\
+        toks/s & 143.41 & 114.78 \\
+        \bottomrule
+      \end{tabular}
+
+      \vspace{0.7em}
+      \begin{block}{结论}
+        这是对 \texttt{partial\_reuse} 最有利的共享骨架场景，但把 effective partial 比例从 75\% 推到 100\% 后，端到端性能仍明显下降。
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{调参后到底发生了什么}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \begin{tikzpicture}
+        \begin{axis}[
+          ybar,
+          width=\linewidth,
+          height=0.30\textheight,
+          bar width=11pt,
+          ymin=0,
+          ymax=100,
+          symbolic x coords={基线,调参后},
+          xtick=data,
+          ylabel={请求数},
+          legend style={font=\tiny, at={(0.5,1.15)}, anchor=south, legend columns=3},
+          enlarge x limits=0.25,
+          axis line style={draw=black!40},
+          tick style={draw=black!40}
+        ]
+          \addplot[fill=ProposalGreen] coordinates {(基线,72) (调参后,96)};
+          \addplot[fill=ProposalBlue] coordinates {(基线,16) (调参后,0)};
+          \addplot[fill=ProposalRed] coordinates {(基线,8) (调参后,0)};
+          \legend{effective partial,effective full,effective recompute}
+        \end{axis}
+      \end{tikzpicture}
+
+      \vspace{0.4em}
+      \begin{tikzpicture}
+        \begin{axis}[
+          ybar,
+          width=\linewidth,
+          height=0.30\textheight,
+          bar width=16pt,
+          ymin=0,
+          symbolic x coords={knowledge,tool-scaffold},
+          xtick=data,
+          ylabel={基线中的full回退数},
+          nodes near coords,
+          every node near coord/.append style={font=\tiny},
+          enlarge x limits=0.30,
+          axis line style={draw=black!40},
+          tick style={draw=black!40}
+        ]
+          \addplot[fill=ProposalGold] coordinates {(knowledge,0) (tool-scaffold,16)};
+        \end{axis}
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \small
+      \begin{alertblock}{主因排序}
+        \begin{enumerate}
+          \item 调参后 effective \texttt{partial\_reuse} 从 72/96 提高到 96/96，请求确实被推向 partial 了。
+          \item 但端到端性能同步恶化，说明问题不在“partial 没有被选中”，而在“当前 partial 动作兑现成本仍偏高”。
+          \item 基线里真正发生 \texttt{partial->full} 回退的主要是 \texttt{tool-scaffold} 场景，说明 runtime guardrail 不是噪声，而是在阻止更差的选择。
+          \item 因此下一步不应再追求把 partial 触发率推满，而应继续优化 runtime realization seam 与更温和的 guardrail。
+        \end{enumerate}
+      \end{alertblock}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{当前修复与边界解释}
+  \begin{itemize}
+    \item 已修复的一点：本地 runtime control 不再错误占用 \texttt{kv\_transfer\_params}，而是改到独立的 materialization-control payload。
+    \item 已新增的一点：live \texttt{partial\_reuse} 会先按 runtime block size 对齐，再在 \texttt{partial/full/recompute} 三者之间重排最优可实现动作。
+    \item 这让当前 online 结果的语义更诚实：
+    \begin{itemize}
+      \item 它确实在测试一个 block-aligned prefix-cache runtime seam；
+      \item 但它还没有进入 connector-backed KV transfer/materialization 路径。
+    \end{itemize}
+    \item 因此现在的负结果不应该被解读为“partial reuse 这个研究方向无效”，而应被解读为“更激进地推广 partial，并不能替代更强的 runtime seam”。
+  \end{itemize}
+
+  \vspace{0.5em}
+  \begin{block}{更准确的结论}
+    现阶段 online 结果说明的是：\alert{runtime realization 与 guardrail 共同决定收益}，而不是 \alert{只要把请求推向 partial 就会更快}。
+  \end{block}
+\end{frame}
+
+\begin{frame}{下一步工作}
+  \begin{itemize}
+    \item 方向一：继续沿 carrier seam 做真正的 segmented materialization path。
+    \item 方向二：做更温和的参数扫描，明确 \texttt{partial\_reuse} 的 guardrail 何时应保留 \texttt{full\_reuse}/\texttt{recompute}。
+    \item 方向三：若环境允许，接入显式 \texttt{kv\_transfer\_config} 与 connector-backed path，验证 transfer 成本是否能被控制策略真正利用。
+  \end{itemize}
+
+  \vspace{0.6em}
+  \begin{block}{答辩时最重要的一句话}
+    这项工作的难点不是“找重叠”，而是\alert{把有价值的重叠以正确代价兑现出来}。
+  \end{block}
+\end{frame}
+
+\begin{frame}{总结}
+  \begin{enumerate}
+    \item arrival-time KV materialization 应被建模为三动作控制问题，而不是默认“有reuse就直接用”。
+    \item offline 结果已经证明这个决策面有研究价值。
+    \item 最新真实实验说明：把 \texttt{partial\_reuse} 推得更激进，虽然能提高 partial 命中率，但并不会自动带来更好的 live 性能。
+    \item 因此后续工作的重点应放在\alert{runtime realization seam + 温和guardrail}，而不是单纯追求更高的 partial 触发率。
+  \end{enumerate}
+\end{frame}
+
+\end{document}

@@ -12,35 +12,6 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
-DECISION_SURFACE_CASE_IDS = (
-	"shared_scenario_multi_turn_knowledge_service",
-	"shared_scenario_rag_followup_long_context",
-	"shared_scenario_structured_agent_decode",
-	"shared_prefix_multi_tenant_assistant",
-	"session_continuation_with_maintenance",
-	"dynamic_rag_corpus_update",
-)
-
-DECISION_SURFACE_CASE_ROLES = {
-	"shared_scenario_multi_turn_knowledge_service": "exact_continuation_baseline",
-	"shared_scenario_rag_followup_long_context": "retrieval_followup_long_context_boundary",
-	"shared_scenario_structured_agent_decode": "mixed_schema_and_transcript_overlap",
-	"shared_prefix_multi_tenant_assistant": "prefix_rich_multi_tenant_surface",
-	"session_continuation_with_maintenance": "long_context_continuation_surface",
-	"dynamic_rag_corpus_update": "dynamic_retrieval_followup_surface",
-}
-
-RUNTIME_BOUNDARY_CASE_IDS = (
-	"shared_prefix_multi_tenant_assistant",
-	"session_continuation_with_maintenance",
-	"dynamic_rag_corpus_update",
-)
-
-EXPERIMENT_ARTICLE_CASE_IDS = DECISION_SURFACE_CASE_IDS
-
-DEFAULT_LIVE_WORKLOAD_CASE = EXPERIMENT_ARTICLE_CASE_IDS[0]
-
-
 class WhitespaceTokenizer:
 	def encode(self, text: str, add_special_tokens: bool = False) -> list[str]:
 		del add_special_tokens
@@ -100,6 +71,52 @@ def load_workloads_module() -> Any:
 			"llm-serving-workloads is required for workload-driven runs. "
 			"Set LLM_SERVING_WORKLOADS_SRC=<repo>/src or install the package first."
 		) from exc
+
+
+def default_shared_benchmark_case_ids() -> tuple[str, ...]:
+	workloads = load_workloads_module()
+	return tuple(str(case_id) for case_id in workloads.DEFAULT_SHARED_BENCHMARK_CASE_ORDER)
+
+
+_EXPLICIT_DECISION_SURFACE_CASE_ROLES = {
+	"shared_scenario_multi_turn_knowledge_service": "exact_continuation_baseline",
+	"shared_scenario_rag_followup_long_context": "retrieval_followup_long_context_boundary",
+	"shared_scenario_structured_agent_decode": "mixed_schema_and_transcript_overlap",
+	"shared_prefix_multi_tenant_assistant": "prefix_rich_multi_tenant_surface",
+	"session_continuation_with_maintenance": "long_context_continuation_surface",
+	"dynamic_rag_corpus_update": "dynamic_retrieval_followup_surface",
+	"memory_write_then_reuse": "write_then_retrieve_state_surface",
+	"preemption_resume_long_decode": "checkpoint_resume_decode_surface",
+	"shared_synthetic_shared_prefix_microbenchmark": "synthetic_shared_prefix_control",
+	"shared_public_sharegpt_boundary": "public_boundary_control",
+}
+
+
+def _default_decision_surface_role(case_id: str) -> str:
+	if case_id in _EXPLICIT_DECISION_SURFACE_CASE_ROLES:
+		return _EXPLICIT_DECISION_SURFACE_CASE_ROLES[case_id]
+	workloads = load_workloads_module()
+	case = dict(workloads.SHARED_BENCHMARK_CASE_CATALOG[case_id])
+	hints = dict(case.get("serving_hints", {}))
+	continuity_focus = hints.get("continuity_focus")
+	if continuity_focus:
+		return f"catalog::{str(continuity_focus).replace('-', '_')}"
+	dataset_name = str(case.get("dataset_name", "unknown"))
+	return f"catalog_case::{dataset_name.replace('-', '_')}"
+
+
+DECISION_SURFACE_CASE_IDS = default_shared_benchmark_case_ids()
+
+DECISION_SURFACE_CASE_ROLES = {
+	case_id: _default_decision_surface_role(case_id)
+	for case_id in DECISION_SURFACE_CASE_IDS
+}
+
+RUNTIME_BOUNDARY_CASE_IDS = DECISION_SURFACE_CASE_IDS
+
+EXPERIMENT_ARTICLE_CASE_IDS = DECISION_SURFACE_CASE_IDS
+
+DEFAULT_LIVE_WORKLOAD_CASE = EXPERIMENT_ARTICLE_CASE_IDS[0]
 
 
 def resolve_case_spec(case_id: str) -> dict[str, Any]:

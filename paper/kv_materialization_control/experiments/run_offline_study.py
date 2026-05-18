@@ -11,8 +11,11 @@ from vllm_kv_materialization.offline_traces import build_signals
 from vllm_kv_materialization.offline_traces import load_traces
 from vllm_kv_materialization.offline_traces import workload_case_to_traces
 from vllm_kv_materialization.policy import MaterializationDecision
+from vllm_kv_materialization.policy import estimate_materialization_ttft_ms
 from vllm_kv_materialization.policy import MaterializationPolicy
 from vllm_kv_materialization.policy import MaterializationSignals
+from vllm_kv_materialization.policy import optimize_partial_reuse_tokens
+from vllm_kv_materialization.shared_workloads import DECISION_SURFACE_CASE_IDS
 from vllm_kv_materialization.shared_workloads import DECISION_SURFACE_CASE_ROLES
 
 
@@ -24,12 +27,32 @@ CORE_POLICIES = (
     "oracle_ttft",
 )
 
+FIGURE_POLICIES = (
+    "threshold_partial",
+    "heuristic",
+    "oracle_ttft",
+)
+
+POLICY_TITLES = {
+    "threshold_partial": "Threshold partial",
+    "heuristic": "Adaptive heuristic",
+    "oracle_ttft": "Oracle TTFT",
+}
+
+DECISION_STYLES = (
+    ("full_reuse", "full reuse", "teal!70!black"),
+    ("partial_reuse", "partial reuse", "orange!85!black"),
+    ("recompute", "recompute", "gray!70"),
+)
+
 SENSITIVITY_POLICIES = (
     "heuristic_transfer_underestimated",
     "heuristic_transfer_overestimated",
     "heuristic_recompute_underestimated",
     "heuristic_recompute_overestimated",
 )
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Run the offline KV materialization study and emit paper-facing summaries."
@@ -45,7 +68,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=7)
     args = parser.parse_args()
     if not args.trace_jsonl and not args.workload_case:
-        parser.error("one of --trace-jsonl or --workload-case is required")
+        args.workload_case = list(DECISION_SURFACE_CASE_IDS)
     return args
 
 
@@ -63,7 +86,12 @@ def decide_baseline(name: str, signals: MaterializationSignals) -> tuple[Materia
         return MaterializationDecision.RECOMPUTE, 0
     if name == "threshold_partial":
         if signals.reusable_prefix_tokens >= 512:
-            return MaterializationDecision.PARTIAL_REUSE, max(256, signals.reusable_prefix_tokens // 2)
+            partial_tokens = optimize_partial_reuse_tokens(
+                signals,
+                partial_reuse_floor_tokens=256,
+            )
+            if partial_tokens > 0:
+                return MaterializationDecision.PARTIAL_REUSE, partial_tokens
         return MaterializationDecision.RECOMPUTE, 0
     raise ValueError(f"unknown baseline: {name}")
 
@@ -73,12 +101,12 @@ def decide_oracle(signals: MaterializationSignals, *, partial_reuse_floor_tokens
     if signals.reusable_prefix_tokens > 0:
         candidates.append((MaterializationDecision.FULL_REUSE, signals.reusable_prefix_tokens))
     if signals.reusable_prefix_tokens >= partial_reuse_floor_tokens:
-        candidates.append(
-            (
-                MaterializationDecision.PARTIAL_REUSE,
-                max(partial_reuse_floor_tokens, signals.reusable_prefix_tokens // 2),
-            )
+        partial_tokens = optimize_partial_reuse_tokens(
+            signals,
+            partial_reuse_floor_tokens=partial_reuse_floor_tokens,
         )
+        if partial_tokens > 0:
+            candidates.append((MaterializationDecision.PARTIAL_REUSE, partial_tokens))
     return min(candidates, key=lambda candidate: evaluate(signals, candidate[0], candidate[1])["ttft_ms"])
 
 
@@ -91,23 +119,28 @@ def perturb_signals(signals: MaterializationSignals, *, transfer_factor: float =
 
 
 def evaluate(signals: MaterializationSignals, decision: MaterializationDecision, reused_tokens: int) -> dict:
+    ttft_ms = estimate_materialization_ttft_ms(
+        signals,
+        decision,
+        reused_tokens,
+        partial_reuse_floor_tokens=256,
+    )
     if decision is MaterializationDecision.FULL_REUSE:
-        ttft_ms = signals.transfer_time_ms + 0.8
         recompute_tokens = 0
         transferred_bytes = signals.remote_kv_bytes
+        reused_tokens = signals.reusable_prefix_tokens
     elif decision is MaterializationDecision.PARTIAL_REUSE:
         reuse_ratio = reused_tokens / max(1, signals.reusable_prefix_tokens)
-        ttft_ms = (signals.transfer_time_ms * reuse_ratio) + (signals.recompute_time_ms * (1.0 - reuse_ratio)) + 0.6
         recompute_tokens = max(0, signals.reusable_prefix_tokens - reused_tokens)
         transferred_bytes = int(signals.remote_kv_bytes * reuse_ratio)
     else:
-        ttft_ms = signals.recompute_time_ms
+        reused_tokens = 0
         recompute_tokens = signals.reusable_prefix_tokens
         transferred_bytes = 0
     return {
         "decision": decision.value,
         "reused_tokens": reused_tokens,
-        "ttft_ms": round(ttft_ms, 3),
+        "ttft_ms": ttft_ms,
         "recompute_tokens": recompute_tokens,
         "transferred_bytes": transferred_bytes,
     }
@@ -226,6 +259,135 @@ def render_macros(summary: dict) -> str:
     ) + "\n"
 
 
+def latex_escape(value: str) -> str:
+    replacements = {
+        "\\": "\\textbackslash{}",
+        "_": "\\_",
+        "&": "\\&",
+        "%": "\\%",
+        "#": "\\#",
+    }
+    return "".join(replacements.get(char, char) for char in value)
+
+
+def humanize_case_id(case_id: str) -> str:
+    return case_id.replace("_", " ")
+
+
+def build_workload_codebook(summary: dict) -> list[dict[str, str]]:
+    case_ids = [
+        case_id
+        for case_id in summary.get("workload_cases", [])
+        if case_id in summary.get("case_summaries", {})
+    ]
+    if not case_ids:
+        case_ids = sorted(summary.get("case_summaries", {}).keys())
+
+    codebook = []
+    for index, case_id in enumerate(case_ids, start=1):
+        case_summary = summary["case_summaries"].get(case_id, {})
+        codebook.append(
+            {
+                "code": f"Q{index}",
+                "case_id": case_id,
+                "workload_family": case_summary.get("workload_family", "unknown"),
+                "decision_role": DECISION_SURFACE_CASE_ROLES.get(case_id, "unassigned"),
+            }
+        )
+    return codebook
+
+
+def render_workload_key_table_tex(summary: dict) -> str:
+    codebook = summary.get("workload_codebook") or build_workload_codebook(summary)
+    rows = []
+    for entry in codebook:
+        rows.append(
+            " & ".join(
+                [
+                    entry["code"],
+                    latex_escape(humanize_case_id(entry["case_id"])),
+                    latex_escape(entry["workload_family"]),
+                ]
+            )
+            + r" \\")
+
+    body = "\n".join(rows)
+    return (
+        "\\begin{table*}[t]\n"
+        "\\centering\n"
+        "\\scriptsize\n"
+        "\\setlength{\\tabcolsep}{4pt}\n"
+        "\\caption{Workload shorthand used in Figure~\\ref{fig:offline-decision-mix}. The default workload matrix still comes directly from \\texttt{llm-serving-workloads}; the paper uses compact Q-codes only to keep the figure legible.}\n"
+        "\\label{tab:offline-workload-key}\n"
+        "\\begin{tabular}{@{}lp{0.45\\textwidth}p{0.3\\textwidth}@{}}\n"
+        "\\toprule\n"
+        "ID & Workload case & Family \\\\ \n"
+        "\\midrule\n"
+        f"{body}\n"
+        "\\bottomrule\n"
+        "\\end{tabular}\n"
+        "\\end{table*}\n"
+    )
+
+
+def render_decision_mix_figure_tex(summary: dict) -> str:
+    codebook = summary.get("workload_codebook") or build_workload_codebook(summary)
+    case_ids = [entry["case_id"] for entry in codebook]
+    code_lookup = {entry["case_id"]: entry["code"] for entry in codebook}
+    xcoords = ",".join(entry["code"] for entry in codebook)
+
+    lines = [
+        "\\begin{figure*}[t]",
+        "\\centering",
+        "\\footnotesize",
+        "\\begin{tikzpicture}",
+        "\\begin{groupplot}[",
+        "group style={group size=3 by 1, horizontal sep=1.1cm},",
+        "ybar stacked,",
+        "width=0.31\\textwidth,",
+        "height=0.23\\textheight,",
+        "ymin=0, ymax=100,",
+        "ylabel={Request share (\\%)},",
+        f"symbolic x coords={{{xcoords}}},",
+        "xtick=data,",
+        "xticklabel style={font=\\scriptsize},",
+        "ytick={0,25,50,75,100},",
+        "legend columns=3,",
+        "legend style={at={(0.5,1.18)}, anchor=south, draw=none, font=\\scriptsize},",
+        "title style={font=\\small}",
+        "]",
+    ]
+
+    for policy_name in FIGURE_POLICIES:
+        lines.append(f"\\nextgroupplot[title={{{POLICY_TITLES[policy_name]}}}]")
+        policy_rows = summary["case_summaries"]
+        for decision_name, legend_label, color in DECISION_STYLES:
+            coords = []
+            for case_id in case_ids:
+                case_summary = policy_rows[case_id]
+                metrics = case_summary["policies"][policy_name]
+                requests = max(1, metrics["requests"])
+                decision_count = metrics["decision_counts"].get(decision_name, 0)
+                share = round((decision_count * 100.0) / requests, 1)
+                coords.append(f"({code_lookup[case_id]},{share})")
+            lines.append(f"\\addplot+[draw=black!15, fill={color}] coordinates {{{' '.join(coords)}}};")
+        if policy_name == FIGURE_POLICIES[-1]:
+            legend_labels = ",".join(label for _, label, _ in DECISION_STYLES)
+            lines.append(f"\\legend{{{legend_labels}}}")
+
+    lines.extend(
+        [
+            "\\end{groupplot}",
+            "\\end{tikzpicture}",
+            "\\caption{Per-workload decision mix for representative offline policies, using the Q-code shorthand from Table~\\ref{tab:offline-workload-key}. The main pattern is still not a broad partial-reuse win: most workloads remain full-reuse dominant and the threshold baseline still over-selects partial reuse, but the confidence-aware oracle now exposes a small, workload-specific partial-reuse region instead of collapsing entirely to the endpoints.}",
+            "\\label{fig:offline-decision-mix}",
+            "\\end{figure*}",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
 def main() -> None:
     args = parse_args()
     output_dir = Path(args.output_dir)
@@ -311,12 +473,15 @@ def main() -> None:
         "policies": {name: summarize(records) for name, records in per_policy_records.items()},
         "case_summaries": summarize_by_case(per_policy_records, family_by_case),
     }
+    summary["workload_codebook"] = build_workload_codebook(summary)
 
     (output_dir / "offline_summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True), encoding="utf-8")
     (output_dir / "offline_details.json").write_text(json.dumps(detailed_records, indent=2, sort_keys=True), encoding="utf-8")
     (output_dir / "offline_summary.md").write_text(render_markdown(summary), encoding="utf-8")
     (output_dir / "offline_summary_table.tex").write_text(render_table_tex(summary), encoding="utf-8")
     (output_dir / "offline_summary_macros.tex").write_text(render_macros(summary), encoding="utf-8")
+    (output_dir / "offline_workload_key_table.tex").write_text(render_workload_key_table_tex(summary), encoding="utf-8")
+    (output_dir / "offline_decision_mix_figure.tex").write_text(render_decision_mix_figure_tex(summary), encoding="utf-8")
 
 
 if __name__ == "__main__":

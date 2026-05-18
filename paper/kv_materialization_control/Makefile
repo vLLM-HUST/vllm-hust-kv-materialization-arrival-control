@@ -8,9 +8,6 @@ EXPERIMENT_DIR := $(CURDIR)/experiments
 RESULT_DIR := $(EXPERIMENT_DIR)/results/latest
 PAPER_TEX := kv_materialization_control.tex
 PAPER_PDF := kv_materialization_control.pdf
-DEFAULT_WORKLOAD_CASES := shared_scenario_multi_turn_knowledge_service shared_scenario_rag_followup_long_context shared_scenario_structured_agent_decode
-DEFAULT_DECISION_WORKLOAD_CASES := shared_scenario_multi_turn_knowledge_service shared_scenario_rag_followup_long_context shared_scenario_structured_agent_decode shared_prefix_multi_tenant_assistant session_continuation_with_maintenance dynamic_rag_corpus_update
-DEFAULT_LIVE_WORKLOAD_CASE := shared_scenario_multi_turn_knowledge_service
 
 .DEFAULT_GOAL := help
 
@@ -30,23 +27,23 @@ help:
 
 decision-study:
 	PYTHONPATH=$(ROOT_DIR)/src $(PYTHON) $(EXPERIMENT_DIR)/run_offline_study.py \
-		$(foreach case,$(if $(WORKLOAD_CASES),$(WORKLOAD_CASES),$(DEFAULT_DECISION_WORKLOAD_CASES)),--workload-case $(case)) \
+		$(foreach case,$(WORKLOAD_CASES),--workload-case $(case)) \
 		--output-dir $(RESULT_DIR)
 
 experiment: decision-study
 
 runtime-boundary-live:
-	@test -n "$(MODEL)" || { echo 'MODEL is required. Usage: make live-benchmark MODEL=/path/to/model [WORKLOAD_CASE=shared_scenario_multi_turn_knowledge_service]' >&2; exit 2; }
+	@test -n "$(MODEL)" || { echo 'MODEL is required. Usage: make live-benchmark MODEL=/path/to/model [WORKLOAD_CASE=<shared-case-id>]' >&2; exit 2; }
 	PYTHONPATH=$(ROOT_DIR)/src $(PYTHON) $(EXPERIMENT_DIR)/run_openai_workloads.py \
 		--base-url "$${BASE_URL:-http://127.0.0.1:8011}" \
 		--model "$(MODEL)" \
-		--workload-case "$${WORKLOAD_CASE:-$(DEFAULT_LIVE_WORKLOAD_CASE)}" \
+		$(if $(WORKLOAD_CASE),--workload-case "$(WORKLOAD_CASE)",) \
 		--api-key "$${OPENAI_API_KEY:-}" \
 		--user-agent "$${OPENAI_HTTP_USER_AGENT:-python-httpx/0.28.1}" \
 		$(if $(REQUEST_RATE),--request-rate $(REQUEST_RATE),) \
 		$(if $(CONCURRENCY),--concurrency $(CONCURRENCY),) \
 		$(if $(SEED),--seed $(SEED),) \
-		--output $(EXPERIMENT_DIR)/results/live/$${LABEL:-$${WORKLOAD_CASE:-$(DEFAULT_LIVE_WORKLOAD_CASE)}}.json
+		--output $(EXPERIMENT_DIR)/results/live/$${LABEL:-$${WORKLOAD_CASE:-default_live_case}}.json
 
 live-benchmark: runtime-boundary-live
 

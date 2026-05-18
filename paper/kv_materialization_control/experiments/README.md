@@ -19,19 +19,17 @@ This path compares:
 - `oracle_ttft`
 - heuristic cost-misestimation sensitivity variants
 
-The default shared-workload matrix comes from `llm-serving-workloads` and now
-includes:
+Paper-facing artifacts emitted under `experiments/results/latest/` now include:
 
-- `shared_scenario_multi_turn_knowledge_service`
-- `shared_scenario_rag_followup_long_context`
-- `shared_scenario_structured_agent_decode`
-- `shared_prefix_multi_tenant_assistant`
-- `session_continuation_with_maintenance`
-- `dynamic_rag_corpus_update`
+- `offline_summary_table.tex`
+- `offline_summary_macros.tex`
+- `offline_decision_mix_figure.tex`
 
-Those cases give one matrix with exact continuation, long-context retrieval,
-schema-heavy structured decode, prefix-rich multi-tenancy, long-context
-continuation, and dynamic retrieval follow-up.
+The default shared-workload matrix comes directly from the current
+`llm-serving-workloads` shared benchmark case order. This repository therefore
+does not carry its own second default case list for the offline decision study;
+it follows the sibling workload catalog unless you explicitly override
+`--workload-case`.
 
 Truthfulness boundary:
 

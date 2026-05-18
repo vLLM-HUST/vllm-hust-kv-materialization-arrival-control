@@ -2,16 +2,56 @@ from __future__ import annotations
 
 import logging
 import os
+from typing import Any
 
 from vllm_kv_materialization.live_control import apply_runtime_control
 from vllm_kv_materialization.live_control import bind_request_headers
 from vllm_kv_materialization.live_control import compute_runtime_control
+from vllm_kv_materialization.live_control import merge_runtime_control_extra_args
 from vllm_kv_materialization.live_control import observe_request
 from vllm_kv_materialization.live_control import reset_request_headers
+from vllm_kv_materialization.live_control import RuntimeControlPlan
 
 logger = logging.getLogger(__name__)
 
 _PATCHED = False
+_RUNTIME_PLANS_ATTR = "_kv_materialization_runtime_plans"
+_RUNTIME_PLAN_CURSOR_ATTR = "_kv_materialization_runtime_plan_cursor"
+
+
+def _store_runtime_plans(request: Any, plans: list[RuntimeControlPlan]) -> None:
+    setattr(request, _RUNTIME_PLANS_ATTR, tuple(plans))
+    setattr(request, _RUNTIME_PLAN_CURSOR_ATTR, 0)
+
+
+def _consume_runtime_plan(request: Any) -> RuntimeControlPlan | None:
+    plans = getattr(request, _RUNTIME_PLANS_ATTR, ())
+    cursor = getattr(request, _RUNTIME_PLAN_CURSOR_ATTR, 0)
+    if not isinstance(plans, tuple) or cursor >= len(plans):
+        return None
+    setattr(request, _RUNTIME_PLAN_CURSOR_ATTR, cursor + 1)
+    return plans[cursor]
+
+
+def _attach_runtime_plan_to_sampling_params(
+    request: Any,
+    original_to_sampling_params,
+    max_tokens: int,
+    default_sampling_params: dict,
+):
+    plan = _consume_runtime_plan(request)
+    if plan is None:
+        return original_to_sampling_params(request, max_tokens, default_sampling_params)
+
+    previous_vllm_xargs = getattr(request, "vllm_xargs", None)
+    try:
+        request.vllm_xargs = merge_runtime_control_extra_args(
+            previous_vllm_xargs,
+            plan,
+        )
+        return original_to_sampling_params(request, max_tokens, default_sampling_params)
+    finally:
+        request.vllm_xargs = previous_vllm_xargs
 
 
 def register_plugin() -> None:
@@ -28,7 +68,9 @@ def register_plugin() -> None:
 
     try:
         from vllm import envs as vllm_envs
+        from vllm.entrypoints.openai.chat_completion.protocol import ChatCompletionRequest
         from vllm.entrypoints.openai.chat_completion.serving import OpenAIServingChat
+        from vllm.entrypoints.openai.completion.protocol import CompletionRequest
         from vllm.entrypoints.openai.completion.serving import OpenAIServingCompletion
         from vllm.entrypoints.openai.engine.serving import OpenAIServing
         from vllm.entrypoints.serve.render.serving import OpenAIServingRender
@@ -42,6 +84,8 @@ def register_plugin() -> None:
     original_completion_create = OpenAIServingCompletion.create_completion
     original_render_chat = OpenAIServingRender.render_chat
     original_render_completion = OpenAIServingRender.render_completion
+    original_chat_to_sampling_params = ChatCompletionRequest.to_sampling_params
+    original_completion_to_sampling_params = CompletionRequest.to_sampling_params
 
     def _prompt_token_count(model_config, prompt) -> int:
         try:
@@ -58,6 +102,7 @@ def register_plugin() -> None:
 
         conversation, engine_prompts = result
         controlled_prompts = []
+        runtime_plans = []
         for index, engine_prompt in enumerate(engine_prompts):
             prompt_tokens = _prompt_token_count(self.model_config, engine_prompt)
             output_tokens = int(
@@ -67,7 +112,9 @@ def register_plugin() -> None:
             )
             request_id = str(getattr(request, "request_id", None) or f"chat-{index}")
             _, plan = compute_runtime_control(request_id, prompt_tokens, output_tokens)
+            runtime_plans.append(plan)
             controlled_prompts.append(apply_runtime_control(engine_prompt, plan))
+        _store_runtime_plans(request, runtime_plans)
         return conversation, controlled_prompts
 
     async def patched_render_completion(self, request):
@@ -76,13 +123,32 @@ def register_plugin() -> None:
             return result
 
         controlled_prompts = []
+        runtime_plans = []
         for index, engine_prompt in enumerate(result):
             prompt_tokens = _prompt_token_count(self.model_config, engine_prompt)
             output_tokens = int(getattr(request, "max_tokens", 0) or 0)
             request_id = str(getattr(request, "request_id", None) or f"completion-{index}")
             _, plan = compute_runtime_control(request_id, prompt_tokens, output_tokens)
+            runtime_plans.append(plan)
             controlled_prompts.append(apply_runtime_control(engine_prompt, plan))
+        _store_runtime_plans(request, runtime_plans)
         return controlled_prompts
+
+    def patched_chat_to_sampling_params(self, max_tokens, default_sampling_params):
+        return _attach_runtime_plan_to_sampling_params(
+            self,
+            original_chat_to_sampling_params,
+            max_tokens,
+            default_sampling_params,
+        )
+
+    def patched_completion_to_sampling_params(self, max_tokens, default_sampling_params):
+        return _attach_runtime_plan_to_sampling_params(
+            self,
+            original_completion_to_sampling_params,
+            max_tokens,
+            default_sampling_params,
+        )
 
     def patched_log_inputs(self, request_id, inputs, params, lora_request) -> None:
         original_log_inputs(self, request_id, inputs, params, lora_request)
@@ -113,6 +179,8 @@ def register_plugin() -> None:
     OpenAIServingCompletion.create_completion = patched_completion_create
     OpenAIServingRender.render_chat = patched_render_chat
     OpenAIServingRender.render_completion = patched_render_completion
+    ChatCompletionRequest.to_sampling_params = patched_chat_to_sampling_params
+    CompletionRequest.to_sampling_params = patched_completion_to_sampling_params
 
     setattr(vllm_envs, "VLLM_KV_MATERIALIZATION_PLUGIN_LOADED", True)
     setattr(

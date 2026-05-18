@@ -9,10 +9,13 @@ import time
 from contextlib import suppress
 from dataclasses import asdict
 from dataclasses import dataclass
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 from typing import Mapping
 
+from vllm_kv_materialization.policy import estimate_materialization_ttft_ms
+from vllm_kv_materialization.policy import MaterializationDecision
 from vllm_kv_materialization.policy import MaterializationPolicy
 from vllm_kv_materialization.policy import MaterializationSignals
 
@@ -48,6 +51,17 @@ RUNTIME_SUPPORT_FALLBACK = "fallback_to_supported_runtime_action"
 PARTIAL_REUSE_FALLBACK_REASON = (
     "exact_partial_segment_materialization_unavailable_on_prefix_cache_path"
 )
+PARTIAL_REUSE_ALIGNMENT_FALLBACK_REASON = (
+    "partial_reuse_cut_point_realigned_to_runtime_hash_blocks"
+)
+PARTIAL_REUSE_RUNTIME_REALIGN_TO_RECOMPUTE = (
+    "block_aligned_partial_reuse_collapses_to_recompute"
+)
+PARTIAL_REUSE_RUNTIME_REALIGN_TO_FULL_REUSE = (
+    "block_aligned_partial_reuse_dominated_by_full_reuse"
+)
+RUNTIME_KV_TRANSFER_CONTROL_KEY = "kv_materialization_runtime_control"
+RUNTIME_KV_TRANSFER_CONTROL_SCHEMA_VERSION = 1
 
 
 @dataclass(frozen=True, slots=True)
@@ -56,6 +70,8 @@ class RuntimeControlPlan:
     effective_decision: str
     control_path: str
     cache_salt: str | None
+    target_reuse_tokens: int
+    target_tail_tokens: int
     decision_supported: bool
     support_tier: str
     fallback_reason: str | None
@@ -86,6 +102,8 @@ class LiveObservation:
     runtime_effective_decision: str
     runtime_control_path: str
     runtime_cache_salt: str | None
+    runtime_target_reuse_tokens: int
+    runtime_target_tail_tokens: int
     runtime_decision_supported: bool
     runtime_support_tier: str
     runtime_fallback_reason: str | None
@@ -255,9 +273,160 @@ def _make_anchor_scoped_salt(primary_anchor_id: str, workload_case: str) -> str 
     return None
 
 
+def _pick_partial_fallback_anchor(
+    primary_anchor_id: str,
+    secondary_anchor_ids: tuple[str, ...],
+) -> str:
+    for anchor_id in secondary_anchor_ids:
+        if "scaffold::" in anchor_id:
+            return anchor_id
+    return primary_anchor_id
+
+
+def _make_partial_fallback_salt(
+    primary_anchor_id: str,
+    secondary_anchor_ids: tuple[str, ...],
+    workload_case: str,
+) -> str | None:
+    selected_anchor_id = _pick_partial_fallback_anchor(
+        primary_anchor_id,
+        secondary_anchor_ids,
+    )
+    if selected_anchor_id:
+        return f"kvmat:anchor:{selected_anchor_id}"
+    if workload_case:
+        return f"kvmat:case:{workload_case}"
+    return None
+
+
 def _make_request_scoped_salt(primary_anchor_id: str, workload_case: str, request_id: str) -> str:
     prefix = primary_anchor_id or workload_case or "request"
     return f"kvmat:recompute:{prefix}:{request_id}"
+
+
+def _get_runtime_hash_block_size() -> int:
+    for env_name in (
+        "VLLM_KV_RUNTIME_HASH_BLOCK_SIZE",
+        "VLLM_KV_RUNTIME_BLOCK_SIZE",
+    ):
+        block_size = _env_int(env_name, 0)
+        if block_size > 0:
+            return block_size
+    return 0
+
+
+def _align_runtime_reuse_tokens(reuse_tokens: int, block_size: int) -> int:
+    if block_size <= 1:
+        return max(reuse_tokens, 0)
+    return (max(reuse_tokens, 0) // block_size) * block_size
+
+
+def _adjust_signals_for_runtime(
+    signals: MaterializationSignals,
+    policy: MaterializationPolicy,
+) -> tuple[MaterializationSignals, MaterializationSignals]:
+    adjusted_transfer_ms = signals.transfer_time_ms - (
+        signals.queue_pressure * policy.queue_pressure_discount_ms
+    )
+    if signals.ttft_sensitive:
+        adjusted_transfer_ms -= policy.ttft_bonus_ms
+
+    adjusted_signals = replace(
+        signals,
+        transfer_time_ms=max(0.0, adjusted_transfer_ms),
+    )
+    full_reuse_signals = replace(
+        adjusted_signals,
+        transfer_time_ms=adjusted_signals.transfer_time_ms
+        + ((1.0 - max(0.0, min(signals.reuse_confidence, 1.0))) * policy.confidence_penalty_ms),
+    )
+    return adjusted_signals, full_reuse_signals
+
+
+def _pick_realizable_runtime_action(
+    signals: MaterializationSignals,
+    policy: MaterializationPolicy,
+    partial_reuse_tokens: int,
+) -> str:
+    adjusted_signals, full_reuse_signals = _adjust_signals_for_runtime(
+        signals,
+        policy,
+    )
+    candidates: list[tuple[float, str]] = [
+        (
+            estimate_materialization_ttft_ms(
+                adjusted_signals,
+                MaterializationDecision.RECOMPUTE,
+                0,
+                partial_reuse_floor_tokens=policy.partial_reuse_floor_tokens,
+            ),
+            "recompute",
+        ),
+        (
+            estimate_materialization_ttft_ms(
+                full_reuse_signals,
+                MaterializationDecision.FULL_REUSE,
+                signals.reusable_prefix_tokens,
+                partial_reuse_floor_tokens=policy.partial_reuse_floor_tokens,
+            ),
+            "full_reuse",
+        ),
+    ]
+
+    if 0 < partial_reuse_tokens < signals.reusable_prefix_tokens:
+        candidates.append(
+            (
+                estimate_materialization_ttft_ms(
+                    adjusted_signals,
+                    MaterializationDecision.PARTIAL_REUSE,
+                    partial_reuse_tokens,
+                    partial_reuse_floor_tokens=policy.partial_reuse_floor_tokens,
+                ),
+                "partial_reuse",
+            )
+        )
+
+    _, best_action = min(candidates, key=lambda item: item[0])
+    return best_action
+
+
+def build_runtime_control_extra_args(plan: RuntimeControlPlan) -> dict[str, Any]:
+    return {
+        RUNTIME_KV_TRANSFER_CONTROL_KEY: {
+            "schema_version": RUNTIME_KV_TRANSFER_CONTROL_SCHEMA_VERSION,
+            "observed_decision": plan.observed_decision,
+            "effective_decision": plan.effective_decision,
+            "control_path": plan.control_path,
+            "decision_supported": plan.decision_supported,
+            "support_tier": plan.support_tier,
+            "fallback_reason": plan.fallback_reason,
+            "target_reuse_tokens": plan.target_reuse_tokens,
+            "target_tail_tokens": plan.target_tail_tokens,
+            "requires_segmented_materialization": (
+                plan.observed_decision == "partial_reuse"
+            ),
+        }
+    }
+
+
+def merge_runtime_control_extra_args(
+    extra_args: Mapping[str, Any] | None,
+    plan: RuntimeControlPlan,
+) -> dict[str, Any]:
+    merged = dict(extra_args or {})
+    merged.update(build_runtime_control_extra_args(plan))
+    return merged
+
+
+def build_runtime_kv_transfer_params(plan: RuntimeControlPlan) -> dict[str, Any]:
+    return build_runtime_control_extra_args(plan)
+
+
+def merge_runtime_kv_transfer_params(
+    kv_transfer_params: Mapping[str, Any] | None,
+    plan: RuntimeControlPlan,
+) -> dict[str, Any]:
+    return merge_runtime_control_extra_args(kv_transfer_params, plan)
 
 
 def compute_runtime_control(
@@ -267,10 +436,14 @@ def compute_runtime_control(
 ) -> tuple[LiveObservation, RuntimeControlPlan]:
     headers = get_request_headers()
     signals, extras = estimate_signals(headers, prompt_tokens, output_tokens)
-    outcome = _make_policy().decide(signals)
+    policy = _make_policy()
+    outcome = policy.decide(signals)
 
     primary_anchor_id = str(extras["primary_anchor_id"])
+    secondary_anchor_ids = tuple(str(value) for value in extras["secondary_anchor_ids"])
     workload_case = str(extras["workload_case"])
+    target_reuse_tokens = max(min(outcome.reused_tokens, max(prompt_tokens, 0)), 0)
+    target_tail_tokens = max(max(prompt_tokens, 0) - target_reuse_tokens, 0)
 
     if outcome.decision.value == "recompute":
         plan = RuntimeControlPlan(
@@ -278,6 +451,8 @@ def compute_runtime_control(
             effective_decision="recompute",
             control_path="request_scoped_prefix_cache_bypass",
             cache_salt=_make_request_scoped_salt(primary_anchor_id, workload_case, request_id),
+            target_reuse_tokens=target_reuse_tokens,
+            target_tail_tokens=target_tail_tokens,
             decision_supported=True,
             support_tier=RUNTIME_SUPPORT_NATIVE,
             fallback_reason=None,
@@ -288,20 +463,86 @@ def compute_runtime_control(
             effective_decision="full_reuse",
             control_path="anchor_scoped_prefix_cache",
             cache_salt=_make_anchor_scoped_salt(primary_anchor_id, workload_case),
+            target_reuse_tokens=target_reuse_tokens,
+            target_tail_tokens=target_tail_tokens,
             decision_supported=True,
             support_tier=RUNTIME_SUPPORT_NATIVE,
             fallback_reason=None,
         )
     else:
-        plan = RuntimeControlPlan(
-            observed_decision=outcome.decision.value,
-            effective_decision="full_reuse",
-            control_path="partial_reuse_fallback_to_anchor_scoped_full_reuse",
-            cache_salt=_make_anchor_scoped_salt(primary_anchor_id, workload_case),
-            decision_supported=False,
-            support_tier=RUNTIME_SUPPORT_FALLBACK,
-            fallback_reason=PARTIAL_REUSE_FALLBACK_REASON,
+        runtime_hash_block_size = _get_runtime_hash_block_size()
+        aligned_reuse_tokens = min(
+            _align_runtime_reuse_tokens(target_reuse_tokens, runtime_hash_block_size),
+            max(signals.reusable_prefix_tokens, 0),
+            max(prompt_tokens, 0),
         )
+        aligned_tail_tokens = max(max(prompt_tokens, 0) - aligned_reuse_tokens, 0)
+
+        if runtime_hash_block_size > 0:
+            realizable_action = _pick_realizable_runtime_action(
+                signals,
+                policy,
+                aligned_reuse_tokens,
+            )
+        else:
+            realizable_action = "full_reuse"
+
+        if realizable_action == "partial_reuse" and aligned_reuse_tokens > 0:
+            plan = RuntimeControlPlan(
+                observed_decision=outcome.decision.value,
+                effective_decision="partial_reuse",
+                control_path="block_aligned_partial_prefix_cache",
+                cache_salt=_make_partial_fallback_salt(
+                    primary_anchor_id,
+                    secondary_anchor_ids,
+                    workload_case,
+                ),
+                target_reuse_tokens=aligned_reuse_tokens,
+                target_tail_tokens=aligned_tail_tokens,
+                decision_supported=True,
+                support_tier=RUNTIME_SUPPORT_NATIVE,
+                fallback_reason=(
+                    PARTIAL_REUSE_ALIGNMENT_FALLBACK_REASON
+                    if aligned_reuse_tokens != target_reuse_tokens
+                    else None
+                ),
+            )
+        elif realizable_action == "recompute":
+            plan = RuntimeControlPlan(
+                observed_decision=outcome.decision.value,
+                effective_decision="recompute",
+                control_path="partial_reuse_realigned_to_request_scoped_recompute",
+                cache_salt=_make_request_scoped_salt(
+                    primary_anchor_id,
+                    workload_case,
+                    request_id,
+                ),
+                target_reuse_tokens=0,
+                target_tail_tokens=max(prompt_tokens, 0),
+                decision_supported=False,
+                support_tier=RUNTIME_SUPPORT_FALLBACK,
+                fallback_reason=PARTIAL_REUSE_RUNTIME_REALIGN_TO_RECOMPUTE,
+            )
+        else:
+            plan = RuntimeControlPlan(
+                observed_decision=outcome.decision.value,
+                effective_decision="full_reuse",
+                control_path="partial_reuse_fallback_to_anchor_scoped_full_reuse",
+                cache_salt=_make_partial_fallback_salt(
+                    primary_anchor_id,
+                    secondary_anchor_ids,
+                    workload_case,
+                ),
+                target_reuse_tokens=max(signals.reusable_prefix_tokens, 0),
+                target_tail_tokens=max(max(prompt_tokens, 0) - max(signals.reusable_prefix_tokens, 0), 0),
+                decision_supported=False,
+                support_tier=RUNTIME_SUPPORT_FALLBACK,
+                fallback_reason=(
+                    PARTIAL_REUSE_RUNTIME_REALIGN_TO_FULL_REUSE
+                    if runtime_hash_block_size > 0
+                    else PARTIAL_REUSE_FALLBACK_REASON
+                ),
+            )
 
     observation = LiveObservation(
         timestamp_s=time.time(),
@@ -310,7 +551,7 @@ def compute_runtime_control(
         workload_case=workload_case,
         workload_family=str(extras["workload_family"]),
         primary_anchor_id=primary_anchor_id,
-        secondary_anchor_ids=tuple(str(value) for value in extras["secondary_anchor_ids"]),
+        secondary_anchor_ids=secondary_anchor_ids,
         home_rank=int(extras["home_rank"]),
         turn_index=int(extras["turn_index"]),
         prompt_tokens=max(prompt_tokens, 0),
@@ -327,6 +568,8 @@ def compute_runtime_control(
         runtime_effective_decision=plan.effective_decision,
         runtime_control_path=plan.control_path,
         runtime_cache_salt=plan.cache_salt,
+        runtime_target_reuse_tokens=plan.target_reuse_tokens,
+        runtime_target_tail_tokens=plan.target_tail_tokens,
         runtime_decision_supported=plan.decision_supported,
         runtime_support_tier=plan.support_tier,
         runtime_fallback_reason=plan.fallback_reason,

@@ -18,9 +18,15 @@
 - Added explicit decision-surface workload coverage for prefix-rich multi-tenant, long-context continuation, and dynamic retrieval follow-up shared cases from `llm-serving-workloads`.
 - Added explicit live runtime fallback taxonomy fields so `partial_reuse` degradations are logged as unsupported exact segment materialization rather than implied as native runtime support.
 - Added a detailed Chinese `HANDOFF.md` so the repository can be handed to a student with a clear paper-oriented plan, especially around the unresolved `partial_reuse` runtime boundary.
+- Added an isolated `carrier/vllm-hust/` runtime copy for carrier-side experiments so segmented materialization hooks can be developed without modifying the shared workspace checkout.
 
 ### Changed
 
+- Changed the live runtime seam so per-request materialization plans now carry exact reuse and tail token targets through a dedicated materialization-control `extra_args` payload instead of reusing `kv_transfer_params`, avoiding false `KVConnector` expectations while exact token-level `partial_reuse` remains unavailable.
+- Changed live `partial_reuse` handling from a pure `full_reuse` fallback to a block-aligned realizable action: the runtime now rounds the offline cut point down to the configured hash-block size, executes block-aligned partial reuse when it remains best, and otherwise re-ranks to `full_reuse` or `recompute`.
+- Changed the carrier-side prefix-cache hook to honor `effective_decision`, so only realized `partial_reuse` plans cap prefix-cache lookup while `full_reuse` and `recompute` fallbacks execute their intended runtime actions.
+- Changed the carrier-side cache commit path so effective `partial_reuse` no longer materializes recomputed tail blocks into the shared prefix cache; shared cache writes now stop at the aligned reuse boundary.
+- Changed the paper-side live launcher to auto-detect a usable conda bootstrap and environment, run against the repo-local `carrier/vllm-hust` copy by default, and place live-run caches under writable temporary roots unless explicitly overridden.
 - Replaced template naming, package metadata, launcher names, and plugin entry points with repository-specific identifiers.
 - Updated the top-level workflow so `make experiment` refreshes paper results and `make pdf` builds the paper from the latest generated summaries.
 - Changed the paper-side default experiment from a checked-in toy trace to representative shared workload cases.
@@ -32,3 +38,4 @@
 - Changed package metadata and repository URLs for transfer readiness to the `intellistream` organization.
 - Changed docs to remove user-specific absolute path examples and source-organization-specific live endpoint examples.
 - Added explicit ownership and transfer targets in `README.md` for `caozhe` and `xuheng li`.
+- Changed the offline `partial_reuse` semantics from a fixed fraction proxy to a confidence-aware cut-point optimizer shared by the policy, threshold baseline, and oracle evaluator.

@@ -1,9 +1,14 @@
 \documentclass[conference]{IEEEtran}
 
 \usepackage{hyperref}
+\usepackage{amsmath}
 \usepackage{booktabs}
 \usepackage{enumitem}
 \usepackage{cite}
+\usepackage{pgfplots}
+
+\usepgfplotslibrary{groupplots}
+\pgfplotsset{compat=1.18}
 
 \title{Adaptive KV Materialization Control for Multi-GPU LLM Serving}
 
@@ -49,6 +54,15 @@ Mooncake~\cite{distserve2024,mooncake2025}, make this cost visible rather than
 hiding it behind a monolithic ``cache hit'' abstraction. Once reuse requires
 transport, re-layout, or partial reconstruction, the runtime needs a policy
 that decides whether realizing the reusable state is worth the startup cost.
+
+That decision is structurally closer to selective materialization than to a
+binary cache-hit classifier. A serving stack is not merely asking whether
+reuse exists; it is asking whether a reusable state fragment should be
+materialized now, how much of it should be materialized, and when recomputing
+the remainder is cheaper. This perspective is inspired by selective
+materialization work in other domains, where the key systems question is not
+``can this state be reused?'' but ``is materializing it worth the cost under
+the current workload and resource conditions?''~\cite{leap2024}.
 
 This repository focuses on a narrow but practically important control point:
 request-arrival KV materialization. Instead of treating reuse as a binary
@@ -100,12 +114,34 @@ produce useful saved work. The objective is to minimize startup latency,
 represented primarily by TTFT, while keeping realized KV traffic proportional
 to actual benefit.
 
+We use these signals through a simple utility view. For a candidate action
+$a$, the controller estimates the startup benefit from avoided recomputation,
+then subtracts realization-side overheads such as transfer, stitching, and
+pressure amplification. Conceptually,
+\[
+U(a) = B_{\text{recompute}}(a) - C_{\text{realize}}(a)
+- P_{\text{pressure}}(a).
+\]
+The controller selects the action with the largest non-negative utility.
+Under this view, \texttt{full\_reuse} corresponds to materializing the whole
+reusable prefix, \texttt{recompute} corresponds to rejecting materialization,
+and \texttt{partial\_reuse} corresponds to selecting only a profitable prefix
+segment when early reuse has positive value but the tail does not.
+
+This formulation is intentionally lightweight: it is not presented as a
+globally optimal estimator, but as the minimal abstraction needed to compare
+three actions on equal footing and to expose where runtime support is still
+missing.
+
 \subsection{Why Partial Reuse Matters}
 The partial action is the key difference between a binary reuse controller and
 a materialization controller. In practice, the early segment of a reusable
 prefix may be worth loading while the tail segment is not, especially when
 transfer cost grows faster than the remaining recomputation avoided. A binary
-policy cannot express that breakpoint.
+policy cannot express that breakpoint. This is exactly where the selective
+materialization perspective matters: the system should realize only the portion
+whose marginal utility remains positive, instead of treating ``reuse'' as an
+all-or-nothing event.
 
 \subsection{Current Partial-Reuse Boundary}
 The artifact keeps the boundary around \texttt{partial\_reuse} explicit. In
@@ -161,9 +197,59 @@ three-action space. Finally, we include cost-misestimation sensitivity variants
 to test whether the heuristic remains stable when the runtime's cost model is
 inaccurate.
 
+These policy families answer different questions. The fixed baselines ask
+whether selective materialization is needed at all. The heuristic asks whether
+a small interpretable controller can improve on static rules once transfer
+cost, pressure, and confidence vary across requests. The oracle asks how much
+decision headroom would remain even if the runtime had perfect per-request
+knowledge within the same three-action space.
+
 The primary metrics are mean and tail TTFT, recomputed prompt tokens, and KV
 bytes realized or transferred. Together these metrics distinguish beneficial
 reuse from expensive reuse.
+
+\subsection{Policy Families}
+The decision study compares five policy families.
+
+\textbf{Always recompute.} This policy rejects all candidate reusable state.
+It is the control baseline for systems where realization overhead dominates and
+materialization is never worth the startup cost.
+
+\textbf{Always full reuse.} This policy materializes the entire reusable
+prefix whenever one exists. It represents the opposite extreme and exposes how
+often naive ``reuse whenever possible'' logic overpays in transfer, stitching,
+or pressure cost.
+
+\textbf{Threshold partial policy.} This policy is a static hand-tuned rule.
+It uses a fixed breakpoint to decide whether to fully reuse, partially reuse,
+or recompute. Its role is not to be optimal, but to provide a simple selective
+materialization baseline that is more expressive than binary reuse.
+
+\textbf{Adaptive heuristic.} This is the main policy under study. It uses the
+signals in Section III-A to estimate whether full realization, partial
+realization, or recomputation has the highest utility for the arriving
+request. Unlike the threshold baseline, it can change its choice with queue
+pressure, reuse confidence, and estimated transfer-versus-recompute balance.
+
+\textbf{Oracle TTFT selector.} This policy is offline only. It chooses the
+best action in hindsight using the same three-action action space and is used
+only to estimate the remaining headroom above realizable heuristics. It is not
+presented as a deployable controller.
+
+\subsection{Sensitivity and Interpretation}
+The decision study also includes cost-misestimation variants that perturb the
+transfer-side and recompute-side estimates seen by the heuristic. These runs
+are important because the central question is not whether one specific cost
+model is perfectly calibrated; it is whether selective materialization remains
+useful when runtime estimates are noisy.
+
+Under this methodology, the result interpretation is disciplined. If the
+heuristic consistently outperforms both static baselines, the evidence supports
+the need for an explicit materialization controller. If the oracle remains far
+ahead of the heuristic, then the paper's remaining opportunity is primarily in
+better decision quality. If the offline headroom is large but the live path is
+still weak, then the bottleneck is runtime realization rather than policy
+value.
 
 \subsection{Workload Source of Truth}
 The study deliberately enters through the sibling
@@ -177,13 +263,39 @@ always full reuse, and a fixed threshold-based partial policy. The adaptive
 heuristic is then compared against these baselines, while an oracle selector is
 used only to estimate remaining headroom within the same three-action space.
 
+This baseline structure mirrors the paper's decision-centric scope. The goal is
+not to claim a sophisticated scheduler or memory manager, but to ask whether a
+runtime can outperform static materialization rules once realization cost is
+made explicit.
+
+\subsection{Research Questions}
+The methodology is organized around three concrete questions:
+
+\begin{itemize}[leftmargin=1.5em]
+\item \textbf{RQ1:} Do workload-grounded request-arrival traces actually
+exhibit a non-trivial three-action decision region, or do static
+``always recompute'' and ``always full reuse'' rules already suffice?
+\item \textbf{RQ2:} When a three-action region exists, can a small
+interpretable heuristic recover a meaningful fraction of oracle headroom?
+\item \textbf{RQ3:} If the offline decision value exists but the live runtime
+still falls back, is the dominant remaining gap policy quality or runtime
+support for exact segmented materialization?
+\end{itemize}
+
+These questions keep the paper aligned with its intended contribution. This is
+not a broad online-serving optimization claim. It is a study of whether
+request-arrival KV materialization is a real control problem, whether simple
+controllers can solve a useful fraction of it, and where the current runtime
+boundary still prevents realization.
+
 \subsection{Current Evidence Scope}
-The repository currently supports a six-case offline decision matrix covering
-exact continuation, long-context retrieval follow-up, structured transcript
-overlap, prefix-rich multi-tenancy, long-context continuation, and dynamic
-retrieval follow-up. It also supports a live runtime-boundary path that enters
-through the same shared workload repository and runs against a controlled
-Qwen2.5-7B-Instruct endpoint.
+The repository currently supports a catalog-driven offline decision matrix that
+follows the shared benchmark case order exported by
+\texttt{llm-serving-workloads}. This lets the paper evaluate the same default
+workload set consumed by sibling artifacts instead of carrying a second
+hardcoded subset locally. It also supports a live runtime-boundary path that
+enters through the same shared workload repository and runs against a
+controlled Qwen2.5-7B-Instruct endpoint.
 
 The claim boundary is therefore explicit. The offline layer supports claims
 about the three-action arrival-time decision surface. The live layer supports
@@ -218,6 +330,61 @@ selected workload cases. It is the right layer for reasoning about whether
 \texttt{partial\_reuse} has a meaningful decision region and how that region
 changes across workload families.
 
+Equally importantly, the offline study is the layer where selective
+materialization can be evaluated without overstating runtime support. It lets
+us ask whether a profitable partial region exists at all, how wide that region
+is under cost-model error, and how much headroom would remain even if the live
+runtime still lacks exact segmented materialization.
+
+\input{experiments/results/latest/offline_workload_key_table.tex}
+\input{experiments/results/latest/offline_decision_mix_figure.tex}
+
+Table~\ref{tab:offline-workload-key} maps the compact Q-codes used in
+Figure~\ref{fig:offline-decision-mix}. That shorthand is necessary because the
+full shared-catalog workload names make the figure unreadable at paper scale.
+
+The resulting picture is also less flattering than a simple
+``selective-materialization is obviously beneficial'' story. Most workloads
+still lean strongly toward \texttt{full\_reuse}. Among the five core policies,
+\texttt{always\_full\_reuse} remains the best mean-TTFT policy on 18 of the
+25 shared-catalog workloads. However, once the offline evaluator stops treating
+\texttt{partial\_reuse} as a fixed-fraction proxy and instead optimizes a
+confidence-aware cut point, the action no longer disappears entirely. The
+oracle now selects \texttt{partial\_reuse} on 71 of 1296 requests, and the
+adaptive heuristic selects it on 365 requests, concentrated in a small set of
+memory-write and session-affine cases. The static threshold policy still
+pushes too many workloads into \texttt{partial\_reuse} and remains clearly
+worse overall, while the adaptive heuristic recovers only a limited slice of
+that new region.
+
+That result does not invalidate the control formulation, but it does narrow the
+claim. The current artifact now supports a slightly stronger statement than the
+earlier negative result: request-arrival KV materialization is a real control
+surface with a small but measurable partial-reuse regime. It still does not
+support a strong claim that \texttt{partial\_reuse} wins broadly across the
+shared default workload matrix, and it still leaves substantial headroom
+between the heuristic and the oracle.
+
+\section{Related Work Perspective}
+Two threads are most relevant to this artifact.
+
+First, recent LLM-serving systems such as DistServe and Mooncake make reuse
+realization costs explicit by exposing remote or disaggregated state movement
+instead of hiding all reuse behind a local cache abstraction~\cite{distserve2024,mooncake2025}.
+These systems motivate why request-arrival materialization needs an explicit
+controller: reusable KV state may save computation, but realizing it can also
+consume bandwidth, increase startup latency, or amplify memory pressure.
+
+Second, this artifact borrows its decision perspective from selective
+materialization work outside LLM serving. LEAP frames materialization as a
+cost-sensitive online choice rather than a static yes-or-no optimization
+target~\cite{leap2024}. We borrow that viewpoint, not the domain mechanism.
+Our problem is not video-view sampling, but arrival-time KV-state realization
+with a three-action space of \texttt{full\_reuse}, \texttt{partial\_reuse},
+and \texttt{recompute}. The connection matters because it clarifies the paper's
+intended contribution: a serving-time selective materialization controller,
+not merely another prefix-cache hit study.
+
 \section{Artifact Boundary}
 This repository intentionally separates decision-side evidence from live runtime
 realization evidence. We do not present offline oracle results as deployed
@@ -230,9 +397,12 @@ contain broader state semantics.
 \begin{enumerate}[leftmargin=1.5em]
 \item A precise systems formulation of request-arrival KV materialization as a
 three-action control problem.
-\item A workload-driven six-case decision matrix sourced entirely from
-\texttt{llm-serving-workloads}, including prefix-rich, long-context
-continuation, and dynamic retrieval-follow-up surfaces.
+\item A selective-materialization view of reuse that evaluates whether and how
+much reusable KV state should be realized, rather than treating reuse as a
+binary cache event.
+\item A workload-driven decision matrix sourced directly from the default
+shared benchmark case order in \texttt{llm-serving-workloads}, avoiding a
+second repo-local default workload subset.
 \item An explicit evidence boundary separating offline decision-surface claims
 from live runtime-boundary claims.
 \item A narrow out-of-tree vLLM plugin target centered on materialization
