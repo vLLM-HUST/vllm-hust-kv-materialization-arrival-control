@@ -13,6 +13,9 @@ authors = [
 	{name = "caozhe"},
 	{name = "xuheng li"},
 ]
+maintainers = [
+	{name = "cao zhe"},
+]
 
 [project.urls]
 Repository = "https://github.com/intellistream/vllm-kv-materialization-plugin"

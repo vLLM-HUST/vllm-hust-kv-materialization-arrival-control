@@ -206,8 +206,9 @@ make kv-materialization-live \
 
 ## Ownership And Transfer
 
-- target owners: `caozhe`, `xuheng li`
-- target organization: `Qixin-Gaoke`
+- current student owner: `cao zhe`
+- target organization: `intellistream`
+- status: handed off to `cao zhe` for paper-oriented follow-up
 - transfer readiness: keep repository docs and scripts free of user-specific
   absolute paths and source-organization hardcoding
 
