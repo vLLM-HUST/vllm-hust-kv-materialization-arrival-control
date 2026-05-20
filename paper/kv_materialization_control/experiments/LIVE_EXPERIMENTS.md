@@ -54,6 +54,20 @@ WORKLOAD_CASE=shared_prefix_multi_tenant_assistant \
 bash paper/kv_materialization_control/experiments/run_live_benchmark.sh
 ```
 
+When the workload comes from the repo-local shared catalog, prefer passing the
+real model tokenizer into the live runner so shared-workload token budgets are
+constructed against the same tokenizer that the endpoint will actually use:
+
+```bash
+/workspace/shuhao-miniconda3/envs/vllm-hust-dev/bin/python \
+	paper/kv_materialization_control/experiments/run_openai_workloads.py \
+	--base-url http://127.0.0.1:8011 \
+	--model Qwen2.5-7B-Instruct \
+	--tokenizer /home/shuhao/shared-models/Qwen2.5-7B-Instruct \
+	--workload-case dynamic_rag_corpus_update \
+	--output paper/kv_materialization_control/experiments/results/live/dynamic_rag_live.json
+```
+
 Preferred workspace entry from the shared workload repository:
 
 ```bash
@@ -84,10 +98,13 @@ Interpret live results with the runtime taxonomy fields emitted by the plugin.
   action is not natively supported and has been degraded to a supported online
   action
 
-For `partial_reuse`, the current expected fallback is:
+For `partial_reuse`, the current runtime may realize one of two truthful paths:
 
-- `runtime_fallback_reason=exact_partial_segment_materialization_unavailable_on_prefix_cache_path`
-- `runtime_effective_decision=full_reuse`
+- `runtime_effective_decision=partial_reuse` with
+	`runtime_control_path=block_aligned_partial_prefix_cache` when the aligned
+	cut point remains profitable on the current prefix-cache path
+- `runtime_effective_decision=full_reuse` when the aligned partial segment is
+	dominated by anchor-scoped reuse or cannot survive runtime realignment
 
 ## Output
 
@@ -99,3 +116,11 @@ The live harness writes a JSON summary with:
 - request throughput
 - output-token throughput
 - failure records, if any
+
+Recent runtime-boundary note:
+
+- `dynamic_rag_corpus_update` can run successfully on the Qwen2.5-7B live path,
+  but only when the workload itself is generated with the real Qwen tokenizer.
+  The earlier 32K-overflow failure was caused by building the workload with a
+  whitespace tokenizer, which inflated the effective prompt budget seen by the
+  runtime.

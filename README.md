@@ -60,8 +60,9 @@ boundary:
 - `full_reuse` is realized through anchor-scoped prefix-cache reuse
 - `recompute` is realized through request-scoped prefix-cache bypass
 - `partial_reuse` is realized only at hash-block granularity on the current
-  prefix-cache path; exact token-level segmented materialization is still not
-  available
+  prefix-cache path; the current carrier seam now isolates the recomputed tail
+  in a request-scoped segmented hash namespace, but exact token-level
+  materialization is still not available
 
 ## Partial Reuse Boundary
 
@@ -108,14 +109,47 @@ Current live-path taxonomy:
   prefix-cache lookup and shared-cache commit at the aligned reuse boundary,
   so the recomputed tail is executed for the current request but is not
   materialized back into the shared prefix-cache namespace
+- carrier-side segmented hashing now also resets the tail hash chain at the
+  aligned reuse boundary under a request-scoped `segmented_tail_cache_salt`,
+  so the recomputed suffix no longer inherits the shared prefix hash chain
 - a true connector-backed KV transfer/materialization path still requires an
   explicit global `kv_transfer_config`; request-local control metadata alone
   does not create a `KVConnector`
 - carrier-side runtime changes must live under
   [carrier/vllm-hust](/workspace/vllm-kv-materialization-plugin/carrier/vllm-hust)
   rather than the shared workspace checkout; the current carrier copy already
-  contains a segmented-prefix hook that caps prefix-cache lookup at the allowed
-  full-block prefix derived from `target_reuse_tokens`
+  contains the current segmented runtime seam: aligned prefix-cache lookup,
+  aligned cache-write capping, and request-scoped tail hash isolation derived
+  from `target_reuse_tokens`
+
+The live paper matrix now has four cells for the two representative workloads:
+old seam + baseline knobs, old seam + tuned knobs, new segmented seam +
+baseline knobs, and new segmented seam + tuned knobs.
+
+- `shared_scenario_multi_turn_knowledge_service`
+  old baseline: mean `3289.302 ms`, p95 `3641.928 ms`, throughput `1.209 rps`
+  old tuned: mean `3860.692 ms`, p95 `4170.369 ms`, throughput `1.031 rps`
+  new segmented baseline: mean `3054.712 ms`, p95 `3383.972 ms`, throughput `1.303 rps`
+  new segmented tuned: mean `2980.648 ms`, p95 `3214.822 ms`, throughput `1.335 rps`
+- `shared_tool_scaffold_agent`
+  old baseline: mean `8856.437 ms`, p95 `10627.872 ms`, throughput `0.896 rps`
+  old tuned: mean `11068.224 ms`, p95 `12187.492 ms`, throughput `0.717 rps`
+  new segmented baseline: mean `9362.399 ms`, p95 `10302.383 ms`, throughput `0.848 rps`
+  new segmented tuned: mean `9186.471 ms`, p95 `10182.569 ms`, throughput `0.865 rps`
+
+This matrix supports a narrower and more honest paper claim:
+
+- the stronger segmented carrier seam is what makes the tuned `partial_reuse`
+  path competitive again on both workloads
+- the segmented seam alone is not a universal win under conservative baseline
+  knobs: knowledge-service improves over the old baseline, but tool-scaffold is
+  still mixed and does not beat the old-baseline mean/throughput point
+- runtime realization and guardrails interact: under the new segmented baseline
+  run, knowledge-service split into `8` effective `recompute` requests and `24`
+  effective `partial_reuse` requests, while tool-scaffold observed
+  `partial_reuse` on all `64` requests but realized `48` effective
+  `partial_reuse` requests and `16` effective `full_reuse` requests after
+  block-aligned re-ranking
 
 That fallback is a real limitation of the current runtime path and should be
 described as such, not widened into a generic “state-management” claim.

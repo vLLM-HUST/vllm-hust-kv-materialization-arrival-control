@@ -70,6 +70,7 @@ class RuntimeControlPlan:
     effective_decision: str
     control_path: str
     cache_salt: str | None
+    segmented_tail_cache_salt: str | None
     target_reuse_tokens: int
     target_tail_tokens: int
     decision_supported: bool
@@ -402,6 +403,7 @@ def build_runtime_control_extra_args(plan: RuntimeControlPlan) -> dict[str, Any]
             "fallback_reason": plan.fallback_reason,
             "target_reuse_tokens": plan.target_reuse_tokens,
             "target_tail_tokens": plan.target_tail_tokens,
+            "segmented_tail_cache_salt": plan.segmented_tail_cache_salt,
             "requires_segmented_materialization": (
                 plan.observed_decision == "partial_reuse"
             ),
@@ -451,6 +453,7 @@ def compute_runtime_control(
             effective_decision="recompute",
             control_path="request_scoped_prefix_cache_bypass",
             cache_salt=_make_request_scoped_salt(primary_anchor_id, workload_case, request_id),
+            segmented_tail_cache_salt=None,
             target_reuse_tokens=target_reuse_tokens,
             target_tail_tokens=target_tail_tokens,
             decision_supported=True,
@@ -463,6 +466,7 @@ def compute_runtime_control(
             effective_decision="full_reuse",
             control_path="anchor_scoped_prefix_cache",
             cache_salt=_make_anchor_scoped_salt(primary_anchor_id, workload_case),
+            segmented_tail_cache_salt=None,
             target_reuse_tokens=target_reuse_tokens,
             target_tail_tokens=target_tail_tokens,
             decision_supported=True,
@@ -497,6 +501,11 @@ def compute_runtime_control(
                     secondary_anchor_ids,
                     workload_case,
                 ),
+                segmented_tail_cache_salt=_make_request_scoped_salt(
+                    primary_anchor_id,
+                    workload_case,
+                    request_id,
+                ),
                 target_reuse_tokens=aligned_reuse_tokens,
                 target_tail_tokens=aligned_tail_tokens,
                 decision_supported=True,
@@ -517,6 +526,7 @@ def compute_runtime_control(
                     workload_case,
                     request_id,
                 ),
+                segmented_tail_cache_salt=None,
                 target_reuse_tokens=0,
                 target_tail_tokens=max(prompt_tokens, 0),
                 decision_supported=False,
@@ -533,6 +543,7 @@ def compute_runtime_control(
                     secondary_anchor_ids,
                     workload_case,
                 ),
+                segmented_tail_cache_salt=None,
                 target_reuse_tokens=max(signals.reusable_prefix_tokens, 0),
                 target_tail_tokens=max(max(prompt_tokens, 0) - max(signals.reusable_prefix_tokens, 0), 0),
                 decision_supported=False,

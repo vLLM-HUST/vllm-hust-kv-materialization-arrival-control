@@ -86,6 +86,42 @@
   \end{itemize}
 \end{frame}
 
+\begin{frame}{什么时候别直接全复用}
+  \begin{block}{核心判断}
+    不是“能复用就全复用”，而是：\alert{后半段拿回来，到底还值不值。}
+  \end{block}
+
+  \begin{columns}[T]
+    \begin{column}{0.49\textwidth}
+      \scriptsize
+      \begin{block}{\texttt{partial\_reuse} 更优}
+        \begin{itemize}
+          \item 前面很多内容是固定的，后面经常变
+          \item 前面复用收益大，后面复用收益小
+          \item 典型：固定提示词/工具框架 + 最近一轮对话或检索结果
+        \end{itemize}
+      \end{block}
+      直觉上：\alert{只复用前面稳定的部分。}
+    \end{column}
+    \begin{column}{0.49\textwidth}
+      \scriptsize
+      \begin{block}{\texttt{recompute} 更优}
+        \begin{itemize}
+          \item 能复用的内容太少
+          \item 这段内容变化太大，不值得搬回来
+          \item 拿回来再接起来，比自己重算还贵
+        \end{itemize}
+      \end{block}
+      直觉上：\alert{既然不划算，那就别复用。}
+    \end{column}
+  \end{columns}
+
+  \vspace{0.3em}
+  \begin{block}{学生版记忆法}
+    大部分都稳定 $\rightarrow$ \texttt{full\_reuse}；前面稳定后面易变 $\rightarrow$ \texttt{partial\_reuse}；可复用太少或太不稳定 $\rightarrow$ \texttt{recompute}。
+  \end{block}
+\end{frame}
+
 \begin{frame}{证据边界必须分开}
   \begin{columns}[T]
     \begin{column}{0.49\textwidth}
@@ -117,13 +153,14 @@
     \item 已完成三动作 offline policy 与 evaluator。
     \item 已接入 \texttt{llm-serving-workloads} 作为共享 workload source of truth。
     \item 已有插件侧 live control：从请求头估计信号、做决策、设置 cache salt、传递 cut point。
-    \item 已在 \texttt{carrier/vllm-hust} 中实现第一版 segmented prefix seam：根据 \texttt{target\_reuse\_tokens} 截断 prefix-cache lookup。
+    \item 已在 \texttt{carrier/vllm-hust} 中推进到第二版 segmented seam：\texttt{target\_reuse\_tokens} 不仅截断 prefix-cache lookup，也会截断 shared-cache commit，并在 reuse boundary 之后重置 tail hash chain。
   \end{itemize}
 
   \vspace{0.5em}
   \begin{block}{当前truthfulness boundary}
-    现在的online \texttt{partial\_reuse} 已能以\alert{block对齐后的prefix-cache动作}执行，
-    但还不是 exact token-level 的完整 segmented materialization path。
+    现在的online \texttt{partial\_reuse} 已能以\alert{block对齐后的segmented prefix-cache动作}执行：
+    共享前缀与重算尾部已经在 carrier seam 上进入不同哈希命名空间，
+    但还不是 connector-backed、exact token-level 的完整 segmented materialization path。
   \end{block}
 \end{frame}
 
@@ -134,18 +171,25 @@
     \item Ascend live路径实际 block size 会固定到 \textbf{128}，因此 partial cut point 必须先做 block 对齐
     \item 本轮对比对象：
     \begin{itemize}
-      \item \textbf{基线参数}：\texttt{floor=256}，\texttt{confidence\_penalty=4.0}
-      \item \textbf{调参参数}：\texttt{floor=128}，\texttt{confidence\_penalty=8.0}
+      \item \textbf{旧 baseline}：旧 seam，\texttt{floor=256}，\texttt{confidence\_penalty=4.0}
+      \item \textbf{旧 tuned}：旧 seam，\texttt{floor=128}，\texttt{confidence\_penalty=8.0}
+      \item \textbf{新 baseline}：新 segmented seam，\texttt{floor=256}，\texttt{confidence\_penalty=4.0}
+      \item \textbf{新 tuned}：新 segmented seam，\texttt{floor=128}，\texttt{confidence\_penalty=8.0}
     \end{itemize}
     \item 代表场景：
     \begin{itemize}
       \item \texttt{shared\_scenario\_multi\_turn\_knowledge\_service}
       \item \texttt{shared\_tool\_scaffold\_agent}
     \end{itemize}
+    \item 新增 runtime-boundary live补充验证：
+    \begin{itemize}
+      \item 成功跑通：\texttt{shared\_prefix\_multi\_tenant\_assistant}、\texttt{session\_continuation\_with\_maintenance}
+      \item 更正后的第三个 case：\texttt{dynamic\_rag\_corpus\_update} 在使用真实 Qwen tokenizer 生成 workload 后可稳定跑通
+    \end{itemize}
   \end{itemize}
 \end{frame}
 
-\begin{frame}{真实实验结果一：知识服务场景}
+\begin{frame}{真实实验结果一：知识服务四格矩阵}
   \begin{columns}[T]
     \begin{column}{0.57\textwidth}
       \begin{tikzpicture}
@@ -153,9 +197,9 @@
           ybar,
           width=\linewidth,
           height=0.58\textheight,
-          bar width=18pt,
+          bar width=14pt,
           ymin=0,
-          symbolic x coords={基线参数,调参参数},
+          symbolic x coords={旧B,旧T,新B,新T},
           xtick=data,
           ylabel={平均延迟(ms)},
           nodes near coords,
@@ -165,31 +209,31 @@
           axis line style={draw=black!40},
           tick style={draw=black!40}
         ]
-          \addplot[fill=ProposalGreen] coordinates {(基线参数,3289.302) (调参参数,3860.692)};
+          \addplot[fill=ProposalGreen] coordinates {(旧B,3289.302) (旧T,3860.692) (新B,3054.712) (新T,2980.648)};
         \end{axis}
       \end{tikzpicture}
     \end{column}
     \begin{column}{0.43\textwidth}
-      \small
-      \begin{tabular}{lrr}
+      \scriptsize
+      \begin{tabular}{lrrrr}
         \toprule
-        指标 & 基线参数 & 调参参数 \\
+        指标 & 旧B & 旧T & 新B & 新T \\
         \midrule
-        p95(ms) & 3642 & 4170 \\
-        RPS & 1.209 & 1.031 \\
-        toks/s & 77.40 & 66.00 \\
+        p95(ms) & 3642 & 4170 & 3384 & 3215 \\
+        RPS & 1.209 & 1.031 & 1.303 & 1.335 \\
+        toks/s & 77.40 & 66.00 & 83.36 & 85.45 \\
         \bottomrule
       \end{tabular}
 
       \vspace{0.7em}
       \begin{block}{结论}
-        把 \texttt{partial\_reuse} 推得更激进后，平均延迟和 p95 都继续恶化，说明这类场景仍需要 \texttt{recompute}/\texttt{full\_reuse} 的保护。
+        knowledge-service 上最优点仍是\textbf{新 tuned}；同时 \textbf{新 baseline} 也比 \textbf{旧 baseline} 的 mean/p95 分别低约 7\%/7\%。这说明更强的 runtime seam 在温和 guardrail 下也能带来正收益。
       \end{block}
     \end{column}
   \end{columns}
 \end{frame}
 
-\begin{frame}{真实实验结果二：Tool-Scaffold场景}
+\begin{frame}{真实实验结果二：Tool-Scaffold}
   \begin{columns}[T]
     \begin{column}{0.57\textwidth}
       \begin{tikzpicture}
@@ -197,9 +241,9 @@
           ybar,
           width=\linewidth,
           height=0.58\textheight,
-          bar width=18pt,
+          bar width=14pt,
           ymin=0,
-          symbolic x coords={基线参数,调参参数},
+          symbolic x coords={旧B,旧T,新B,新T},
           xtick=data,
           ylabel={平均延迟(ms)},
           nodes near coords,
@@ -209,85 +253,77 @@
           axis line style={draw=black!40},
           tick style={draw=black!40}
         ]
-          \addplot[fill=ProposalGreen] coordinates {(基线参数,8856.437) (调参参数,11068.224)};
+          \addplot[fill=ProposalGreen] coordinates {(旧B,8856.437) (旧T,11068.224) (新B,9362.399) (新T,9186.471)};
         \end{axis}
       \end{tikzpicture}
     \end{column}
     \begin{column}{0.43\textwidth}
-      \small
-      \begin{tabular}{lrr}
+      \scriptsize
+      \begin{tabular}{lrrrr}
         \toprule
-        指标 & 基线参数 & 调参参数 \\
+        指标 & 旧B & 旧T & 新B & 新T \\
         \midrule
-        p95(ms) & 10628 & 12187 \\
-        RPS & 0.896 & 0.717 \\
-        toks/s & 143.41 & 114.78 \\
+        p95(ms) & 10628 & 12187 & 10302 & 10183 \\
+        RPS & 0.896 & 0.717 & 0.848 & 0.865 \\
+        toks/s & 143.41 & 114.78 & 135.68 & 138.33 \\
         \bottomrule
       \end{tabular}
 
       \vspace{0.7em}
       \begin{block}{结论}
-        这是对 \texttt{partial\_reuse} 最有利的共享骨架场景，但把 effective partial 比例从 75\% 推到 100\% 后，端到端性能仍明显下降。
+        tool-scaffold 上，\textbf{旧 baseline} 仍是 mean/throughput 最优点；但新 seam 已把 \textbf{旧 tuned} 的负结果明显拉回，并让 \textbf{新 tuned} 在 p95 上成为最佳。这说明收益已经变成\textbf{workload-dependent}，不能再写成“全面变好”。
       \end{block}
     \end{column}
   \end{columns}
 \end{frame}
 
-\begin{frame}{调参后到底发生了什么}
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \begin{tikzpicture}
-        \begin{axis}[
-          ybar,
-          width=\linewidth,
-          height=0.30\textheight,
-          bar width=11pt,
-          ymin=0,
-          ymax=100,
-          symbolic x coords={基线,调参后},
-          xtick=data,
-          ylabel={请求数},
-          legend style={font=\tiny, at={(0.5,1.15)}, anchor=south, legend columns=3},
-          enlarge x limits=0.25,
-          axis line style={draw=black!40},
-          tick style={draw=black!40}
-        ]
-          \addplot[fill=ProposalGreen] coordinates {(基线,72) (调参后,96)};
-          \addplot[fill=ProposalBlue] coordinates {(基线,16) (调参后,0)};
-          \addplot[fill=ProposalRed] coordinates {(基线,8) (调参后,0)};
-          \legend{effective partial,effective full,effective recompute}
-        \end{axis}
-      \end{tikzpicture}
+\begin{frame}{新增真实 workload：online 证据更完整}
+  \scriptsize
+  \begin{tabular}{p{0.28\textwidth}rrrrp{0.2\textwidth}}
+    \toprule
+    workload & 完成 & mean & p95 & RPS & effective动作 \\
+    \midrule
+    shared-prefix assistant & 40/40 & 10469 & 16098 & 0.460 & 40/40 为 \texttt{partial\_reuse} \\
+    session maintenance & 40/40 & 6120 & 6488 & 0.651 & 40/40 为 \texttt{partial\_reuse} \\
+    dynamic RAG update & 32/32 & 2634 & 3073 & 1.510 & 8 个 \texttt{partial} + 24 个 \texttt{full} \\
+    \bottomrule
+  \end{tabular}
 
-      \vspace{0.4em}
-      \begin{tikzpicture}
-        \begin{axis}[
-          ybar,
-          width=\linewidth,
-          height=0.30\textheight,
-          bar width=16pt,
-          ymin=0,
-          symbolic x coords={knowledge,tool-scaffold},
-          xtick=data,
-          ylabel={基线中的full回退数},
-          nodes near coords,
-          every node near coord/.append style={font=\tiny},
-          enlarge x limits=0.30,
-          axis line style={draw=black!40},
-          tick style={draw=black!40}
-        ]
-          \addplot[fill=ProposalGold] coordinates {(knowledge,0) (tool-scaffold,16)};
-        \end{axis}
-      \end{tikzpicture}
+  \vspace{0.5em}
+  \begin{alertblock}{关键更正}
+    \texttt{dynamic\_rag\_corpus\_update} 之前之所以在 live 路径上报 32K 越界，不是因为 case 本身太长，而是因为我们用 \textbf{WhitespaceTokenizer} 生成 workload，导致 token budget 在真实 Qwen tokenizer 下严重失真。改成真实 tokenizer 后，这条 case 可以用原始 \texttt{72} 输出预算稳定跑通。
+  \end{alertblock}
+
+  \vspace{0.2em}
+  \begin{block}{这页想说明什么}
+    \begin{itemize}
+      \item 这两组新增 live workload 不是 offline proxy，而是真实 Qwen2.5-7B 在线服务跑出来的结果。
+      \item 其中前两个 case 的 observed/effective action 都稳定落到 \texttt{partial\_reuse}，说明新 seam 已不只是“看到 partial”，而是能把 partial 真正 materialize 出来。
+      \item dynamic RAG 则补上了第三种真实 online 证据：当 retrieval overlap 在后续轮次继续增大时，系统会从首轮 \texttt{partial\_reuse} 自然切到后续轮次 \texttt{full\_reuse}。
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}{这次 rerun 到底说明了什么}
+  \begin{columns}[T]
+    \begin{column}{0.45\textwidth}
+      \begin{block}{新的 baseline decision mix}
+        \begin{itemize}
+          \item knowledge-service：32 个请求里，8 个 effective \texttt{recompute}，24 个 effective \texttt{partial\_reuse}
+          \item tool-scaffold：observed 64 个 \texttt{partial\_reuse}，但 effective 上变成 48 个 \texttt{partial\_reuse} + 16 个 \texttt{full\_reuse}
+          \item 新增 two live boundary cases：都出现 40/40 的 effective \texttt{partial\_reuse}，说明当前 seam 已能在真实服务里稳定兑现 partial 语义
+          \item 修正后的 dynamic RAG：32 个请求全部完成，effective mix 为 8 个 \texttt{partial\_reuse} + 24 个 \texttt{full\_reuse}
+          \item fallback 不再只有 cut-point realign，还会出现 \texttt{block\_aligned\_partial\_reuse\_dominated\_by\_full\_reuse}
+        \end{itemize}
+      \end{block}
     \end{column}
-    \begin{column}{0.48\textwidth}
+    \begin{column}{0.55\textwidth}
       \small
-      \begin{alertblock}{主因排序}
+      \begin{alertblock}{主因判断}
         \begin{enumerate}
-          \item 调参后 effective \texttt{partial\_reuse} 从 72/96 提高到 96/96，请求确实被推向 partial 了。
-          \item 但端到端性能同步恶化，说明问题不在“partial 没有被选中”，而在“当前 partial 动作兑现成本仍偏高”。
-          \item 基线里真正发生 \texttt{partial->full} 回退的主要是 \texttt{tool-scaffold} 场景，说明 runtime guardrail 不是噪声，而是在阻止更差的选择。
-          \item 因此下一步不应再追求把 partial 触发率推满，而应继续优化 runtime realization seam 与更温和的 guardrail。
+          \item 新 segmented seam 确实把旧 tuned 的负结果拉回到了可竞争区间，这说明此前主要瓶颈在 runtime realization。
+          \item dynamic RAG 的修正 rerun 说明：真实 online 失败有时并不是 policy 或模型窗口本身的问题，而是 workload token budget 是否与真实 tokenizer 对齐。
+          \item 因此更合理的论文结论应是：\textbf{runtime seam、guardrail 与 workload construction fidelity 联合作用}，并且收益具有 workload dependence。
         \end{enumerate}
       \end{alertblock}
     \end{column}
@@ -297,24 +333,25 @@
 \begin{frame}{当前修复与边界解释}
   \begin{itemize}
     \item 已修复的一点：本地 runtime control 不再错误占用 \texttt{kv\_transfer\_params}，而是改到独立的 materialization-control payload。
-    \item 已新增的一点：live \texttt{partial\_reuse} 会先按 runtime block size 对齐，再在 \texttt{partial/full/recompute} 三者之间重排最优可实现动作。
+    \item 已新增的一点：live \texttt{partial\_reuse} 会先按 block size 对齐，再在 \texttt{partial/full/recompute} 间重排可实现动作。
+    \item 已推进的一点：carrier seam 现在不只截断 lookup 和 commit，还会在 reuse boundary 之后用 request-scoped salt 重置 tail hash chain。
     \item 这让当前 online 结果的语义更诚实：
     \begin{itemize}
-      \item 它确实在测试一个 block-aligned prefix-cache runtime seam；
+      \item 它确实在测试一个 block-aligned segmented prefix-cache runtime seam；
       \item 但它还没有进入 connector-backed KV transfer/materialization 路径。
     \end{itemize}
-    \item 因此现在的负结果不应该被解读为“partial reuse 这个研究方向无效”，而应被解读为“更激进地推广 partial，并不能替代更强的 runtime seam”。
+    \item 这次四格矩阵表明：更强的 runtime seam 足以把 tuned partial 的 live 性能显著拉回，但是否超过 baseline 仍取决于 guardrail 与 workload 形态。
   \end{itemize}
 
   \vspace{0.5em}
   \begin{block}{更准确的结论}
-    现阶段 online 结果说明的是：\alert{runtime realization 与 guardrail 共同决定收益}，而不是 \alert{只要把请求推向 partial 就会更快}。
+    现阶段 online 结果说明的是：\alert{runtime realization 与 guardrail 共同决定收益}；更强的 seam 让 \texttt{partial\_reuse} 重新变得可竞争，但 paper claim 必须保持 workload-dependent。
   \end{block}
 \end{frame}
 
 \begin{frame}{下一步工作}
   \begin{itemize}
-    \item 方向一：继续沿 carrier seam 做真正的 segmented materialization path。
+    \item 方向一：继续沿 carrier seam 把 block-aligned segmented path 推向 connector-backed、exact token-level 的 materialization path。
     \item 方向二：做更温和的参数扫描，明确 \texttt{partial\_reuse} 的 guardrail 何时应保留 \texttt{full\_reuse}/\texttt{recompute}。
     \item 方向三：若环境允许，接入显式 \texttt{kv\_transfer\_config} 与 connector-backed path，验证 transfer 成本是否能被控制策略真正利用。
   \end{itemize}
@@ -329,8 +366,8 @@
   \begin{enumerate}
     \item arrival-time KV materialization 应被建模为三动作控制问题，而不是默认“有reuse就直接用”。
     \item offline 结果已经证明这个决策面有研究价值。
-    \item 最新真实实验说明：把 \texttt{partial\_reuse} 推得更激进，虽然能提高 partial 命中率，但并不会自动带来更好的 live 性能。
-    \item 因此后续工作的重点应放在\alert{runtime realization seam + 温和guardrail}，而不是单纯追求更高的 partial 触发率。
+    \item 最新真实实验说明：把 carrier seam 推进到 segmented tail path 后，旧 tuned 的负结果被显著拉回，但不同 workload 对 baseline/tuned guardrail 的偏好并不相同。
+    \item 因此后续工作的重点仍是\alert{runtime realization seam + 温和guardrail}，并以 workload-dependent 的方式陈述 live 证据，而不是把它写成统一正收益。
   \end{enumerate}
 \end{frame}
 

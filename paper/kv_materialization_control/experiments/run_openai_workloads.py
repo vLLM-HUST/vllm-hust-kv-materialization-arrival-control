@@ -160,6 +160,8 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=7)
     parser.add_argument("--request-rate", type=float)
     parser.add_argument("--concurrency", type=int)
+    parser.add_argument("--max-output-tokens", type=int)
+    parser.add_argument("--tokenizer")
     parser.add_argument("--api-key", default=os.environ.get("OPENAI_API_KEY", ""))
     parser.add_argument("--user-agent", default=os.environ.get("OPENAI_HTTP_USER_AGENT", "python-httpx/0.28.1"))
     parser.add_argument("--output", required=True)
@@ -174,6 +176,8 @@ def main() -> None:
         seed=args.seed,
         request_rate=args.request_rate,
         concurrency=args.concurrency,
+        max_output_tokens=args.max_output_tokens,
+        tokenizer_name_or_path=args.tokenizer,
     )
 
     output_path = Path(args.output)

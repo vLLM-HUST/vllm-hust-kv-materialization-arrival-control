@@ -32,8 +32,15 @@ path documents what the current out-of-tree vLLM seam actually realizes online.
 The resulting claim boundary is explicit: the repository supports decision-side
 evidence for \texttt{full\_reuse}, \texttt{partial\_reuse}, and
 \texttt{recompute}, and live runtime evidence for native
-\texttt{full\_reuse}/\texttt{recompute} plus truthfulness-safe
-\texttt{partial\_reuse} fallback reporting on the current prefix-cache path.
+\texttt{full\_reuse}/\texttt{recompute} plus a block-aligned segmented
+\texttt{partial\_reuse} seam with explicit effective-action and fallback
+reporting on the current prefix-cache path. The resulting empirical message is
+narrow but concrete: the offline study exposes a small yet real
+\texttt{partial\_reuse} regime, while live evidence across prefix-rich,
+continuation-heavy, and tokenizer-faithful dynamic-RAG cases shows that the
+current seam can realize block-aligned \texttt{partial\_reuse}, transition to
+\texttt{full\_reuse} when overlap grows, and only supports truthful online
+claims when workload construction matches the serving tokenizer.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -147,13 +154,15 @@ all-or-nothing event.
 The artifact keeps the boundary around \texttt{partial\_reuse} explicit. In
 the offline decision study, \texttt{partial\_reuse} is a first-class action:
 the controller may materialize only a profitable prefix segment and recompute
-the remainder. On the current live prefix-cache seam, exact online segmented
-materialization is not yet available. Accordingly, the runtime does not claim
-native support it does not have: it logs \texttt{partial\_reuse} as the
-observed policy decision, marks the support tier as a fallback, records the
-reason that exact partial segment materialization is unavailable on the current
-prefix-cache path, and degrades the effective online action to anchor-scoped
-\texttt{full\_reuse}.
+the remainder. On the current live prefix-cache seam, \texttt{partial\_reuse}
+is now realized only at block-aligned granularity: prefix-cache lookup is
+capped at the aligned reuse boundary, cache write-back is capped at the same
+boundary, and the recomputed tail is isolated under a request-scoped segmented
+hash namespace. This is stronger than the earlier fallback-only seam, but it
+is still not exact token-level materialization. Accordingly, the runtime keeps
+the observed decision separate from the effective action and records when a
+block-aligned \texttt{partial\_reuse} cut point is realigned, dominated by
+\texttt{full\_reuse}, or collapses to \texttt{recompute}.
 
 \section{Design Perspective}
 The design goal is not to maximize reuse rate. The design goal is to minimize
@@ -300,8 +309,9 @@ controlled Qwen2.5-7B-Instruct endpoint.
 The claim boundary is therefore explicit. The offline layer supports claims
 about the three-action arrival-time decision surface. The live layer supports
 claims about runtime realization status on the current seam: native support for
-\texttt{full\_reuse} and \texttt{recompute}, and fallback reporting for
-\texttt{partial\_reuse}.
+\texttt{full\_reuse} and \texttt{recompute}, plus block-aligned segmented
+support for \texttt{partial\_reuse} with explicit effective-action and
+fallback reporting.
 
 \section{Live Runtime Boundary}
 The live path is intentionally narrower than a broad online benchmark suite. It
@@ -309,19 +319,113 @@ is used to answer one question: what does the current runtime seam really do?
 
 On the current out-of-tree prefix-cache path, \texttt{full\_reuse} is realized
 through stable anchor-scoped cache domains, and \texttt{recompute} is realized
-through request-scoped cache bypass. \texttt{partial\_reuse} is not yet
-realized as exact segmented materialization and must therefore be reported as a
-fallback on this path.
+through request-scoped cache bypass. \texttt{partial\_reuse} is realized only
+at a block-aligned segmented boundary on this path: the runtime caps lookup and
+shared-cache commit at the aligned reuse boundary and resets the tail hash
+chain into a request-scoped segmented namespace. This seam is still narrower
+than exact token-level segmented materialization, so the live path must continue
+to report observed versus effective action explicitly.
 
 \subsection{Fallback Taxonomy}
 This distinction is essential for paper truthfulness. The repository has a real
-online control path for two of the three actions, but it does not yet have an
-end-to-end implementation of exact online \texttt{partial\_reuse}. The runtime
-therefore exposes a fallback taxonomy rather than hiding the gap. When the
-policy selects \texttt{partial\_reuse}, the live record includes the observed
-decision, the effective fallback action, the support tier, and the fallback
-reason stating that exact partial segment materialization is unavailable on the
-current prefix-cache path.
+online control path for all three actions, but \texttt{partial\_reuse} is only
+realized on a block-aligned segmented seam rather than as exact token-level
+materialization. The runtime therefore exposes a fallback taxonomy rather than
+hiding the remaining gap. When the policy selects \texttt{partial\_reuse}, the
+live record includes the observed decision, the effective action, the support
+tier, and the fallback reason stating whether the cut point was realigned to
+runtime blocks, dominated by \texttt{full\_reuse}, or collapsed to
+\texttt{recompute}.
+
+\subsection{Representative Live Matrix}
+To test whether the recent online improvement comes from the runtime seam or
+only from changing the decision mix, we compare four controlled live
+conditions on two representative workloads: old seam plus baseline knobs
+(\texttt{floor=256}, \texttt{confidence\_penalty=4.0}), old seam plus tuned
+knobs (\texttt{floor=128}, \texttt{confidence\_penalty=8.0}), new segmented
+seam plus baseline knobs, and new segmented seam plus tuned knobs. All runs use
+the same Qwen2.5-7B-Instruct deployment and enter through the shared workload
+catalog.
+
+\begin{table}[t]
+\centering
+\caption{Representative live runtime-boundary matrix.}
+\label{tab:live-matrix}
+\scriptsize
+\begin{tabular}{llrrr}
+\toprule
+Workload & Setting & Mean (ms) & p95 (ms) & RPS \\
+\midrule
+Knowledge & old baseline & 3289.302 & 3641.928 & 1.209 \\
+Knowledge & old tuned & 3860.692 & 4170.369 & 1.031 \\
+Knowledge & new baseline & 3054.712 & 3383.972 & 1.303 \\
+Knowledge & new tuned & 2980.648 & 3214.822 & 1.335 \\
+Tool scaffold & old baseline & 8856.437 & 10627.872 & 0.896 \\
+Tool scaffold & old tuned & 11068.224 & 12187.492 & 0.717 \\
+Tool scaffold & new baseline & 9362.399 & 10302.383 & 0.848 \\
+Tool scaffold & new tuned & 9186.471 & 10182.569 & 0.865 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Additional live boundary cases on the segmented seam, including the tokenizer-faithful dynamic-RAG rerun.}
+\label{tab:live-boundary-cases}
+\scriptsize
+\begin{tabular}{lrrr}
+\toprule
+Workload & Completed & Mean (ms) & p95 (ms) \\
+\midrule
+Shared-prefix assistant & 40/40 & 10469.485 & 16098.330 \\
+Session maintenance & 40/40 & 6120.100 & 6488.292 \\
+Dynamic RAG update & 32/32 & 2634.091 & 3073.478 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+This matrix supports a narrower but stronger live claim than the earlier
+fallback-only result. On the knowledge-service workload, the stronger segmented
+seam improves even the conservative baseline point over the old baseline by
+7.1\% mean latency and 7.1\% p95 latency, and the new tuned configuration is
+the best of the four settings. On the tool-scaffold workload, the old baseline
+still remains the best mean-latency and throughput point, but the stronger seam
+substantially recovers the old tuned negative result and gives the best p95
+point under the new tuned setting. The correct paper conclusion is therefore
+not that the seam universally wins by itself, but that a stronger realization
+seam is what makes tuned \texttt{partial\_reuse} competitive again and that
+the resulting benefit is workload-dependent.
+
+Table~\ref{tab:live-boundary-cases} extends that statement beyond the two
+four-setting comparison workloads. The shared-prefix assistant and session
+maintenance cases show that the segmented seam can sustain stable online
+execution on prefix-rich and long-continuation workloads without reopening the
+offline-only evidence boundary. The dynamic-RAG rerun is methodologically more
+important: the earlier failed run was not evidence that this case inherently
+exceeded the Qwen2.5-7B context window. Instead, the failure came from
+constructing the live workload with a whitespace tokenizer, which distorted the
+shared-workload token budget relative to the tokenizer used by the actual
+endpoint. Once the live runner was switched to the real Qwen tokenizer, the
+same \texttt{dynamic\_rag\_corpus\_update} case completed cleanly and showed
+the expected action transition: early turns remained in the block-aligned
+\texttt{partial\_reuse} regime, while later turns moved to effective
+\texttt{full\_reuse} as retrieval overlap increased. This correction matters
+for paper truthfulness because it turns a misleading ``context-window
+boundary'' story into the real systems conclusion: live evidence depends not
+only on the runtime seam, but also on whether workload construction is faithful
+to the serving tokenizer.
+
+\subsection{Observed and Effective Actions}
+The new segmented-baseline run also clarifies why the claim must remain tied to
+runtime realization rather than nominal policy choice alone. On
+\texttt{shared\_scenario\_multi\_turn\_knowledge\_service}, the workload
+splits into 8 effective \texttt{recompute} requests and 24 effective
+\texttt{partial\_reuse} requests. On \texttt{shared\_tool\_scaffold\_agent},
+all 64 requests are observed as \texttt{partial\_reuse}, but the effective
+runtime actions become 48 block-aligned \texttt{partial\_reuse} requests and
+16 \texttt{full\_reuse} requests after re-ranking. This behavior shows that
+the seam and the guardrails jointly determine the realized action mix: the
+controller cannot be evaluated honestly by observed decisions alone.
 
 \section{Offline Decision Study}
 The offline study remains valuable because it is the only place where the full
@@ -360,7 +464,8 @@ that new region.
 That result does not invalidate the control formulation, but it does narrow the
 claim. The current artifact now supports a slightly stronger statement than the
 earlier negative result: request-arrival KV materialization is a real control
-surface with a small but measurable partial-reuse regime. It still does not
+surface with a small but measurable partial-reuse regime, and a stronger live
+realization seam can recover part of that value online. It still does not
 support a strong claim that \texttt{partial\_reuse} wins broadly across the
 shared default workload matrix, and it still leaves substantial headroom
 between the heuristic and the oracle.
@@ -407,18 +512,23 @@ second repo-local default workload subset.
 from live runtime-boundary claims.
 \item A narrow out-of-tree vLLM plugin target centered on materialization
 control rather than scheduler, admission, or memory-evolution redesign, with a
-live fallback taxonomy that truthfully reports the current \texttt{partial\_reuse}
-gap.
+live runtime-boundary taxonomy that truthfully reports the current block-aligned
+\texttt{partial\_reuse} seam, demonstrates stable online behavior on
+shared-prefix and continuation cases, captures the
+\texttt{partial\_reuse}-to-\texttt{full\_reuse} transition on
+tokenizer-faithful dynamic RAG, and keeps the remaining gap to exact
+token-level materialization explicit.
 \end{enumerate}
 
 \section{Limitations and Next Step}
-The main limitation remains exact online \texttt{partial\_reuse}. The next
+The main limitation remains exact token-level online \texttt{partial\_reuse}
+beyond the current block-aligned segmented seam. The next
 milestones are therefore concrete:
 
 \begin{enumerate}[leftmargin=1.5em]
 \item implement a deeper runtime path, likely via a custom KV materialization
 or connector seam, that can realize exact online \texttt{partial\_reuse}
-rather than degrading it to anchor-scoped full reuse;
+rather than relying on block-aligned segmented reuse plus fallback re-ranking;
 \item keep the live runtime-boundary matrix grounded in shared workload cases
 that stress prefix-rich, long-context continuation, and dynamic retrieval
 follow-up behavior; and

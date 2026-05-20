@@ -5,6 +5,7 @@ import os
 import random
 import sys
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -16,6 +17,23 @@ class WhitespaceTokenizer:
 	def encode(self, text: str, add_special_tokens: bool = False) -> list[str]:
 		del add_special_tokens
 		return text.split()
+
+
+@lru_cache(maxsize=4)
+def _load_hf_tokenizer(model_name_or_path: str) -> Any:
+	try:
+		from transformers import AutoTokenizer
+	except ImportError as exc:
+		raise RuntimeError(
+			"transformers is required to build live workloads with a real model tokenizer."
+		) from exc
+	return AutoTokenizer.from_pretrained(model_name_or_path, trust_remote_code=True)
+
+
+def resolve_workload_tokenizer(tokenizer_name_or_path: str | None = None) -> Any:
+	if not tokenizer_name_or_path:
+		return WhitespaceTokenizer()
+	return _load_hf_tokenizer(str(tokenizer_name_or_path))
 
 
 @dataclass(frozen=True, slots=True)
@@ -204,17 +222,18 @@ def _generate_public_case_requests(workloads: Any, case_id: str, case: dict[str,
 	return rows
 
 
-def generate_case_requests(case_id: str, *, seed: int) -> list[Any]:
+def generate_case_requests(case_id: str, *, seed: int, tokenizer: Any | None = None) -> list[Any]:
 	workloads = load_workloads_module()
 	case = resolve_case_spec(case_id)
 	dataset_name = str(case["dataset_name"])
+	effective_tokenizer = tokenizer if tokenizer is not None else WhitespaceTokenizer()
 	if dataset_name in getattr(workloads, "PUBLIC_WORKLOAD_DATASET_NAMES", ()):
 		return _generate_public_case_requests(workloads, case_id, case, seed=seed)
 	if not workloads.is_repo_local_workload_dataset(dataset_name):
 		raise ValueError(f"workload case {case_id} uses unsupported dataset {dataset_name}")
 	return workloads.generate_repo_local_workload_requests(
 		dataset_name=dataset_name,
-		tokenizer=WhitespaceTokenizer(),
+		tokenizer=effective_tokenizer,
 		dp_size=int(case.get("dp_size", 8)),
 		num_prompts=int(case.get("num_prompts", int(case["num_groups"]) * int(case["prompts_per_group"]))),
 		num_groups=int(case["num_groups"]),
@@ -232,10 +251,16 @@ def build_live_workload(
 	seed: int = 7,
 	request_rate: float | None = None,
 	concurrency: int | None = None,
+	max_output_tokens: int | None = None,
+	tokenizer_name_or_path: str | None = None,
 ) -> SharedLiveWorkload:
 	workloads = load_workloads_module()
 	case = resolve_case_spec(case_id)
-	rows = generate_case_requests(case_id, seed=seed)
+	rows = generate_case_requests(
+		case_id,
+		seed=seed,
+		tokenizer=resolve_workload_tokenizer(tokenizer_name_or_path),
+	)
 	preset = workloads.WORKLOAD_PRESET_CATALOG.get(str(case["dataset_name"]), {})
 	effective_request_rate = float(
 		request_rate if request_rate is not None else preset.get("recommended_request_rate", 16)
@@ -253,12 +278,15 @@ def build_live_workload(
 		if shared_prefix_tokens <= 0:
 			shared_prefix_tokens = max(0, int(row.prompt_len * (0.6 if metadata.turn_index > 0 else 0.35)))
 		reuse_confidence = 0.95 if metadata.turn_index > 0 else 0.45
+		output_tokens = int(row.output_len)
+		if max_output_tokens is not None:
+			output_tokens = max(1, min(output_tokens, int(max_output_tokens)))
 		requests.append(
 			SharedLiveRequest(
 				request_id=f"{case_id}-{index}",
 				prompt=row.prompt,
 				prompt_tokens=int(row.prompt_len),
-				output_tokens=int(row.output_len),
+				output_tokens=output_tokens,
 				workload_case=case_id,
 				workload_family=metadata.workload_family,
 				family_label=metadata.family_label,
@@ -297,4 +325,5 @@ __all__ = [
 	"load_workloads_module",
 	"recommended_context_window",
 	"resolve_case_spec",
+	"resolve_workload_tokenizer",
 ]

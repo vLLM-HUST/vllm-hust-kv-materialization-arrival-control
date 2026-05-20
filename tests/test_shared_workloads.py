@@ -11,6 +11,12 @@ from vllm_kv_materialization.shared_workloads import recommended_context_window
 from vllm_kv_materialization.shared_workloads import RUNTIME_BOUNDARY_CASE_IDS
 
 
+class CharTokenizer:
+	def encode(self, text: str, add_special_tokens: bool = False) -> list[str]:
+		del add_special_tokens
+		return list(text)
+
+
 def test_default_experiment_cases_exist_in_shared_catalog() -> None:
 	workloads = load_workloads_module()
 	assert DECISION_SURFACE_CASE_IDS == workloads.DEFAULT_SHARED_BENCHMARK_CASE_ORDER
@@ -31,6 +37,15 @@ def test_generate_case_requests_uses_shared_workload_cases() -> None:
 	assert rows[0].output_len > 0
 
 
+def test_generate_case_requests_accepts_custom_tokenizer() -> None:
+	default_rows = generate_case_requests("dynamic_rag_corpus_update", seed=7)
+	custom_rows = generate_case_requests("dynamic_rag_corpus_update", seed=7, tokenizer=CharTokenizer())
+
+	assert default_rows
+	assert custom_rows
+	assert custom_rows[0].prompt_len > default_rows[0].prompt_len
+
+
 def test_build_live_workload_preserves_shared_case_metadata() -> None:
 	workload = build_live_workload(
 		"shared_scenario_rag_followup_long_context",
@@ -47,6 +62,18 @@ def test_build_live_workload_preserves_shared_case_metadata() -> None:
 	assert workload.requests[0].arrival_gap_s == 0.0
 	assert workload.requests[1].arrival_gap_s > 0.0
 	assert workload.requests[0].workload_family == "rag-followup"
+
+
+def test_build_live_workload_can_cap_output_tokens() -> None:
+	workload = build_live_workload(
+		"dynamic_rag_corpus_update",
+		seed=7,
+		max_output_tokens=64,
+	)
+
+	assert workload.requests
+	assert max(request.output_tokens for request in workload.requests) == 64
+	assert min(request.output_tokens for request in workload.requests) == 64
 
 
 def test_decision_surface_follows_full_shared_catalog() -> None:

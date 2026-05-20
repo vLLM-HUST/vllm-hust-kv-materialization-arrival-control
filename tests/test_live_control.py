@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+
 from vllm_kv_materialization.live_control import HEADER_PRIMARY_ANCHOR
 from vllm_kv_materialization.live_control import HEADER_REUSE_CONFIDENCE
 from vllm_kv_materialization.live_control import HEADER_SECONDARY_ANCHORS
@@ -213,6 +215,7 @@ def test_compute_runtime_control_aligns_partial_to_runtime_blocks(monkeypatch) -
     assert plan.target_reuse_tokens % 128 == 0
     assert 0 < plan.target_reuse_tokens <= observation.reused_tokens
     assert plan.cache_salt == "kvmat:anchor:shared-scaffold::2"
+    assert plan.segmented_tail_cache_salt == "kvmat:recompute:anchor-align:req-align"
     assert plan.fallback_reason == PARTIAL_REUSE_ALIGNMENT_FALLBACK_REASON
 
 
@@ -262,6 +265,73 @@ def test_partial_reuse_caps_cacheable_tokens_to_reuse_boundary() -> None:
     KVCacheManager.cache_blocks(manager, request, 1536)
 
     assert manager.coordinator.calls == [(request, 768)]
+
+
+def test_partial_reuse_exports_segmented_tail_salt(monkeypatch) -> None:
+    monkeypatch.delenv("VLLM_KV_MATERIALIZATION_LOG_PATH", raising=False)
+    monkeypatch.setenv("VLLM_KV_RUNTIME_BLOCK_SIZE", "128")
+
+    headers = {
+        HEADER_PRIMARY_ANCHOR: "anchor-tail-salt",
+        HEADER_SECONDARY_ANCHORS: "tenant::0,shared-scaffold::2",
+        HEADER_SHARED_PREFIX_TOKENS: "1024",
+        HEADER_TURN_INDEX: "0",
+        HEADER_REUSE_CONFIDENCE: "0.2",
+    }
+
+    token = bind_request_headers(headers)
+    try:
+        _, plan = compute_runtime_control("req-tail-salt", 1536, 64)
+    finally:
+        reset_request_headers(token)
+
+    runtime_hint = build_runtime_control_extra_args(plan)[RUNTIME_KV_TRANSFER_CONTROL_KEY]
+
+    assert plan.effective_decision == "partial_reuse"
+    assert runtime_hint["segmented_tail_cache_salt"] == plan.segmented_tail_cache_salt
+    assert runtime_hint["segmented_tail_cache_salt"] == "kvmat:recompute:anchor-tail-salt:req-tail-salt"
+
+
+def test_partial_reuse_resets_tail_hash_chain_at_boundary() -> None:
+    from vllm.sampling_params import SamplingParams
+    from vllm.v1.core.kv_cache_utils import get_request_block_hasher
+    from vllm.v1.core.kv_cache_utils import init_none_hash
+    from vllm.v1.request import Request
+
+    def _stable_hash(value: object) -> bytes:
+        return hashlib.sha256(repr(value).encode("utf-8")).digest()
+
+    init_none_hash(_stable_hash)
+    block_hasher = get_request_block_hasher(2, _stable_hash)
+    runtime_control = {
+        "effective_decision": "partial_reuse",
+        "target_reuse_tokens": 4,
+        "segmented_tail_cache_salt": "kvmat:segment:test",
+    }
+    sampling_params = SamplingParams.from_optional(
+        max_tokens=1,
+        extra_args={RUNTIME_KV_TRANSFER_CONTROL_KEY: runtime_control},
+    )
+
+    request_a = Request(
+        "req-segment-a",
+        [1, 2, 3, 4, 9, 10, 11, 12],
+        sampling_params,
+        None,
+        cache_salt="kvmat:anchor:test",
+        block_hasher=block_hasher,
+    )
+    request_b = Request(
+        "req-segment-b",
+        [5, 6, 7, 8, 9, 10, 11, 12],
+        sampling_params,
+        None,
+        cache_salt="kvmat:anchor:test",
+        block_hasher=block_hasher,
+    )
+
+    assert request_a.block_hashes[:2] != request_b.block_hashes[:2]
+    assert request_a.block_hashes[2:] == request_b.block_hashes[2:]
 
 
 def test_full_reuse_keeps_cacheable_tokens_uncapped() -> None:

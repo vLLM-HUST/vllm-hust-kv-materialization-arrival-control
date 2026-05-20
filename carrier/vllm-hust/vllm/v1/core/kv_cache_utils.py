@@ -641,6 +641,41 @@ def get_request_block_hasher(
     of a request."""
 
     def request_block_hasher(request: Request) -> list[BlockHash]:
+        runtime_control = request.kv_materialization_runtime_control
+        if not isinstance(runtime_control, dict):
+            kv_transfer_params = request.kv_transfer_params or {}
+            runtime_control = kv_transfer_params.get(
+                "kv_materialization_runtime_control"
+            )
+        segment_start_idx = None
+        segment_parent_hash = None
+        if isinstance(runtime_control, dict):
+            effective_decision = runtime_control.get("effective_decision")
+            if effective_decision is None:
+                effective_decision = runtime_control.get("observed_decision")
+            target_reuse_tokens = runtime_control.get("target_reuse_tokens")
+            segmented_tail_cache_salt = runtime_control.get(
+                "segmented_tail_cache_salt"
+            )
+            if (
+                effective_decision == "partial_reuse"
+                and isinstance(target_reuse_tokens, int)
+                and target_reuse_tokens > 0
+                and target_reuse_tokens % block_size == 0
+                and isinstance(segmented_tail_cache_salt, str)
+                and segmented_tail_cache_salt
+            ):
+                segment_start_idx = target_reuse_tokens
+                segment_parent_hash = BlockHash(
+                    caching_hash_fn(
+                        (
+                            "kv_materialization_segment",
+                            segmented_tail_cache_salt,
+                            target_reuse_tokens,
+                        )
+                    )
+                )
+
         start_token_idx = len(request.block_hashes) * block_size
         num_tokens = request.num_tokens
 
@@ -665,6 +700,9 @@ def get_request_block_hasher(
             if end_token_idx > num_tokens:
                 # We only hash full blocks
                 break
+
+            if segment_start_idx is not None and start_token_idx == segment_start_idx:
+                prev_block_hash_value = segment_parent_hash
 
             # MM and LoRA requests need extra keys for block-hash computation.
             extra_keys, curr_mm_idx = generate_block_hash_extra_keys(
