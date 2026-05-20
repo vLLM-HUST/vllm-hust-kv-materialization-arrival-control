@@ -18,8 +18,8 @@ maintainers = [
 ]
 
 [project.urls]
-Repository = "https://github.com/intellistream/vllm-kv-materialization-plugin"
-Issues = "https://github.com/intellistream/vllm-kv-materialization-plugin/issues"
+Repository = "https://github.com/intellistream/kv-materialization-plugin"
+Issues = "https://github.com/intellistream/kv-materialization-plugin/issues"
 
 [project.scripts]
 vllm-kv-materialization-serve = "vllm_kv_materialization.launcher:main"

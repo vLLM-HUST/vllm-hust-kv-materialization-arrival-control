@@ -39,4 +39,5 @@
 - Changed docs to remove user-specific absolute path examples and source-organization-specific live endpoint examples.
 - Added explicit ownership and transfer targets in `README.md` for `caozhe` and `xuheng li`.
 - Changed the ownership marker to record `cao zhe` as the current student owner and `intellistream` as the target repository organization.
+- Changed repository ownership markers from transfer planning state to completed handoff state after moving the repository into the `intellistream` organization.
 - Changed the offline `partial_reuse` semantics from a fixed fraction proxy to a confidence-aware cut-point optimizer shared by the policy, threshold baseline, and oracle evaluator.

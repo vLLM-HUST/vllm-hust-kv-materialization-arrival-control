@@ -2,7 +2,7 @@
 
 ## 当前定位
 
-这个仓库已经转交给 `cao zhe` 同学继续推进，并按仓库归属规划迁移到 `intellistream` 组织下；从研究视角看，它仍然属于 advanced incubation 阶段。
+这个仓库已经转交给 `cao zhe` 同学继续推进，并已迁移到 `intellistream` 组织下；从研究视角看，它仍然属于 advanced incubation 阶段。
 
 它已经不是一个空模板，也不是单纯的工程脚手架。当前更准确的状态是：
 
