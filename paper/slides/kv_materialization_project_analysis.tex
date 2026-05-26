@@ -1,0 +1,245 @@
+\documentclass[10pt,aspectratio=169]{ctexbeamer}
+
+\usetheme{Madrid}
+\usecolortheme{default}
+\usefonttheme{professionalfonts}
+
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{hyperref}
+
+\definecolor{PrimaryBlue}{HTML}{0F4C81}
+\definecolor{SecondaryOrange}{HTML}{C65D07}
+\definecolor{MutedGray}{HTML}{5B6570}
+
+\setbeamercolor{structure}{fg=PrimaryBlue}
+\setbeamercolor{title}{fg=PrimaryBlue}
+\setbeamercolor{frametitle}{fg=PrimaryBlue}
+\setbeamercolor{block title}{bg=PrimaryBlue!10,fg=PrimaryBlue}
+\setbeamercolor{block body}{bg=gray!4,fg=black}
+\setbeamercolor{itemize item}{fg=SecondaryOrange}
+\setbeamercolor{enumerate item}{fg=SecondaryOrange}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+
+\title{KV Materialization 项目整理与推进判断}
+\subtitle{vllm-kv-materialization-plugin 课题分析版}
+\author{vllm-kv-materialization-plugin}
+\date{2026-05-23}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{先给结论：这条线值得继续，但只要盯住 \texttt{partial\_reuse}}
+\begin{block}{当前判断}
+这个课题是值得继续推进的，因为它把“reuse 不是免费 latency win”这件事收成了一个很窄、很硬的控制点：\textbf{请求到达时，面对可重用 KV，应该选 \texttt{full\_reuse}、\texttt{partial\_reuse} 还是 \texttt{recompute}。} 但它现在的论文成败，几乎都取决于\textbf{\texttt{partial\_reuse} 能不能从 offline decision surface 真正推进到可信的 runtime boundary。}
+\end{block}
+
+\begin{columns}[T]
+\column{0.33\textwidth}
+\textbf{为什么值得继续}
+\begin{itemize}
+  \item 问题收得很准
+  \item 三动作面清楚
+  \item offline / live 边界清楚
+\end{itemize}
+
+\column{0.33\textwidth}
+\textbf{现在最大缺口}
+\begin{itemize}
+  \item \texttt{partial\_reuse} 仍非完整 runtime path
+  \item offline 与 live 还没完全闭环
+  \item 需要更强 hook value 论证
+\end{itemize}
+
+\column{0.33\textwidth}
+\textbf{推进建议}
+\begin{itemize}
+  \item 继续，但别扩题
+  \item 围着 \texttt{partial\_reuse} 打
+  \item 把 boundary paper 做硬
+\end{itemize}
+\end{columns}
+\end{frame}
+
+\begin{frame}{1. 这个项目到底在解决什么问题}
+\begin{block}{核心问题}
+当前 serving 系统越来越能看到 reusable prefix 或 KV state，但\textbf{看到可复用状态} 不等于 \textbf{应该立刻把它物化成 startup-latency 减少}。跨设备传输、stitching、格式适配和压力放大都会让 reuse 带来成本。
+\end{block}
+
+\begin{itemize}
+  \item 所以 arrival time 需要一个显式决策；
+  \item 问题不是“有没有 cache hit”，而是“\textbf{现在该物化多少、值不值得物化}”。
+\end{itemize}
+
+\vspace{0.4em}
+\textbf{项目的精确表述}
+研究 request-arrival KV materialization decision，而不是泛化成 admission、eviction 或 memory evolution。
+\end{frame}
+
+\begin{frame}{2. 为什么这个问题是值得单独成立的一条线}
+\begin{columns}[T]
+\column{0.52\textwidth}
+\textbf{为什么它重要}
+\begin{itemize}
+  \item reusable state 在多 GPU / 多 worker serving 中越来越常见
+  \item realization overhead 不再能被“cache hit”这个词掩盖
+  \item TTFT 受 materialize-vs-recompute 决策直接影响
+\end{itemize}
+
+\column{0.48\textwidth}
+\textbf{为什么它不是别的课题}
+\begin{itemize}
+  \item 不是 general admission control
+  \item 不是 scheduler redesign
+  \item 不是 long-horizon state lifecycle
+\end{itemize}
+\end{columns}
+
+\vspace{0.4em}
+\begin{alertblock}{最重要的课题价值}
+这条线把 reuse 从“有没有”变成“应该在 arrival 时物化到什么程度”，这比二元 cache 命中视角更接近真实系统控制问题。
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{3. 这个课题最有价值的核心假设}
+\begin{block}{核心假设}
+对于一部分 workload，最佳动作不是 \texttt{full\_reuse} 也不是 \texttt{recompute}，而是\textbf{只物化一段 profitable prefix，再重算 tail}。这就是 \texttt{partial\_reuse} 的价值。
+\end{block}
+
+\begin{itemize}
+  \item 如果只有二元策略，很多中间最优点表达不出来；
+  \item \texttt{partial\_reuse} 使这条线真正区别于普通 prefix reuse controller；
+  \item 也正因为如此，这条线的成败几乎都系在 \texttt{partial\_reuse} 上。
+\end{itemize}
+
+\vspace{0.4em}
+\textbf{一句话}
+没有 \texttt{partial\_reuse}，这个项目会明显退化成“更复杂一点的 full-reuse-vs-recompute 选择器”。
+\end{frame}
+
+\begin{frame}{4. 当前设计整理：这个 repo 已经有什么}
+\textbf{当前 artifact 已经形成两层很清楚的证据结构：}
+
+\vspace{0.3em}
+\begin{enumerate}
+  \item \textbf{decision-study}
+  offline、workload-grounded 的三动作决策面分析。
+
+  \item \textbf{runtime-boundary-live}
+  live 路径上如实报告当前 seam 实际能实现什么动作。
+\end{enumerate}
+
+\vspace{0.4em}
+\textbf{这两层里已经有的关键资产：}
+\begin{itemize}
+  \item 动作空间已固定为 \texttt{full\_reuse / partial\_reuse / recompute}；
+  \item offline 里的 \texttt{partial\_reuse} 已不再是固定半前缀 proxy，而是 confidence-aware cut point；
+  \item live path 已能 truthfully 区分 observed decision、runtime support tier、effective live action 和 fallback reason。
+\end{itemize}
+
+\vspace{0.4em}
+\begin{block}{为什么这很重要}
+这说明仓库已经不是概念草稿，而是一个 boundary 明确、证据可继续累加的系统研究载体。
+\end{block}
+\end{frame}
+
+\begin{frame}{5. 当前最强的地方，不是数字，而是边界处理得诚实}
+\begin{block}{truthfulness boundary}
+这个仓库最成熟的地方，是它没有把 offline 好看的 \texttt{partial\_reuse} 直接写成 live runtime gain，而是明确区分：\textbf{decision-side evidence} 和 \textbf{runtime realization evidence}。
+\end{block}
+
+\begin{itemize}
+  \item offline 证明三动作面有结构；
+  \item live 证明当前 seam 最多只能做到 block-aligned segmented partial reuse；
+  \item 当 cut point 被 realign、被 full reuse 支配、或塌缩成 recompute 时，repo 都会明确报出来。
+\end{itemize}
+
+\vspace{0.4em}
+\begin{alertblock}{这正是这条线还能继续投资源的原因}
+不是因为已经完美，而是因为它已经把“哪里没做成”写得很清楚，因此下一步非常明确。
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{6. 现在最缺的证据是什么}
+\textbf{如果要判断值不值得继续，关键看这三类证据能不能补强：}
+
+\vspace{0.3em}
+\begin{enumerate}
+  \item \textbf{\texttt{partial\_reuse} 的 runtime seam 价值}
+  要证明为什么现有 prefix-cache path 不够，以及一个最小 hook 能恢复多少 offline 决策价值。
+
+  \item \textbf{offline vs live 偏差分析}
+  不能只说 offline 有 \texttt{partial\_reuse} 区间，还要说 live 为什么偏掉、偏掉多少、在哪些 case 上偏得最严重。
+
+  \item \textbf{negative result 与 boundary case}
+  哪些 workload 上即使真正实现 \texttt{partial\_reuse} 也未必值得，哪些场景其实 \texttt{full\_reuse} 或 \texttt{recompute} 就够了。
+\end{enumerate}
+
+\vspace{0.4em}
+\textbf{没有这三项，这篇文章很容易停在 artifact 说明层，而不是系统论文层。}
+\end{frame}
+
+\begin{frame}{7. 这个课题真正的风险在哪里}
+\begin{columns}[T]
+\column{0.48\textwidth}
+\textbf{理论风险}
+\begin{itemize}
+  \item \texttt{partial\_reuse} 的有效区间可能很窄
+  \item oracle headroom 可能没有想象中大
+  \item 三动作面未必比二元面多出足够价值
+\end{itemize}
+
+\column{0.48\textwidth}
+\textbf{工程风险}
+\begin{itemize}
+  \item 现有 plugin seam 可能永远不够
+  \item runtime hook 成本可能高于恢复的价值
+  \item block 对齐和 hash boundary 会持续扭曲 offline 决策
+\end{itemize}
+\end{columns}
+
+\vspace{0.5em}
+\begin{block}{最现实的风险判断}
+最大的风险不是“问题不重要”，而是“\texttt{partial\_reuse} 这个主角动作最后在真实 runtime 上恢复不出足够多的价值”。
+\end{block}
+\end{frame}
+
+\begin{frame}{8. 值不值得推进：我的判断}
+\begin{block}{结论}
+值得推进，而且比很多泛化的 state-management 题目更值得，因为它的问题边界更硬、控制点更窄、证据更容易说清楚。
+\end{block}
+
+\vspace{0.4em}
+\textbf{但推进方式必须非常聚焦：}
+\begin{itemize}
+  \item 不要把这条线扩写成 generic memory evolution；
+  \item 不要把 live fallback 包装成“已经实现 partial reuse”；
+  \item 就围着 \texttt{partial\_reuse} 的 runtime boundary 打，做成一篇硬的 boundary/value paper。
+\end{itemize}
+
+\vspace{0.4em}
+\begin{alertblock}{一句话建议}
+这条线可以继续投资源，但前提是把“最小 runtime hook 到底值不值”做成核心主问题。
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{9. 下一步最该做什么}
+\textbf{如果只做三件事，我建议是：}
+
+\begin{enumerate}
+  \item 系统梳理 \texttt{partial\_reuse} 当前为何仍然只到 block-aligned boundary，并明确一个最小 runtime hook proposal；
+  \item 做 offline vs live 偏差矩阵，把每类 workload 上丢掉的 \texttt{partial\_reuse} 决策价值量化出来；
+  \item 做 hook value analysis：如果新增一个更强 seam，预计能恢复多少 TTFT 或避免多少无意义物化。
+\end{enumerate}
+
+\vspace{0.5em}
+\centering
+\Large \textcolor{PrimaryBlue}{围着 \texttt{partial\_reuse} 做硬，不要把题目写散。}
+\end{frame}
+
+\end{document}
