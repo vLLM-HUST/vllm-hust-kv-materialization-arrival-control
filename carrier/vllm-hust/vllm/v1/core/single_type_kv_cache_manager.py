@@ -300,7 +300,11 @@ class SingleTypeKVCacheManager(ABC):
 
         self.num_cached_block[request.request_id] = num_full_blocks
 
-    def free(self, request_id: str) -> None:
+    def free(
+        self,
+        request_id: str,
+        prioritize_uncached_for_reuse: bool = False,
+    ) -> None:
         """
         Free the blocks for the request.
 
@@ -314,7 +318,10 @@ class SingleTypeKVCacheManager(ABC):
         # freed first.
         ordered_blocks = reversed(req_blocks)
 
-        self.block_pool.free_blocks(ordered_blocks)
+        self.block_pool.free_blocks(
+            ordered_blocks,
+            prioritize_uncached_for_reuse=prioritize_uncached_for_reuse,
+        )
         self.num_cached_block.pop(request_id, None)
 
     @abstractmethod

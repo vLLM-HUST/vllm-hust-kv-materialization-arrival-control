@@ -18,6 +18,24 @@ from vllm.v1.request import Request
 logger = init_logger(__name__)
 
 
+def _kvplane_allows_prefix_cache_write(request: Request) -> bool:
+    """Return whether KVPlane allows this request to write reusable KV state."""
+    sampling_params = getattr(request, "sampling_params", None)
+    extra_args = getattr(sampling_params, "extra_args", None) or {}
+    value = extra_args.get("kvplane_admit_prefix_cache")
+    if value is None:
+        value = extra_args.get("agentkv_admit_prefix_cache")
+    if value is None:
+        return True
+    if isinstance(value, str):
+        return value.strip().lower() not in {"0", "false", "no", "deny", "skip"}
+    return bool(value)
+
+
+def _kvplane_denies_prefix_cache_write(request: Request) -> bool:
+    return not _kvplane_allows_prefix_cache_write(request)
+
+
 @dataclass
 class KVCacheBlocks:
     """
@@ -512,6 +530,15 @@ class KVCacheManager:
             request,
             num_tokens_to_cache,
         )
+        if _kvplane_denies_prefix_cache_write(request):
+            logger.info(
+                "KVPlane prefix cache write denied during allocation "
+                "request_id=%s num_tokens=%d num_tokens_to_cache=%d",
+                request.request_id,
+                request.num_tokens,
+                num_tokens_to_cache,
+            )
+            return self.create_kv_cache_blocks(new_blocks)
         self.coordinator.cache_blocks(request, num_tokens_to_cache)
 
         return self.create_kv_cache_blocks(new_blocks)
@@ -524,7 +551,10 @@ class KVCacheManager:
         Args:
             request: The request to free the blocks.
         """
-        self.coordinator.free(request.request_id)
+        self.coordinator.free(
+            request.request_id,
+            prioritize_uncached_for_reuse=_kvplane_denies_prefix_cache_write(request),
+        )
 
     def remove_skipped_blocks(
         self, request_id: str, total_computed_tokens: int
@@ -622,6 +652,15 @@ class KVCacheManager:
                 that are already cached and tokens to be cached.
         """
         if self.enable_caching:
+            if _kvplane_denies_prefix_cache_write(request):
+                logger.info(
+                    "KVPlane prefix cache write denied at final commit "
+                    "request_id=%s num_tokens=%d num_computed_tokens=%d",
+                    request.request_id,
+                    request.num_tokens,
+                    num_computed_tokens,
+                )
+                return
             self.coordinator.cache_blocks(
                 request,
                 self._get_cacheable_num_tokens(request, num_computed_tokens),
