@@ -1,0 +1,3 @@
+[submodule "vendor/vllm"]
+	path = vendor/vllm
+	url = git@github.com:vLLM-HUST/vllm-hust.git
