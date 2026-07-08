@@ -54,6 +54,28 @@ This repository keeps two evidence layers separate.
 The offline study supports claims about decision structure, sensitivity, and
 workload coverage. It does not imply deployed runtime gains.
 
+## Workflow Compliance
+
+This repository is the parent artifact for KV materialization policy logic,
+runtime-boundary experiments, paper assets, and reproducibility docs. Runtime
+changes and paper evidence must be traceable from this repository rather than a
+shared external checkout.
+
+- Carry unavoidable runtime deltas as repo-local patches, vendored checkouts,
+  carrier copies, or submodules under this repository.
+- Run repo-local experiments and smoke checks in
+  `vllm-kv-materialization-exp`.
+- If a runtime submodule needs edits, use
+  `feature/kv-materialization-<purpose>`, not `main` and not a `codex/...`
+  branch.
+- Label results as `real-online`, `existing-server-probe`, `replay`,
+  `simulation/model`, `projected-profile`, or `derived-artifact`; offline
+  decision studies and runtime-boundary probes are not generic state-management
+  gains.
+- Every result directory should include parent commit, dependency/runtime
+  commit or patch provenance, dirty status, hardware, model, environment,
+  command, workload, and timestamp.
+
 The live path is truthfulness-safe only when described as a runtime realization
 boundary:
 
