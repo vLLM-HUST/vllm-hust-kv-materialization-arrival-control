@@ -15,6 +15,8 @@ from vllm.v1.kv_cache_interface import KVCacheConfig
 from vllm.v1.metrics.stats import PrefixCacheStats
 from vllm.v1.request import Request
 
+from .kvplane_write_control import allows_prefix_cache_write
+
 logger = init_logger(__name__)
 
 
@@ -25,11 +27,7 @@ def _kvplane_allows_prefix_cache_write(request: Request) -> bool:
     value = extra_args.get("kvplane_admit_prefix_cache")
     if value is None:
         value = extra_args.get("agentkv_admit_prefix_cache")
-    if value is None:
-        return True
-    if isinstance(value, str):
-        return value.strip().lower() not in {"0", "false", "no", "deny", "skip"}
-    return bool(value)
+    return allows_prefix_cache_write(value)
 
 
 def _kvplane_denies_prefix_cache_write(request: Request) -> bool:
