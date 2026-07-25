@@ -1,0 +1,13 @@
+{
+  "schema_version": "kv-materialization-offline-evidence-v1",
+  "generated_at": "2026-07-25",
+  "generator": "paper/kv_materialization_control/experiments/run_offline_study.py",
+  "generator_sha256": "798b67b4e15e7749a4bd75ae248333b2eb8ccbdd0b511470cc79438a93deb48d",
+  "llm_serving_workloads_commit": "3afdd1aca8a4255a50bb523254037cdca0a7adc4",
+  "seed": 7,
+  "workload_cases": 25,
+  "requests": 1296,
+  "offline_summary_path": "paper/kv_materialization_control/experiments/results/latest/offline_summary.json",
+  "offline_summary_sha256": "7572d84f9cca17f2460d79c38beadb143685378ca4817ee4a453ca8b46dd320c",
+  "interpretation": "deterministic offline cost-model evidence; not an online performance measurement"
+}

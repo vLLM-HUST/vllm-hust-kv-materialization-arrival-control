@@ -39,6 +39,14 @@ POLICY_TITLES = {
     "oracle_ttft": "Oracle TTFT",
 }
 
+POLICY_LABELS = {
+    "always_recompute": "Always recompute",
+    "always_full_reuse": "Always full reuse",
+    "threshold_partial": "Static threshold",
+    "heuristic": "Adaptive heuristic",
+    "oracle_ttft": "Oracle",
+}
+
 DECISION_STYLES = (
     ("full_reuse", "full reuse", "teal!70!black"),
     ("partial_reuse", "partial reuse", "orange!85!black"),
@@ -224,9 +232,10 @@ def render_table_tex(summary: dict) -> str:
     rows = []
     for policy_name in CORE_POLICIES:
         metrics = summary["policies"][policy_name]
-        label = policy_name.replace("_", " ")
+        label = POLICY_LABELS[policy_name]
         rows.append(
-            f"{label} & {metrics['mean_ttft_ms']} & {metrics['p95_ttft_ms']} & {metrics['mean_recompute_tokens']} & {metrics['mean_transferred_kib']} \\\\" 
+            f"{label} & {metrics['mean_ttft_ms']:.2f} & {metrics['p95_ttft_ms']:.2f} & "
+            f"{metrics['mean_recompute_tokens']:.1f} & {metrics['mean_transferred_kib'] / 1024.0:.1f} \\\\"
         )
     body = "\n".join(rows)
     return (
@@ -234,10 +243,12 @@ def render_table_tex(summary: dict) -> str:
         "\\centering\n"
         "\\setlength{\\tabcolsep}{3pt}\n"
         "\\footnotesize\n"
-        "\\caption{Arrival-time decision-study snapshot on workload-driven traces derived from llm-serving-workloads.}\n"
+        "\\caption{Offline cost-model results across 1,296 requests from 25 workload cases. "
+        "Latency values are model estimates, not online measurements.}\n"
+        "\\label{tab:offline-summary}\n"
         "\\begin{tabular}{@{}lrrrr@{}}\n"
         "\\toprule\n"
-        "Policy & Mean & P95 & Recomp. & Xfer KiB \\\\ \n"
+        "Policy & Mean & P95 & Recomp. & Xfer MiB \\\\\n"
         "\\midrule\n"
         f"{body}\n"
         "\\bottomrule\n"
@@ -331,57 +342,65 @@ def render_workload_key_table_tex(summary: dict) -> str:
 
 
 def render_decision_mix_figure_tex(summary: dict) -> str:
-    codebook = summary.get("workload_codebook") or build_workload_codebook(summary)
-    case_ids = [entry["case_id"] for entry in codebook]
-    code_lookup = {entry["case_id"]: entry["code"] for entry in codebook}
-    xcoords = ",".join(entry["code"] for entry in codebook)
+    labels = {
+        "memory_write_then_reuse": "Memory write",
+        "shared_async_document_pipeline": "Async document",
+        "shared_memory_write_then_reuse": "Shared memory write",
+        "shared_prefix_multi_tenant_assistant": "Multi-tenant prefix",
+        "shared_public_sharegpt_boundary": "ShareGPT control",
+        "shared_session_continuation_maintenance": "Session maintenance",
+        "shared_shared_prefix_multi_tenant_assistant": "Shared multi-tenant",
+        "shared_synthetic_shared_prefix_microbenchmark": "Synthetic prefix",
+    }
+    case_ids = [
+        case_id
+        for case_id, case_summary in summary["case_summaries"].items()
+        if case_summary["policies"]["oracle_ttft"]["decision_counts"].get("partial_reuse", 0) > 0
+    ]
+    case_ids.sort(key=lambda case_id: labels[case_id])
+    ycoords = ",".join("{" + labels[case_id] + "}" for case_id in reversed(case_ids))
 
     lines = [
-        "\\begin{figure*}[t]",
+        "\\begin{figure}[t]",
         "\\centering",
         "\\footnotesize",
         "\\begin{tikzpicture}",
-        "\\begin{groupplot}[",
-        "group style={group size=3 by 1, horizontal sep=1.1cm},",
-        "ybar stacked,",
-        "width=0.31\\textwidth,",
+        "\\begin{axis}[",
+        "xbar,",
+        "bar width=5pt,",
+        "width=0.80\\columnwidth,",
         "height=0.23\\textheight,",
-        "ymin=0, ymax=100,",
-        "ylabel={Request share (\\%)},",
-        f"symbolic x coords={{{xcoords}}},",
-        "xtick=data,",
-        "xticklabel style={font=\\scriptsize},",
-        "ytick={0,25,50,75,100},",
-        "legend columns=3,",
-        "legend style={at={(0.5,1.18)}, anchor=south, draw=none, font=\\scriptsize},",
-        "title style={font=\\small}",
+        "xmin=0, xmax=100,",
+        "xlabel={Requests selecting partial reuse (\\%)},",
+        f"symbolic y coords={{{ycoords}}},",
+        "ytick=data,",
+        "yticklabel style={font=\\tiny},",
+        "xtick={0,25,50,75,100},",
+        "xmajorgrids=true,",
+        "grid style={draw=gray!20},",
+        "legend columns=2,",
+        "legend style={at={(0.5,1.03)}, anchor=south, draw=none, font=\\scriptsize},",
         "]",
     ]
 
-    for policy_name in FIGURE_POLICIES:
-        lines.append(f"\\nextgroupplot[title={{{POLICY_TITLES[policy_name]}}}]")
-        policy_rows = summary["case_summaries"]
-        for decision_name, legend_label, color in DECISION_STYLES:
-            coords = []
-            for case_id in case_ids:
-                case_summary = policy_rows[case_id]
-                metrics = case_summary["policies"][policy_name]
-                requests = max(1, metrics["requests"])
-                decision_count = metrics["decision_counts"].get(decision_name, 0)
-                share = round((decision_count * 100.0) / requests, 1)
-                coords.append(f"({code_lookup[case_id]},{share})")
-            lines.append(f"\\addplot+[draw=black!15, fill={color}] coordinates {{{' '.join(coords)}}};")
-        if policy_name == FIGURE_POLICIES[-1]:
-            legend_labels = ",".join(label for _, label, _ in DECISION_STYLES)
-            lines.append(f"\\legend{{{legend_labels}}}")
+    for policy_name, color in (("heuristic", "teal!70!black"), ("oracle_ttft", "orange!85!black")):
+        coords = []
+        for case_id in case_ids:
+            metrics = summary["case_summaries"][case_id]["policies"][policy_name]
+            requests = max(1, metrics["requests"])
+            partial = metrics["decision_counts"].get("partial_reuse", 0)
+            coords.append(f"({round(partial * 100.0 / requests, 1)},{{{labels[case_id]}}})")
+        lines.append(f"\\addplot+[draw=none, fill={color}] coordinates {{{' '.join(coords)}}};")
+    lines.append("\\legend{Adaptive heuristic,Oracle}")
 
     lines.extend(
         [
-            "\\end{groupplot}",
+            "\\end{axis}",
             "\\end{tikzpicture}",
-            "\\caption{Per-workload decision mix for representative offline policies, using the Q-code shorthand from Table~\\ref{tab:offline-workload-key}. The main pattern is still not a broad partial-reuse win: most workloads remain full-reuse dominant and the threshold baseline still over-selects partial reuse, but the confidence-aware oracle now exposes a small, workload-specific partial-reuse region instead of collapsing entirely to the endpoints.}",
+            "\\caption{The eight workload cases in which the offline oracle selects partial reuse at least once. "
+            "Partial reuse is concentrated rather than universal; the heuristic also over-selects it in several cases.}",
             "\\label{fig:offline-decision-mix}",
-            "\\end{figure*}",
+            "\\end{figure}",
             "",
         ]
     )

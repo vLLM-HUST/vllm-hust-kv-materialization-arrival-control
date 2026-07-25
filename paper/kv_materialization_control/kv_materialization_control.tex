@@ -6,13 +6,19 @@
 \usepackage{enumitem}
 \usepackage{cite}
 \usepackage{pgfplots}
+\usepackage{microtype}
 
 \usepgfplotslibrary{groupplots}
 \pgfplotsset{compat=1.18}
 
-\title{Adaptive KV Materialization Control for Multi-GPU LLM Serving}
+\hyphenpenalty=500
+\exhyphenpenalty=200
+\doublehyphendemerits=100000
+\finalhyphendemerits=5000
 
-\author{\IEEEauthorblockN{Anonymous Artifact Draft}}
+\title{Arrival-Time KV Materialization for LLM Serving}
+
+\author{\IEEEauthorblockN{Anonymous Authors}}
 
 \begin{document}
 \maketitle
@@ -20,27 +26,18 @@
 \input{experiments/results/latest/offline_summary_macros.tex}
 
 \begin{abstract}
-Large language model serving stacks increasingly expose reusable prefix or KV
-state across requests, but converting that state into startup-latency reduction
-is not free. Realizing reusable state may require transfer, stitching, or
-format adaptation, so a runtime needs a decision at request arrival: should it
-fully reuse that state, partially materialize only a profitable segment, or
-recompute from scratch? This artifact studies that narrow three-action control
-surface. Its workload-driven offline path evaluates the arrival-time decision
-surface over named shared cases from \texttt{llm-serving-workloads}; its live
-path documents what the current out-of-tree vLLM seam actually realizes online.
-The resulting claim boundary is explicit: the repository supports decision-side
-evidence for \texttt{full\_reuse}, \texttt{partial\_reuse}, and
-\texttt{recompute}, and live runtime evidence for native
-\texttt{full\_reuse}/\texttt{recompute} plus a block-aligned segmented
-\texttt{partial\_reuse} seam with explicit effective-action and fallback
-reporting on the current prefix-cache path. The resulting empirical message is
-narrow but concrete: the offline study exposes a small yet real
-\texttt{partial\_reuse} regime, while live evidence across prefix-rich,
-continuation-heavy, and tokenizer-faithful dynamic-RAG cases shows that the
-current seam can realize block-aligned \texttt{partial\_reuse}, transition to
-\texttt{full\_reuse} when overlap grows, and only supports truthful online
-claims when workload construction matches the serving tokenizer.
+Reusable KV state can reduce prefill work, but loading and adapting that state
+also consumes time and bandwidth. We study the request-arrival decision among
+full prefix reuse, block-aligned partial reuse, and recomputation. A lightweight
+controller estimates saved prefill work against realization cost and exposes
+the action that the runtime actually executes, rather than reporting cache hits
+alone. An offline cost-model study over 1,296 requests from 25 workload cases
+finds that full reuse remains the best mean-latency policy in 18 cases and that
+the oracle selects partial reuse for only 71 requests. Thus partial reuse is a
+workload-specific option, not a universal improvement. A prototype vLLM path
+implements block-aligned segmentation and records action realignment. The
+online results in this draft are descriptive single runs; they validate the
+runtime path but do not establish a statistically significant speedup.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -71,8 +68,8 @@ materialization work in other domains, where the key systems question is not
 ``can this state be reused?'' but ``is materializing it worth the cost under
 the current workload and resource conditions?''~\cite{leap2024}.
 
-This repository focuses on a narrow but practically important control point:
-request-arrival KV materialization. Instead of treating reuse as a binary
+We focus on a narrow but practically important control point: request-arrival
+KV materialization. Instead of treating reuse as a binary
 choice, we study a three-action decision surface. The controller can fully
 materialize the reusable prefix, partially materialize only a profitable
 segment, or ignore the reusable state and recompute the prompt from scratch.
@@ -91,10 +88,16 @@ request urgency. Because these factors vary across workloads, a serving stack
 needs an explicit materialization controller instead of a fixed ``always reuse''
 rule.
 
-In contrast to a broad scheduler redesign, this paper targets one narrow and
-measurable hook. The benefit of that choice is methodological: it keeps the
-artifact honest about what is being optimized, and it makes offline and online
-evidence easier to interpret.
+In contrast to a broad scheduler redesign, this paper targets one measurable
+hook and keeps placement, admission, and eviction unchanged. We make three
+contributions:
+\begin{itemize}[leftmargin=1.5em]
+\item a three-action formulation of arrival-time KV realization;
+\item a block-aligned vLLM mechanism that separates requested and executed
+actions; and
+\item an evaluation that identifies a narrow partial-reuse region and reports
+online path behavior without promoting modeled results to measured speedups.
+\end{itemize}
 
 \section{Problem Formulation}
 We study a single-hook decision problem at request arrival. For each incoming
@@ -150,8 +153,8 @@ materialization perspective matters: the system should realize only the portion
 whose marginal utility remains positive, instead of treating ``reuse'' as an
 all-or-nothing event.
 
-\subsection{Current Partial-Reuse Boundary}
-The artifact keeps the boundary around \texttt{partial\_reuse} explicit. In
+\subsection{Runtime Granularity}
+The implementation keeps the boundary around \texttt{partial\_reuse} explicit. In
 the offline decision study, \texttt{partial\_reuse} is a first-class action:
 the controller may materialize only a profitable prefix segment and recompute
 the remainder. On the current live prefix-cache seam, \texttt{partial\_reuse}
@@ -164,7 +167,7 @@ the observed decision separate from the effective action and records when a
 block-aligned \texttt{partial\_reuse} cut point is realigned, dominated by
 \texttt{full\_reuse}, or collapses to \texttt{recompute}.
 
-\section{Design Perspective}
+\section{Controller Design}
 The design goal is not to maximize reuse rate. The design goal is to minimize
 request latency subject to the actual cost of realizing reusable state. From
 this perspective, full reuse is only one candidate action, not the default
@@ -178,16 +181,8 @@ nominal reuse coverage but also increases transfer volume or startup delay is
 not an optimization. We therefore evaluate the controller with both latency and
 cost-oriented metrics, rather than reuse ratio alone.
 
-This design perspective also sets the paper's evidence boundary. A strong
-offline result means the decision rule is plausible under workload-grounded
-cost assumptions. It does not automatically imply an end-to-end serving gain
-until the same rule is tested through the live vLLM plugin path. Conversely, a
-live run that only observes decisions without enforcing them is useful for
-validating workload entry, prompt geometry, and service-side constraints, but
-it is not yet evidence that the controller changed runtime behavior.
-
 \section{Methodology}
-This artifact uses two evaluation layers and keeps them separate.
+We use two evaluation layers and keep their interpretations separate.
 
 The first layer is a workload-driven offline decision study over named shared
 cases from \texttt{llm-serving-workloads}. This layer is used to compare the
@@ -297,23 +292,7 @@ request-arrival KV materialization is a real control problem, whether simple
 controllers can solve a useful fraction of it, and where the current runtime
 boundary still prevents realization.
 
-\subsection{Current Evidence Scope}
-The repository currently supports a catalog-driven offline decision matrix that
-follows the shared benchmark case order exported by
-\texttt{llm-serving-workloads}. This lets the paper evaluate the same default
-workload set consumed by sibling artifacts instead of carrying a second
-hardcoded subset locally. It also supports a live runtime-boundary path that
-enters through the same shared workload repository and runs against a
-controlled Qwen2.5-7B-Instruct endpoint.
-
-The claim boundary is therefore explicit. The offline layer supports claims
-about the three-action arrival-time decision surface. The live layer supports
-claims about runtime realization status on the current seam: native support for
-\texttt{full\_reuse} and \texttt{recompute}, plus block-aligned segmented
-support for \texttt{partial\_reuse} with explicit effective-action and
-fallback reporting.
-
-\section{Live Runtime Boundary}
+\section{Online Path Evaluation}
 The live path is intentionally narrower than a broad online benchmark suite. It
 is used to answer one question: what does the current runtime seam really do?
 
@@ -326,7 +305,7 @@ chain into a request-scoped segmented namespace. This seam is still narrower
 than exact token-level segmented materialization, so the live path must continue
 to report observed versus effective action explicitly.
 
-\subsection{Fallback Taxonomy}
+\subsection{Action Realization}
 This distinction is essential for paper truthfulness. The repository has a real
 online control path for all three actions, but \texttt{partial\_reuse} is only
 realized on a block-aligned segmented seam rather than as exact token-level
@@ -349,7 +328,8 @@ catalog.
 
 \begin{table}[t]
 \centering
-\caption{Representative live runtime-boundary matrix.}
+\caption{Single-run online path results. Each cell is descriptive; no
+confidence interval is available.}
 \label{tab:live-matrix}
 \scriptsize
 \begin{tabular}{llrrr}
@@ -370,7 +350,7 @@ Tool scaffold & new tuned & 9186.471 & 10182.569 & 0.865 \\
 
 \begin{table}[t]
 \centering
-\caption{Additional live boundary cases on the segmented seam, including the tokenizer-faithful dynamic-RAG rerun.}
+\caption{Additional single-run path checks on the segmented seam.}
 \label{tab:live-boundary-cases}
 \scriptsize
 \begin{tabular}{lrrr}
@@ -406,7 +386,7 @@ exceeded the Qwen2.5-7B context window. Instead, the failure came from
 constructing the live workload with a whitespace tokenizer, which distorted the
 shared-workload token budget relative to the tokenizer used by the actual
 endpoint. Once the live runner was switched to the real Qwen tokenizer, the
-same \texttt{dynamic\_rag\_corpus\_update} case completed cleanly and showed
+dynamic-RAG case completed cleanly and showed
 the expected action transition: early turns remained in the block-aligned
 \texttt{partial\_reuse} regime, while later turns moved to effective
 \texttt{full\_reuse} as retrieval overlap increased. This correction matters
@@ -416,16 +396,13 @@ only on the runtime seam, but also on whether workload construction is faithful
 to the serving tokenizer.
 
 \subsection{Observed and Effective Actions}
-The new segmented-baseline run also clarifies why the claim must remain tied to
-runtime realization rather than nominal policy choice alone. On
-\texttt{shared\_scenario\_multi\_turn\_knowledge\_service}, the workload
-splits into 8 effective \texttt{recompute} requests and 24 effective
-\texttt{partial\_reuse} requests. On \texttt{shared\_tool\_scaffold\_agent},
-all 64 requests are observed as \texttt{partial\_reuse}, but the effective
-runtime actions become 48 block-aligned \texttt{partial\_reuse} requests and
-16 \texttt{full\_reuse} requests after re-ranking. This behavior shows that
-the seam and the guardrails jointly determine the realized action mix: the
-controller cannot be evaluated honestly by observed decisions alone.
+The new segmented-baseline run also clarifies why nominal policy choice is
+insufficient. The multi-turn knowledge workload executes 8 recomputations and
+24 partial reuses. The tool-scaffold workload requests partial reuse for all
+64 requests, but the runtime executes 48 block-aligned partial reuses and 16
+full reuses after re-ranking. The runtime mechanism and its guardrails
+therefore determine the realized action mix; an evaluation that counts only
+requested actions would be misleading.
 
 \section{Offline Decision Study}
 The offline study remains valuable because it is the only place where the full
@@ -440,12 +417,12 @@ us ask whether a profitable partial region exists at all, how wide that region
 is under cost-model error, and how much headroom would remain even if the live
 runtime still lacks exact segmented materialization.
 
-\input{experiments/results/latest/offline_workload_key_table.tex}
+\input{experiments/results/latest/offline_summary_table.tex}
 \input{experiments/results/latest/offline_decision_mix_figure.tex}
 
-Table~\ref{tab:offline-workload-key} maps the compact Q-codes used in
-Figure~\ref{fig:offline-decision-mix}. That shorthand is necessary because the
-full shared-catalog workload names make the figure unreadable at paper scale.
+Table~\ref{tab:offline-summary} reports aggregate cost-model estimates.
+Figure~\ref{fig:offline-decision-mix} then isolates the workload cases for
+which the oracle selects partial reuse at least once.
 
 The resulting picture is also less flattering than a simple
 ``selective-materialization is obviously beneficial'' story. Most workloads
@@ -470,8 +447,8 @@ support a strong claim that \texttt{partial\_reuse} wins broadly across the
 shared default workload matrix, and it still leaves substantial headroom
 between the heuristic and the oracle.
 
-\section{Related Work Perspective}
-Two threads are most relevant to this artifact.
+\section{Related Work}
+Two threads are most relevant to this work.
 
 First, recent LLM-serving systems such as DistServe and Mooncake make reuse
 realization costs explicit by exposing remote or disaggregated state movement
@@ -480,7 +457,7 @@ These systems motivate why request-arrival materialization needs an explicit
 controller: reusable KV state may save computation, but realizing it can also
 consume bandwidth, increase startup latency, or amplify memory pressure.
 
-Second, this artifact borrows its decision perspective from selective
+Second, our controller borrows its decision perspective from selective
 materialization work outside LLM serving. LEAP frames materialization as a
 cost-sensitive online choice rather than a static yes-or-no optimization
 target~\cite{leap2024}. We borrow that viewpoint, not the domain mechanism.
@@ -490,51 +467,27 @@ and \texttt{recompute}. The connection matters because it clarifies the paper's
 intended contribution: a serving-time selective materialization controller,
 not merely another prefix-cache hit study.
 
-\section{Artifact Boundary}
-This repository intentionally separates decision-side evidence from live runtime
-realization evidence. We do not present offline oracle results as deployed
-gains, and we do not treat the existence of reusable state as proof that
-materialization is beneficial. We also do not reframe this repository as a
-general admission or memory-evolution artifact simply because some workloads
-contain broader state semantics.
+\section{Limitations}
+The offline study uses a cost model and therefore supports policy-shape claims,
+not end-to-end performance claims. The online tables contain one run per
+configuration and their original result bundles must be retained before the
+reported differences can support a submission claim. The prototype realizes
+partial reuse only at block boundaries; it cannot choose an arbitrary token
+cut. Finally, the present baseline set does not yet establish novelty against
+recent KV blending, cache stitching, and remote-KV systems.
 
-\section{Current Contributions}
-\begin{enumerate}[leftmargin=1.5em]
-\item A precise systems formulation of request-arrival KV materialization as a
-three-action control problem.
-\item A selective-materialization view of reuse that evaluates whether and how
-much reusable KV state should be realized, rather than treating reuse as a
-binary cache event.
-\item A workload-driven decision matrix sourced directly from the default
-shared benchmark case order in \texttt{llm-serving-workloads}, avoiding a
-second repo-local default workload subset.
-\item An explicit evidence boundary separating offline decision-surface claims
-from live runtime-boundary claims.
-\item A narrow out-of-tree vLLM plugin target centered on materialization
-control rather than scheduler, admission, or memory-evolution redesign, with a
-live runtime-boundary taxonomy that truthfully reports the current block-aligned
-\texttt{partial\_reuse} seam, demonstrates stable online behavior on
-shared-prefix and continuation cases, captures the
-\texttt{partial\_reuse}-to-\texttt{full\_reuse} transition on
-tokenizer-faithful dynamic RAG, and keeps the remaining gap to exact
-token-level materialization explicit.
-\end{enumerate}
+\section{Conclusion}
+Arrival-time KV materialization is more expressive than a binary cache-hit
+decision, but the useful partial-reuse region is narrow in our offline study.
+The prototype demonstrates how to realize and audit block-aligned actions in
+vLLM. A submission-quality performance claim requires repeated matched online
+runs with preserved raw results; until then, the online measurements should be
+read as path validation.
 
-\section{Limitations and Next Step}
-The main limitation remains exact token-level online \texttt{partial\_reuse}
-beyond the current block-aligned segmented seam. The next
-milestones are therefore concrete:
-
-\begin{enumerate}[leftmargin=1.5em]
-\item implement a deeper runtime path, likely via a custom KV materialization
-or connector seam, that can realize exact online \texttt{partial\_reuse}
-rather than relying on block-aligned segmented reuse plus fallback re-ranking;
-\item keep the live runtime-boundary matrix grounded in shared workload cases
-that stress prefix-rich, long-context continuation, and dynamic retrieval
-follow-up behavior; and
-\item rerun the shared workload suite under the deeper runtime path once exact
-online segmented materialization exists.
-\end{enumerate}
+\section*{Generative AI Disclosure}
+Generative AI tools assisted with language editing and code development. The
+authors reviewed the resulting text, code, and evidence and take responsibility
+for the manuscript.
 
 \bibliographystyle{IEEEtran}
 \bibliography{kv_materialization_control}

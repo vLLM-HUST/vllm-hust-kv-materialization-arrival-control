@@ -1,5 +1,6 @@
 PYTHON ?= python3
 TECTONIC ?= tectonic
+SOURCE_DATE_EPOCH ?= 1784985600
 ROOT_DIR := $(abspath ../..)
 LLM_OPTIMIZATIONS_ROOT ?= $(abspath $(ROOT_DIR)/../llm-optimizations)
 LLM_OPTIMIZATIONS_PDF_DIR ?= $(LLM_OPTIMIZATIONS_ROOT)/docs/papers
@@ -49,8 +50,11 @@ live-benchmark: runtime-boundary-live
 
 optimization-live: runtime-boundary-live
 
-pdf: decision-study
-	cd $(CURDIR) && $(TECTONIC) --keep-logs $(PAPER_TEX)
+pdf:
+	@test -f "$(RESULT_DIR)/offline_summary_macros.tex" || { echo 'Missing pinned offline evidence; see experiments/results/offline_evidence_manifest.json' >&2; exit 2; }
+	@test -f "$(RESULT_DIR)/offline_summary_table.tex" || { echo 'Missing pinned offline table' >&2; exit 2; }
+	@test -f "$(RESULT_DIR)/offline_decision_mix_figure.tex" || { echo 'Missing pinned offline figure' >&2; exit 2; }
+	cd $(CURDIR) && SOURCE_DATE_EPOCH=$(SOURCE_DATE_EPOCH) $(TECTONIC) --keep-logs $(PAPER_TEX)
 	@if [ -d "$(LLM_OPTIMIZATIONS_ROOT)" ] && [ -f "$(PAPER_PDF)" ]; then \
 		python3 "$(LLM_OPTIMIZATIONS_ROOT)/scripts/export_paper_pdf.py" \
 			--workspace-file "$(LLM_OPTIMIZATIONS_ROOT)/llm-optimizations.code-workspace" \

@@ -1,0 +1,18 @@
+\begin{table}[t]
+\centering
+\setlength{\tabcolsep}{3pt}
+\footnotesize
+\caption{Offline cost-model results across 1,296 requests from 25 workload cases. Latency values are model estimates, not online measurements.}
+\label{tab:offline-summary}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Policy & Mean & P95 & Recomp. & Xfer MiB \\
+\midrule
+Always recompute & 19.80 & 41.24 & 938.7 & 0.0 \\
+Always full reuse & 10.97 & 23.44 & 0.0 & 29.3 \\
+Static threshold & 13.35 & 32.45 & 115.2 & 25.7 \\
+Adaptive heuristic & 11.15 & 23.44 & 8.5 & 29.1 \\
+Oracle & 10.97 & 23.44 & 0.2 & 29.3 \\
+\bottomrule
+\end{tabular}
+\end{table}
