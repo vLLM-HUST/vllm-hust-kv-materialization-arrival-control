@@ -1,0 +1,4 @@
+[submodule "vendor/vllm"]
+	path = vendor/vllm
+	url = https://github.com/vLLM-HUST/vllm-hust.git
+	branch = feature/kv-materialization-runtime-integration

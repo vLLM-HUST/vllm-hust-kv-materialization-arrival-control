@@ -2,16 +2,12 @@ CONDA ?= conda
 CONDA_ENV ?= vllm-kv-materialization-exp
 CONDA_RUN ?= $(CONDA) run --no-capture-output -n $(CONDA_ENV)
 PYTHON ?= $(CONDA_RUN) python
-PIP ?= $(CONDA_RUN) python -m pip
+PIP ?= $(CONDA_RUN) env -u LD_LIBRARY_PATH python -m pip
 PYTEST ?= PYTHONPATH=src $(CONDA_RUN) python -m pytest -q
 RUFF ?= $(CONDA_RUN) python -m ruff
 BUILD ?= $(CONDA_RUN) python -m build
 TECTONIC ?= tectonic
-SHARED_ENV_SCRIPT ?= /home/shuhao/llm-optimizations/scripts/bootstrap_shared_env.sh
-SHARED_SOURCE_ENV ?= llm-optimizations
-SHARED_ENV_NAME ?= $(CONDA_ENV)
 BOOTSTRAP_ENV ?= bash scripts/setup_repo_env.sh
-WORKLOAD_REPO ?= $(abspath $(CURDIR)/../llm-serving-workloads)
 SHARED_WORKLOAD_RESULTS_DIR ?= .benchmarks/results
 
 PACKAGE_IMPORT := vllm_kv_materialization
@@ -20,7 +16,7 @@ PAPER_DIR := paper/kv_materialization_control
 
 .DEFAULT_GOAL := help
 
-.PHONY: help bootstrap-env bootstrap-shared-env install-dev smoke test shared-workloads-smoke shared-workloads-test lint format build bench paper offline-experiment experiment decision-study study-experiment shared-workloads-offline paper-experiment runtime-boundary-live live-benchmark shared-workloads-live optimization-live pdf paper-pdf evidence clean
+.PHONY: help bootstrap-env install-dev smoke test shared-workloads-smoke shared-workloads-test lint format build bench paper offline-experiment experiment decision-study study-experiment shared-workloads-offline paper-experiment runtime-boundary-live live-benchmark shared-workloads-live optimization-live pdf paper-pdf evidence clean
 
 help:
 	@printf '%s\n' \
@@ -54,17 +50,7 @@ help:
 bootstrap-env:
 	$(BOOTSTRAP_ENV)
 
-bootstrap-shared-env:
-	$(SHARED_ENV_SCRIPT) --profile generic --source-env '$(SHARED_SOURCE_ENV)' --repo-root "$$PWD" --env-name '$(SHARED_ENV_NAME)'
-	@$(MAKE) install-dev CONDA_ENV='$(SHARED_ENV_NAME)'
-	@printf '%s\n' 'Bootstrap complete and dev dependencies installed.'
-
 install-dev:
-	@if [ -f '$(WORKLOAD_REPO)/pyproject.toml' ]; then \
-		$(PIP) install -e '$(WORKLOAD_REPO)' || printf '%s\n' 'Skipping sibling llm-serving-workloads editable install; shared-workload entrypoints will use WORKLOAD_REPO/src directly.'; \
-	else \
-		printf 'Skipping sibling llm-serving-workloads install: %s\n' '$(WORKLOAD_REPO)'; \
-	fi
 	$(PIP) install -e ".[dev]"
 
 smoke:
@@ -75,7 +61,7 @@ test:
 
 shared-workloads-smoke:
 	@mkdir -p '$(SHARED_WORKLOAD_RESULTS_DIR)'
-	$(CONDA_RUN) env PYTHONPATH='$(WORKLOAD_REPO)/src:src' python -m llm_serving_workloads.shared_workload_smoke \
+	$(CONDA_RUN) env PYTHONPATH='src' python -m llm_serving_workloads.shared_workload_smoke \
 		--output-json '$(SHARED_WORKLOAD_RESULTS_DIR)/shared_workloads_smoke.json' \
 		--output-markdown '$(SHARED_WORKLOAD_RESULTS_DIR)/shared_workloads_smoke.md'
 

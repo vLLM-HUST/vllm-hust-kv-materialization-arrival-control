@@ -8,7 +8,9 @@ version = "0.1.0"
 description = "Standalone vLLM plugin for adaptive KV materialization studies"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+	"llm-serving-workloads @ git+https://github.com/intellistream/llm-serving-workloads.git@ceef92d52e0c49f26ba1efc6706edd1f6df5d913",
+]
 authors = [
 	{name = "caozhe"},
 	{name = "xuheng li"},
@@ -39,3 +41,4 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["src", "vendor/vllm"]

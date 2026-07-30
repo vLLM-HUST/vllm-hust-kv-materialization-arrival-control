@@ -26,10 +26,9 @@ Paper-facing artifacts emitted under `experiments/results/latest/` now include:
 - `offline_decision_mix_figure.tex`
 
 The default shared-workload matrix comes directly from the current
-`llm-serving-workloads` shared benchmark case order. This repository therefore
-does not carry its own second default case list for the offline decision study;
-it follows the sibling workload catalog unless you explicitly override
-`--workload-case`.
+the installed `llm-serving-workloads` shared benchmark case order. This
+repository therefore does not carry its own second default case list for the
+offline decision study; override `--workload-case` when needed.
 
 Truthfulness boundary:
 
@@ -43,7 +42,7 @@ Truthfulness boundary:
 Canonical entry:
 
 ```bash
-make runtime-boundary-live MODEL=/home/shuhao/shared-models/Qwen2.5-7B-Instruct \
+make runtime-boundary-live MODEL=/path/to/model \
 	WORKLOAD_CASE=shared_prefix_multi_tenant_assistant
 ```
 

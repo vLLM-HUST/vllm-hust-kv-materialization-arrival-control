@@ -108,8 +108,11 @@ def test_compute_runtime_control_marks_partial_as_degraded_full_reuse(monkeypatc
 
     assert observation.decision == "partial_reuse"
     assert observation.runtime_effective_decision == "full_reuse"
-    assert observation.runtime_target_reuse_tokens == observation.reused_tokens
-    assert observation.runtime_target_tail_tokens == 1600 - observation.reused_tokens
+    assert observation.runtime_target_reuse_tokens == observation.reusable_prefix_tokens
+    assert (
+        observation.runtime_target_tail_tokens
+        == 1600 - observation.reusable_prefix_tokens
+    )
     assert plan.decision_supported is False
     assert plan.cache_salt == "kvmat:anchor:shared-scaffold::2"
     assert observation.runtime_support_tier == RUNTIME_SUPPORT_FALLBACK
@@ -119,8 +122,11 @@ def test_compute_runtime_control_marks_partial_as_degraded_full_reuse(monkeypatc
 
     runtime_hint = build_runtime_control_extra_args(plan)[RUNTIME_KV_TRANSFER_CONTROL_KEY]
 
-    assert runtime_hint["target_reuse_tokens"] == observation.reused_tokens
-    assert runtime_hint["target_tail_tokens"] == 1600 - observation.reused_tokens
+    assert runtime_hint["target_reuse_tokens"] == observation.reusable_prefix_tokens
+    assert (
+        runtime_hint["target_tail_tokens"]
+        == 1600 - observation.reusable_prefix_tokens
+    )
     assert runtime_hint["requires_segmented_materialization"] is True
 
 
@@ -178,6 +184,7 @@ def test_apply_runtime_control_injects_cache_salt() -> None:
         effective_decision=plan.effective_decision,
         control_path=plan.control_path,
         cache_salt="kvmat:anchor:test",
+        segmented_tail_cache_salt=plan.segmented_tail_cache_salt,
         target_reuse_tokens=plan.target_reuse_tokens,
         target_tail_tokens=plan.target_tail_tokens,
         decision_supported=plan.decision_supported,
@@ -249,6 +256,7 @@ def test_partial_reuse_caps_cacheable_tokens_to_reuse_boundary() -> None:
 
     manager = object.__new__(KVCacheManager)
     manager.enable_caching = True
+    manager.log_stats = False
     manager.coordinator = _RecordingCoordinator()
 
     sampling_params = SamplingParams.from_optional(
@@ -341,6 +349,7 @@ def test_full_reuse_keeps_cacheable_tokens_uncapped() -> None:
 
     manager = object.__new__(KVCacheManager)
     manager.enable_caching = True
+    manager.log_stats = False
     manager.coordinator = _RecordingCoordinator()
 
     sampling_params = SamplingParams.from_optional(

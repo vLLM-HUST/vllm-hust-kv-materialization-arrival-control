@@ -120,10 +120,9 @@ Current live-path taxonomy:
 - a true connector-backed KV transfer/materialization path still requires an
   explicit global `kv_transfer_config`; request-local control metadata alone
   does not create a `KVConnector`
-- carrier-side runtime changes must live under
-  [carrier/vllm-hust](/workspace/kv-materialization-arrival-control/carrier/vllm-hust)
-  rather than the shared workspace checkout; the current carrier copy already
-  contains the current segmented runtime seam: aligned prefix-cache lookup,
+- carrier-side runtime changes live only in the `vendor/vllm` submodule; the
+  pinned feature branch contains the segmented runtime seam: aligned
+  prefix-cache lookup,
   aligned cache-write capping, and request-scoped tail hash isolation derived
   from `target_reuse_tokens`
 
@@ -258,10 +257,9 @@ When launching a local vLLM server through
 leave `MAX_MODEL_LEN` unset if you want the launcher to derive the serving
 window from `llm-serving-workloads` via `WORKLOAD_CASE`.
 
-That launcher now defaults to the repo-local
-[carrier/vllm-hust](/workspace/kv-materialization-arrival-control/carrier/vllm-hust)
-runtime path, auto-detects a usable conda bootstrap and environment, and uses
-writable temporary cache roots for live runs. Override `CONDA_SH`, `ENV_NAME`,
+That launcher always resolves the repo-local `vendor/vllm` runtime from the
+parent repository, activates `vllm-kv-materialization-exp`, and uses writable
+repo-local cache roots. Override `CONDA_SH`, `ENV_NAME`,
 `VLLM_KV_MATERIALIZATION_XDG_CACHE_HOME`, or
 `VLLM_KV_MATERIALIZATION_HF_HOME` when you need a different local setup.
 
@@ -283,50 +281,35 @@ The decision-study pipeline emits paper-facing summaries under
 The runtime-boundary live path writes endpoint summaries under
 `paper/kv_materialization_control/experiments/results/live/`.
 
-## Repository Boundary
+## Reproducible Runtime Carrier
 
-Keep the shared external `reference-repos/vllm` checkout untouched. If an upstream-local delta
-becomes unavoidable, carry it inside this repository under `vendor/` or
-`patches/`.
+`vendor/vllm` is the only runtime carrier. It is a regular, in-repository
+submodule (not a symlink) with:
+
+- URL: `https://github.com/vLLM-HUST/vllm-hust.git`
+- branch: `feature/kv-materialization-runtime-integration`
+- pinned carrier commit: `f8efeeb93c616709331e0517f106350101c8f3e0`
+- base: vLLM-HUST `main` at `e4ce33646f2ef1781289e6dc651fad0d00177c55`
+
+Fresh-checkout CPU validation:
+
+```bash
+git clone --recurse-submodules https://github.com/intellistream/kv-materialization-arrival-control.git
+cd kv-materialization-arrival-control
+bash scripts/setup_repo_env.sh
+make test
+```
+
+For an existing checkout:
+
+```bash
+git submodule sync --recursive
+git submodule update --init --recursive
+```
 
 This repository exists because vLLM supports out-of-tree plugins through
 `vllm.general_plugins`. That seam is the right place to study arrival-time
 materialization decisions without turning this repo into an upstream fork.
 
-## Generic dev-hub Validation
-
-Use this pattern to validate this plugin through the host-managed vLLM-HUST dev-hub launcher. Keep dev-hub generic: do not hardcode this repository name, plugin name, port, NPU IDs, or experiment container in dev-hub itself.
-
-Before launch:
-
-- confirm this repository is visible inside the container, usually under `/workspace/<repo-name>`;
-- check NPU occupancy with `npu-smi info`;
-- choose a unique experiment container name, systemd unit name, and free port;
-- use a real API key already configured for the manager, but never print or record it;
-- do not share the active twin container.
-
-Generic launch template:
-
-```bash
-export DEV_HUB_ROOT=${DEV_HUB_ROOT:-/home/shuhao/vllm-hust-dev-hub}
-
-export VLLM_ENGINE_CONTAINER=<unique-experiment-container>
-export VLLM_ENGINE_IMAGE=<known-good-vllm-ascend-image>
-export VLLM_ENGINE_AUTO_CREATE_CONTAINER=true
-export VLLM_ENGINE_MODEL_PATH=<model-path>
-export VLLM_ENGINE_SERVED_MODEL_NAME=<served-model-name>
-export VLLM_ENGINE_CONDA_ENV=<conda-env>
-export VLLM_ENGINE_PORT=<free-port>
-export VLLM_ENGINE_TP_SIZE=<tp-size>
-export VLLM_ENGINE_NPU_DEVICES=<dedicated-npu-ids>
-export VLLM_ENGINE_SYSTEMD_UNIT=<unique-unit-name>.service
-export VLLM_ENGINE_COMPILATION_CONFIG='<optional-json-compilation-config>'
-
-export VLLM_PLUGINS=<plugin-name-or-comma-list>
-export VLLM_ENGINE_PYTHONPATH=/workspace/<repo-name>/src:/workspace/<repo-name>:/workspace/vllm-hust:/workspace/vllm-ascend-hust
-
-"$DEV_HUB_ROOT/manage.sh" restart
-"$DEV_HUB_ROOT/manage.sh" status --json
-```
 
 Run A/B with only plugin-owned environment variables changed between baseline and experiment. Record command shape, devices, model, graph config, prompt, max tokens, output length, TTFT, TPOT, throughput, result paths, confirmed facts, hypotheses, rejected directions, and the next experiment. If startup fails, stop through the same manager and record the failure; do not switch to manual Docker startup.

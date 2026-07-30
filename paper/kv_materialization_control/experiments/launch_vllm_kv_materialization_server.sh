@@ -6,16 +6,16 @@ REPO_ROOT="$(cd -- "$SCRIPT_DIR/../../.." && pwd)"
 CONDA_SH="${CONDA_SH:-}"
 HOST="${HOST:-127.0.0.1}"
 PORT="${PORT:-8011}"
-MODEL="${MODEL:-/home/shuhao/shared-models/Qwen2.5-7B-Instruct}"
+MODEL="${MODEL:-}"
 GPU_MEMORY_UTILIZATION="${GPU_MEMORY_UTILIZATION:-0.85}"
 WORKLOAD_CASE="${WORKLOAD_CASE:-shared_scenario_multi_turn_knowledge_service}"
 MAX_MODEL_LEN="${MAX_MODEL_LEN:-}"
 BLOCK_SIZE="${BLOCK_SIZE:-16}"
 SERVED_MODEL_NAME="${SERVED_MODEL_NAME:-$(basename "$MODEL")}"
 ENABLE_PLUGIN="${ENABLE_PLUGIN:-1}"
-CARRIER_VLLM_HUST_ROOT="${CARRIER_VLLM_HUST_ROOT:-$REPO_ROOT/carrier/vllm-hust}"
-XDG_CACHE_HOME="${VLLM_KV_MATERIALIZATION_XDG_CACHE_HOME:-/tmp/shuhao-vllm-cache}"
-HF_HOME="${VLLM_KV_MATERIALIZATION_HF_HOME:-/tmp/shuhao-hf-cache}"
+CARRIER_VLLM_HUST_ROOT="$REPO_ROOT/vendor/vllm"
+XDG_CACHE_HOME="${VLLM_KV_MATERIALIZATION_XDG_CACHE_HOME:-$REPO_ROOT/.cache/vllm}"
+HF_HOME="${VLLM_KV_MATERIALIZATION_HF_HOME:-$REPO_ROOT/.cache/huggingface}"
 VLLM_CACHE_ROOT="${VLLM_CACHE_ROOT:-$XDG_CACHE_HOME/vllm}"
 
 if [[ -z "$CONDA_SH" ]]; then
@@ -26,11 +26,6 @@ if [[ -z "$CONDA_SH" ]]; then
       conda_candidates+=("$conda_base/etc/profile.d/conda.sh")
     fi
   fi
-  conda_candidates+=(
-    "$HOME/shuhao-miniconda3/etc/profile.d/conda.sh"
-    "/home/shuhao/shuhao-miniconda3/etc/profile.d/conda.sh"
-    "/root/miniconda3/etc/profile.d/conda.sh"
-  )
   for candidate in "${conda_candidates[@]}"; do
     if [[ -f "$candidate" ]]; then
       CONDA_SH="$candidate"
@@ -45,20 +40,15 @@ if [[ -z "$CONDA_SH" || ! -f "$CONDA_SH" ]]; then
 fi
 
 source "$CONDA_SH"
-ENV_NAME="${ENV_NAME:-}"
-if [[ -z "$ENV_NAME" ]]; then
-  conda_env_listing="$(conda env list 2>/dev/null || true)"
-  for candidate in "${VLLM_KV_MATERIALIZATION_ENV_NAME:-}" "vllm-kv-materialization-exp" "vllm-hust-dev"; do
-    if [[ -z "$candidate" ]]; then
-      continue
-    fi
-    if grep -Eq "(^|[[:space:]])${candidate}([[:space:]]|$)" <<<"$conda_env_listing"; then
-      ENV_NAME="$candidate"
-      break
-    fi
-  done
-fi
 ENV_NAME="${ENV_NAME:-vllm-kv-materialization-exp}"
+if [[ -z "$MODEL" ]]; then
+  echo "MODEL is required" >&2
+  exit 2
+fi
+if [[ ! -f "$CARRIER_VLLM_HUST_ROOT/vllm/__init__.py" ]]; then
+  echo "missing runtime carrier; run: git submodule update --init" >&2
+  exit 2
+fi
 conda activate "$ENV_NAME"
 export LD_LIBRARY_PATH="$CONDA_PREFIX/lib:${LD_LIBRARY_PATH:-}"
 export XDG_CACHE_HOME

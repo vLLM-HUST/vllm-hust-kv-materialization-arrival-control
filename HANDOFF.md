@@ -1,5 +1,21 @@
 # 项目交接说明
 
+## Runtime carrier checkpoint
+
+唯一 runtime carrier 是 `vendor/vllm` submodule，分支为
+`feature/kv-materialization-runtime-integration`，基于 vLLM-HUST `main`
+commit `e4ce33646f2ef1781289e6dc651fad0d00177c55`，当前 pinned carrier commit
+为 `f8efeeb93c616709331e0517f106350101c8f3e0`。fresh checkout 的最小 CPU 验收命令为：
+
+```bash
+git submodule update --init --recursive
+bash scripts/setup_repo_env.sh
+make test
+```
+
+环境脚本只创建或复用 `vllm-kv-materialization-exp`；如果它尚不存在，
+脚本会从 `vllm-hust-dev` 克隆，但不会向后者安装项目依赖。
+
 ## 当前定位
 
 这个仓库已经转交给 `cao zhe` 同学继续推进，并已迁移到 `intellistream` 组织下；从研究视角看，它仍然属于 advanced incubation 阶段。

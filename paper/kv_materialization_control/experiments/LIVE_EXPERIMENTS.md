@@ -7,16 +7,10 @@ Run a live runtime-boundary experiment against a vLLM OpenAI-compatible endpoint
 This path is not the same as the offline decision study. It is used to show
 which arrival-time actions the current runtime seam realizes online.
 
-## Default Model
+## Model
 
-Preferred local path in this workspace:
-
-- `/home/shuhao/shared-models/Qwen2.5-7B-Instruct`
-
-Compatibility-only paths on some hosts may include:
-
-- `/shared-models/Qwen2.5-7B-Instruct`
-- `/workspace/shared-models/Qwen2.5-7B-Instruct`
+Set `MODEL` to a locally available model or model identifier. The scripts do
+not assume a host-specific model directory.
 
 ## Server Launch
 
@@ -28,7 +22,7 @@ workspace). You can still override it manually for constrained local runs.
 
 ```bash
 ENV_NAME=vllm-kv-materialization-exp \
-MODEL=/home/shuhao/shared-models/Qwen2.5-7B-Instruct \
+MODEL=/path/to/model \
 WORKLOAD_CASE=shared_prefix_multi_tenant_assistant \
 bash paper/kv_materialization_control/experiments/launch_vllm_kv_materialization_server.sh
 ```
@@ -37,7 +31,7 @@ Enable the plugin loader explicitly:
 
 ```bash
 ENV_NAME=vllm-kv-materialization-exp \
-MODEL=/home/shuhao/shared-models/Qwen2.5-7B-Instruct \
+MODEL=/path/to/model \
 ENABLE_PLUGIN=1 \
 WORKLOAD_CASE=shared_prefix_multi_tenant_assistant \
 bash paper/kv_materialization_control/experiments/launch_vllm_kv_materialization_server.sh
@@ -46,7 +40,7 @@ bash paper/kv_materialization_control/experiments/launch_vllm_kv_materialization
 ## Workload Driver
 
 ```bash
-MODEL=/home/shuhao/shared-models/Qwen2.5-7B-Instruct \
+MODEL=/path/to/model \
 BASE_URL=https://api.sage.org.ai/v1 \
 OPENAI_API_KEY=<token> \
 OPENAI_HTTP_USER_AGENT=python-httpx/0.28.1 \
@@ -59,24 +53,13 @@ real model tokenizer into the live runner so shared-workload token budgets are
 constructed against the same tokenizer that the endpoint will actually use:
 
 ```bash
-/workspace/shuhao-miniconda3/envs/vllm-hust-dev/bin/python \
+conda run -n vllm-kv-materialization-exp python \
 	paper/kv_materialization_control/experiments/run_openai_workloads.py \
 	--base-url http://127.0.0.1:8011 \
 	--model Qwen2.5-7B-Instruct \
-	--tokenizer /home/shuhao/shared-models/Qwen2.5-7B-Instruct \
+	--tokenizer /path/to/model \
 	--workload-case dynamic_rag_corpus_update \
 	--output paper/kv_materialization_control/experiments/results/live/dynamic_rag_live.json
-```
-
-Preferred workspace entry from the shared workload repository:
-
-```bash
-cd /home/shuhao/llm-serving-workloads
-make kv-materialization-live \
-	BASE_URL=https://api.sage.org.ai/v1 \
-	OPENAI_API_KEY=<token> \
-	MODEL=/home/shuhao/shared-models/Qwen2.5-7B-Instruct \
-	WORKLOAD_CASE=shared_prefix_multi_tenant_assistant
 ```
 
 Recommended runtime-boundary cases:
