@@ -2,7 +2,7 @@
 
 ## Repository Role
 
-- Repository: `vllm-kv-materialization-plugin`
+- Repository: `kv-materialization-arrival-control`
 - Purpose: standalone vLLM adaptive KV materialization plugin and paper artifact
 
 ## Critical Boundary
@@ -20,7 +20,7 @@
 - Prefer the dedicated conda environment `vllm-kv-materialization-exp` for this repository.
 - When this repository uses scenario-grounded workloads, consume them from the sibling `llm-serving-workloads` repository/package.
 - Update this repository's `CHANGELOG.md` and `README.md` for user-visible behavior changes.
-- Do not write `vllm-kv-materialization-plugin` changes into `/home/shuhao/sagellm/CHANGELOG.md`.
+- Do not write `kv-materialization-arrival-control` changes into `/home/shuhao/sagellm/CHANGELOG.md`.
 - Do not create `.venv` or `venv`.
 
 ## Research Scope

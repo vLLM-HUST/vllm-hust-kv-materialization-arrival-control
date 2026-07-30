@@ -1,4 +1,9 @@
-# vLLM KV Materialization Plugin
+# KV Materialization Arrival Control
+
+This repository studies the request-arrival decision among full reuse,
+block-aligned partial reuse, and recomputation. It is distinct from
+`intellistream/kv-materialization-scheduling`, which studies cross-request
+resource coordination and scheduling.
 
 This repository studies one narrow control point in vLLM serving: arrival-time
 KV materialization decisions.
@@ -116,7 +121,7 @@ Current live-path taxonomy:
   explicit global `kv_transfer_config`; request-local control metadata alone
   does not create a `KVConnector`
 - carrier-side runtime changes must live under
-  [carrier/vllm-hust](/workspace/vllm-kv-materialization-plugin/carrier/vllm-hust)
+  [carrier/vllm-hust](/workspace/kv-materialization-arrival-control/carrier/vllm-hust)
   rather than the shared workspace checkout; the current carrier copy already
   contains the current segmented runtime seam: aligned prefix-cache lookup,
   aligned cache-write capping, and request-scoped tail hash isolation derived
@@ -254,7 +259,7 @@ leave `MAX_MODEL_LEN` unset if you want the launcher to derive the serving
 window from `llm-serving-workloads` via `WORKLOAD_CASE`.
 
 That launcher now defaults to the repo-local
-[carrier/vllm-hust](/workspace/vllm-kv-materialization-plugin/carrier/vllm-hust)
+[carrier/vllm-hust](/workspace/kv-materialization-arrival-control/carrier/vllm-hust)
 runtime path, auto-detects a usable conda bootstrap and environment, and uses
 writable temporary cache roots for live runs. Override `CONDA_SH`, `ENV_NAME`,
 `VLLM_KV_MATERIALIZATION_XDG_CACHE_HOME`, or
