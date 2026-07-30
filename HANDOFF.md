@@ -5,7 +5,7 @@
 唯一 runtime carrier 是 `vendor/vllm` submodule，分支为
 `feature/kv-materialization-runtime-integration`，基于 vLLM-HUST `main`
 commit `e4ce33646f2ef1781289e6dc651fad0d00177c55`，当前 pinned carrier commit
-为 `f8efeeb93c616709331e0517f106350101c8f3e0`。fresh checkout 的最小 CPU 验收命令为：
+为 `f8efeebe900e638f178e3b460f50cc750054fa17`。fresh checkout 的最小 CPU 验收命令为：
 
 ```bash
 git submodule update --init --recursive
