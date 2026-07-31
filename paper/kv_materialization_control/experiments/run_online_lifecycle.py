@@ -62,11 +62,8 @@ def git_state(path: Path) -> dict[str, object]:
 
 def port_is_free(host: str, port: int) -> bool:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-        try:
-            sock.bind((host, port))
-        except OSError:
-            return False
-    return True
+        sock.settimeout(1)
+        return sock.connect_ex((host, port)) != 0
 
 
 def npu_is_idle(npu_info: str, device: int) -> bool:
@@ -100,7 +97,7 @@ def validate_server_carrier_log(
     log = server_log_path.read_text(encoding="utf-8", errors="replace")
     if "Failed to import vLLM during plugin registration" in log:
         raise RuntimeError("KV materialization plugin registration failed")
-    if "Registered vLLM KV materialization plugin" not in log:
+    if "KV_MATERIALIZATION_PLUGIN_REGISTERED" not in log:
         raise RuntimeError("KV materialization plugin registration was not confirmed")
     forced_block_match = re.search(r"Block size is set to (\d+)", log)
     if forced_block_match and int(forced_block_match.group(1)) != requested_block_size:

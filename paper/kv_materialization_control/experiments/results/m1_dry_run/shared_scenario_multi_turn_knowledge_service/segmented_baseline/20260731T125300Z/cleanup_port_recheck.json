@@ -1,0 +1,7 @@
+{
+  "checked_at_utc": "2026-07-31T12:57:00Z",
+  "method": "netstat listener check after lifecycle shutdown",
+  "port": 8011,
+  "port_listener_present": false,
+  "note": "cleanup.json used a bind check and reported false while the closed socket was in a transient kernel state; no listening process remained. Later runner versions use a connect/listener check."
+}

@@ -213,3 +213,7 @@ def register_plugin() -> None:
     logger.info(
         "Registered vLLM KV materialization plugin with prefix-cache runtime control."
     )
+    print(
+        "KV_MATERIALIZATION_PLUGIN_REGISTERED mode=prefix_cache_runtime_control",
+        flush=True,
+    )
