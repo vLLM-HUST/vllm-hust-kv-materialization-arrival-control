@@ -6,24 +6,24 @@ import logging
 import os
 import threading
 import time
+from collections.abc import Mapping
 from contextlib import suppress
-from dataclasses import asdict
-from dataclasses import dataclass
-from dataclasses import replace
+from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 from typing import Any
-from typing import Mapping
 
-from vllm_kv_materialization.policy import estimate_materialization_ttft_ms
-from vllm_kv_materialization.policy import MaterializationDecision
-from vllm_kv_materialization.policy import MaterializationPolicy
-from vllm_kv_materialization.policy import MaterializationSignals
+from vllm_kv_materialization.policy import (
+    MaterializationDecision,
+    MaterializationPolicy,
+    MaterializationSignals,
+    estimate_materialization_ttft_ms,
+)
 
 logger = logging.getLogger(__name__)
 
 REQUEST_HEADERS: contextvars.ContextVar[dict[str, str]] = contextvars.ContextVar(
     "vllm_kv_materialization_request_headers",
-    default={},
+    default={},  # noqa: B039 - callers receive a defensive copy from get_request_headers
 )
 
 _ANCHOR_SEEN_COUNTS: dict[str, int] = {}
@@ -108,9 +108,13 @@ class LiveObservation:
     runtime_decision_supported: bool
     runtime_support_tier: str
     runtime_fallback_reason: str | None
+    runtime_reused_tokens: int = 0
+    runtime_recomputed_tokens: int = 0
 
 
-def bind_request_headers(headers: Mapping[str, str] | None) -> contextvars.Token[dict[str, str]]:
+def bind_request_headers(
+    headers: Mapping[str, str] | None,
+) -> contextvars.Token[dict[str, str]]:
     normalized: dict[str, str] = {}
     if headers is not None:
         normalized = {str(key).lower(): str(value) for key, value in headers.items()}
@@ -169,7 +173,9 @@ def _split_secondary_anchor_ids(raw: str) -> tuple[str, ...]:
     return tuple(part.strip() for part in raw.split(",") if part.strip())
 
 
-def _default_reuse_confidence(anchor_seen_count: int, turn_index: int, reusable_prefix_tokens: int) -> float:
+def _default_reuse_confidence(
+    anchor_seen_count: int, turn_index: int, reusable_prefix_tokens: int
+) -> float:
     if reusable_prefix_tokens <= 0:
         return 0.0
     if anchor_seen_count > 0:
@@ -179,7 +185,9 @@ def _default_reuse_confidence(anchor_seen_count: int, turn_index: int, reusable_
     return 0.35
 
 
-def estimate_reusable_prefix_tokens(headers: Mapping[str, str], prompt_tokens: int) -> int:
+def estimate_reusable_prefix_tokens(
+    headers: Mapping[str, str], prompt_tokens: int
+) -> int:
     explicit = _header_int(headers, HEADER_SHARED_PREFIX_TOKENS, -1)
     if explicit >= 0:
         return min(explicit, max(prompt_tokens, 0))
@@ -194,7 +202,9 @@ def estimate_reusable_prefix_tokens(headers: Mapping[str, str], prompt_tokens: i
     return max(0, int(prompt_tokens * 0.35))
 
 
-def estimate_signals(headers: Mapping[str, str], prompt_tokens: int, output_tokens: int) -> tuple[MaterializationSignals, dict[str, Any]]:
+def estimate_signals(
+    headers: Mapping[str, str], prompt_tokens: int, output_tokens: int
+) -> tuple[MaterializationSignals, dict[str, Any]]:
     del output_tokens
 
     primary_anchor_id = headers.get(HEADER_PRIMARY_ANCHOR, "").strip()
@@ -210,7 +220,9 @@ def estimate_signals(headers: Mapping[str, str], prompt_tokens: int, output_toke
     reuse_confidence = _header_float(
         headers,
         HEADER_REUSE_CONFIDENCE,
-        _default_reuse_confidence(anchor_seen_count, turn_index, reusable_prefix_tokens),
+        _default_reuse_confidence(
+            anchor_seen_count, turn_index, reusable_prefix_tokens
+        ),
     )
     queue_pressure = _header_float(
         headers,
@@ -231,7 +243,9 @@ def estimate_signals(headers: Mapping[str, str], prompt_tokens: int, output_toke
     remote_kv_bytes = max(reusable_prefix_tokens, 0) * max(bytes_per_token, 0)
     transfer_time_ms = 0.0
     if bandwidth_gbps > 0.0:
-        transfer_time_ms = (remote_kv_bytes / (bandwidth_gbps * 1_000_000_000.0)) * 1000.0
+        transfer_time_ms = (
+            remote_kv_bytes / (bandwidth_gbps * 1_000_000_000.0)
+        ) * 1000.0
     recompute_time_ms = (max(reusable_prefix_tokens, 0) / 1000.0) * prefill_ms_per_1k
 
     signals = MaterializationSignals(
@@ -259,7 +273,9 @@ def estimate_signals(headers: Mapping[str, str], prompt_tokens: int, output_toke
 def _make_policy() -> MaterializationPolicy:
     return MaterializationPolicy(
         partial_reuse_floor_tokens=_env_int("VLLM_KV_PARTIAL_REUSE_FLOOR_TOKENS", 256),
-        queue_pressure_discount_ms=_env_float("VLLM_KV_QUEUE_PRESSURE_DISCOUNT_MS", 0.5),
+        queue_pressure_discount_ms=_env_float(
+            "VLLM_KV_QUEUE_PRESSURE_DISCOUNT_MS", 0.5
+        ),
         ttft_bonus_ms=_env_float("VLLM_KV_TTFT_BONUS_MS", 1.5),
         low_confidence_cutoff=_env_float("VLLM_KV_LOW_CONFIDENCE_CUTOFF", 0.55),
         confidence_penalty_ms=_env_float("VLLM_KV_CONFIDENCE_PENALTY_MS", 4.0),
@@ -300,7 +316,9 @@ def _make_partial_fallback_salt(
     return None
 
 
-def _make_request_scoped_salt(primary_anchor_id: str, workload_case: str, request_id: str) -> str:
+def _make_request_scoped_salt(
+    primary_anchor_id: str, workload_case: str, request_id: str
+) -> str:
     prefix = primary_anchor_id or workload_case or "request"
     return f"kvmat:recompute:{prefix}:{request_id}"
 
@@ -339,7 +357,10 @@ def _adjust_signals_for_runtime(
     full_reuse_signals = replace(
         adjusted_signals,
         transfer_time_ms=adjusted_signals.transfer_time_ms
-        + ((1.0 - max(0.0, min(signals.reuse_confidence, 1.0))) * policy.confidence_penalty_ms),
+        + (
+            (1.0 - max(0.0, min(signals.reuse_confidence, 1.0)))
+            * policy.confidence_penalty_ms
+        ),
     )
     return adjusted_signals, full_reuse_signals
 
@@ -452,7 +473,9 @@ def compute_runtime_control(
             observed_decision=outcome.decision.value,
             effective_decision="recompute",
             control_path="request_scoped_prefix_cache_bypass",
-            cache_salt=_make_request_scoped_salt(primary_anchor_id, workload_case, request_id),
+            cache_salt=_make_request_scoped_salt(
+                primary_anchor_id, workload_case, request_id
+            ),
             segmented_tail_cache_salt=None,
             target_reuse_tokens=target_reuse_tokens,
             target_tail_tokens=target_tail_tokens,
@@ -545,7 +568,9 @@ def compute_runtime_control(
                 ),
                 segmented_tail_cache_salt=None,
                 target_reuse_tokens=max(signals.reusable_prefix_tokens, 0),
-                target_tail_tokens=max(max(prompt_tokens, 0) - max(signals.reusable_prefix_tokens, 0), 0),
+                target_tail_tokens=max(
+                    max(prompt_tokens, 0) - max(signals.reusable_prefix_tokens, 0), 0
+                ),
                 decision_supported=False,
                 support_tier=RUNTIME_SUPPORT_FALLBACK,
                 fallback_reason=(
@@ -557,7 +582,9 @@ def compute_runtime_control(
 
     observation = LiveObservation(
         timestamp_s=time.time(),
-        mode=os.getenv("VLLM_KV_MATERIALIZATION_PLUGIN_MODE", "prefix_cache_runtime_control"),
+        mode=os.getenv(
+            "VLLM_KV_MATERIALIZATION_PLUGIN_MODE", "prefix_cache_runtime_control"
+        ),
         request_id=headers.get(HEADER_REQUEST_ID, request_id) or request_id,
         workload_case=workload_case,
         workload_family=str(extras["workload_family"]),
@@ -584,6 +611,8 @@ def compute_runtime_control(
         runtime_decision_supported=plan.decision_supported,
         runtime_support_tier=plan.support_tier,
         runtime_fallback_reason=plan.fallback_reason,
+        runtime_reused_tokens=plan.target_reuse_tokens,
+        runtime_recomputed_tokens=plan.target_tail_tokens,
     )
     return observation, plan
 
@@ -595,7 +624,9 @@ def apply_runtime_control(prompt: Any, plan: RuntimeControlPlan) -> Any:
         return prompt
 
     prompt_copy = dict(prompt)
-    if prompt_copy.get("type") == "enc_dec" and isinstance(prompt_copy.get("decoder_prompt"), dict):
+    if prompt_copy.get("type") == "enc_dec" and isinstance(
+        prompt_copy.get("decoder_prompt"), dict
+    ):
         decoder_prompt = dict(prompt_copy["decoder_prompt"])
         decoder_prompt["cache_salt"] = plan.cache_salt
         prompt_copy["decoder_prompt"] = decoder_prompt
@@ -605,7 +636,9 @@ def apply_runtime_control(prompt: Any, plan: RuntimeControlPlan) -> Any:
     return prompt_copy
 
 
-def observe_request(request_id: str, prompt_tokens: int, output_tokens: int) -> LiveObservation:
+def observe_request(
+    request_id: str, prompt_tokens: int, output_tokens: int
+) -> LiveObservation:
     observation, _ = compute_runtime_control(request_id, prompt_tokens, output_tokens)
     if observation.primary_anchor_id:
         with _ANCHOR_LOCK:
@@ -623,7 +656,6 @@ def _append_observation(observation: LiveObservation) -> None:
     path = Path(log_path)
     path.parent.mkdir(parents=True, exist_ok=True)
     payload = json.dumps(asdict(observation), sort_keys=True)
-    with _LOG_LOCK:
-        with path.open("a", encoding="utf-8") as handle:
-            handle.write(payload)
-            handle.write("\n")
+    with _LOG_LOCK, path.open("a", encoding="utf-8") as handle:
+        handle.write(payload)
+        handle.write("\n")
