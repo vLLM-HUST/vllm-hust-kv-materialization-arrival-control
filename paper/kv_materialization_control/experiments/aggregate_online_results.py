@@ -49,9 +49,9 @@ def collect_runs(input_dir: Path) -> list[dict]:
         raise ValueError(
             f"suite is explicitly invalidated: {input_dir / 'INVALIDATED.txt'}"
         )
-    execution_path = input_dir / "suite_execution.json"
+    execution_path = input_dir / "suite_manifest.json"
     if not execution_path.is_file():
-        raise ValueError("suite_execution.json is missing")
+        raise ValueError("suite_manifest.json is missing")
     execution = json.loads(execution_path.read_text())
     if execution.get("status") != "completed":
         raise ValueError(f"suite execution status is {execution.get('status')!r}")

@@ -23,21 +23,21 @@ class RunSpec:
 ROUND_ORDERS = (
     (
         ("old", "baseline"),
-        ("segmented", "baseline"),
-        ("old", "tuned"),
         ("segmented", "tuned"),
+        ("old", "tuned"),
+        ("segmented", "baseline"),
     ),
     (
         ("segmented", "tuned"),
-        ("old", "tuned"),
-        ("segmented", "baseline"),
         ("old", "baseline"),
+        ("segmented", "baseline"),
+        ("old", "tuned"),
     ),
     (
         ("old", "tuned"),
+        ("segmented", "baseline"),
         ("old", "baseline"),
         ("segmented", "tuned"),
-        ("segmented", "baseline"),
     ),
 )
 WORKLOADS = (
@@ -102,7 +102,7 @@ def main() -> int:
         "schedule": [spec.__dict__ for spec in schedule],
         "runs": [],
     }
-    execution_path = suite_dir / "suite_execution.json"
+    execution_path = suite_dir / "suite_manifest.json"
 
     for sequence, spec in enumerate(schedule, start=1):
         condition_label = f"{spec.seam}_{spec.condition}"
