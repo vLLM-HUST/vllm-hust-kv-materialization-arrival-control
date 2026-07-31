@@ -27,12 +27,14 @@ def read_jsonl(path: Path) -> list[dict]:
     ]
 
 
-def normalize_engine_request_id(request_id: str) -> str:
-    normalized = request_id
-    normalized = normalized.removeprefix("chatcmpl-")
-    return (
-        normalized.rsplit("-", 1)[0] if re.search(r"-\d+$", normalized) else normalized
-    )
+def normalize_engine_request_id(request_id: str, workload_request_ids: set[str]) -> str:
+    normalized = request_id.removeprefix("chatcmpl-")
+    matches = [
+        candidate
+        for candidate in workload_request_ids
+        if normalized == candidate or normalized.startswith(f"{candidate}-")
+    ]
+    return max(matches, key=len) if matches else normalized
 
 
 def validate_bundle(bundle_dir: Path) -> dict[str, object]:
@@ -89,7 +91,7 @@ def validate_bundle(bundle_dir: Path) -> dict[str, object]:
 
     runtime_events: dict[str, set[str]] = {}
     for event, raw_request_id in PREFIX_EVENT_RE.findall(server_log):
-        request_id = normalize_engine_request_id(raw_request_id)
+        request_id = normalize_engine_request_id(raw_request_id, request_ids)
         runtime_events.setdefault(request_id, set()).add(event)
     missing_runtime_events = sorted(
         request_id
