@@ -1,0 +1,244 @@
+{
+  "applied_decision_mix": {
+    "full_reuse": 16,
+    "partial_reuse": 16,
+    "recompute": 0
+  },
+  "completed": 32,
+  "engine_accounting": [
+    {
+      "prompt_tokens": 592,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 592,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-0",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 592,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 592,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-1",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 641,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 513,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-10",
+      "reused_tokens": 128
+    },
+    {
+      "prompt_tokens": 641,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 513,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-11",
+      "reused_tokens": 128
+    },
+    {
+      "prompt_tokens": 641,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 513,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-12",
+      "reused_tokens": 128
+    },
+    {
+      "prompt_tokens": 641,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 513,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-13",
+      "reused_tokens": 128
+    },
+    {
+      "prompt_tokens": 641,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 513,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-14",
+      "reused_tokens": 128
+    },
+    {
+      "prompt_tokens": 641,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 513,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-15",
+      "reused_tokens": 128
+    },
+    {
+      "prompt_tokens": 703,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 319,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-16",
+      "reused_tokens": 384
+    },
+    {
+      "prompt_tokens": 703,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 319,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-17",
+      "reused_tokens": 384
+    },
+    {
+      "prompt_tokens": 703,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 319,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-18",
+      "reused_tokens": 384
+    },
+    {
+      "prompt_tokens": 703,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 319,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-19",
+      "reused_tokens": 384
+    },
+    {
+      "prompt_tokens": 592,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 592,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-2",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 703,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 319,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-20",
+      "reused_tokens": 384
+    },
+    {
+      "prompt_tokens": 703,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 319,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-21",
+      "reused_tokens": 384
+    },
+    {
+      "prompt_tokens": 703,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 319,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-22",
+      "reused_tokens": 384
+    },
+    {
+      "prompt_tokens": 703,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 319,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-23",
+      "reused_tokens": 384
+    },
+    {
+      "prompt_tokens": 767,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 383,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-24",
+      "reused_tokens": 384
+    },
+    {
+      "prompt_tokens": 767,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 383,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-25",
+      "reused_tokens": 384
+    },
+    {
+      "prompt_tokens": 767,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 383,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-26",
+      "reused_tokens": 384
+    },
+    {
+      "prompt_tokens": 767,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 383,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-27",
+      "reused_tokens": 384
+    },
+    {
+      "prompt_tokens": 767,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 383,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-28",
+      "reused_tokens": 384
+    },
+    {
+      "prompt_tokens": 767,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 383,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-29",
+      "reused_tokens": 384
+    },
+    {
+      "prompt_tokens": 592,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 592,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-3",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 767,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 383,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-30",
+      "reused_tokens": 384
+    },
+    {
+      "prompt_tokens": 767,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 383,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-31",
+      "reused_tokens": 384
+    },
+    {
+      "prompt_tokens": 592,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 592,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-4",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 592,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 592,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-5",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 592,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 592,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-6",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 592,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 592,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-7",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 641,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 513,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-8",
+      "reused_tokens": 128
+    },
+    {
+      "prompt_tokens": 641,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 513,
+      "request_id": "shared_scenario_multi_turn_knowledge_service-9",
+      "reused_tokens": 128
+    }
+  ],
+  "engine_event_count": 4128,
+  "errors": [],
+  "failed": 0,
+  "observation_count": 32,
+  "realized_decision_mix": {
+    "partial_reuse": 24,
+    "recompute": 8
+  },
+  "request_count": 32,
+  "valid": true
+}

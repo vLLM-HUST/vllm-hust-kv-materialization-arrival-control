@@ -94,8 +94,8 @@ optimization-live: runtime-boundary-live
 
 m1-online-rebuild:
 	PYTHONPATH=src $(PYTHON) $(BENCH_DIR)/aggregate_online_results.py \
-		--input-dir $(BENCH_DIR)/results/m1_formal \
-		--output-dir $(BENCH_DIR)/results/m1_formal/generated
+		--input-dir $(BENCH_DIR)/results/m1_formal_engine_accounted_complete_20260731 \
+		--output-dir $(BENCH_DIR)/results/m1_formal_engine_accounted_complete_20260731/generated
 
 pdf: paper-pdf
 

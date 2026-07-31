@@ -1,0 +1,21 @@
+{
+  "completed": 32,
+  "concurrency": 4,
+  "dataset_name": "session-affine-multi-turn",
+  "failures": [],
+  "finished_at_utc": "2026-07-31T14:49:27.849305Z",
+  "mean_latency_ms": 1158.385,
+  "mean_ttft_ms": 151.737,
+  "output_throughput_toks": 218.273,
+  "p95_latency_ms": 1237.645,
+  "p95_ttft_ms": 225.51,
+  "request_rate": 24.0,
+  "request_throughput_rps": 3.411,
+  "requests": 32,
+  "requests_output": "/tmp/kvmat-m1-formal-engine-accounted-20260731-18a878e/shared_scenario_multi_turn_knowledge_service/old_tuned/round_01_sequence_03/request_results.jsonl",
+  "seed": 7,
+  "started_at_utc": "2026-07-31T14:49:18.466564Z",
+  "workload_case": "shared_scenario_multi_turn_knowledge_service",
+  "workload_family": "session-affine-multi-turn",
+  "workload_label": "Scenario: multi-turn knowledge service"
+}

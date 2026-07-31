@@ -1,0 +1,244 @@
+{
+  "applied_decision_mix": {
+    "full_reuse": 16,
+    "partial_reuse": 8,
+    "recompute": 8
+  },
+  "completed": 32,
+  "engine_accounting": [
+    {
+      "prompt_tokens": 375,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 375,
+      "request_id": "shared_tool_scaffold_agent-0",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 375,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 375,
+      "request_id": "shared_tool_scaffold_agent-1",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 424,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 424,
+      "request_id": "shared_tool_scaffold_agent-10",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 424,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 424,
+      "request_id": "shared_tool_scaffold_agent-11",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 424,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 424,
+      "request_id": "shared_tool_scaffold_agent-12",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 424,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 424,
+      "request_id": "shared_tool_scaffold_agent-13",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 424,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 424,
+      "request_id": "shared_tool_scaffold_agent-14",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 424,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 424,
+      "request_id": "shared_tool_scaffold_agent-15",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 486,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 230,
+      "request_id": "shared_tool_scaffold_agent-16",
+      "reused_tokens": 256
+    },
+    {
+      "prompt_tokens": 486,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 230,
+      "request_id": "shared_tool_scaffold_agent-17",
+      "reused_tokens": 256
+    },
+    {
+      "prompt_tokens": 486,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 230,
+      "request_id": "shared_tool_scaffold_agent-18",
+      "reused_tokens": 256
+    },
+    {
+      "prompt_tokens": 486,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 230,
+      "request_id": "shared_tool_scaffold_agent-19",
+      "reused_tokens": 256
+    },
+    {
+      "prompt_tokens": 375,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 375,
+      "request_id": "shared_tool_scaffold_agent-2",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 486,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 230,
+      "request_id": "shared_tool_scaffold_agent-20",
+      "reused_tokens": 256
+    },
+    {
+      "prompt_tokens": 486,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 230,
+      "request_id": "shared_tool_scaffold_agent-21",
+      "reused_tokens": 256
+    },
+    {
+      "prompt_tokens": 486,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 230,
+      "request_id": "shared_tool_scaffold_agent-22",
+      "reused_tokens": 256
+    },
+    {
+      "prompt_tokens": 486,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 230,
+      "request_id": "shared_tool_scaffold_agent-23",
+      "reused_tokens": 256
+    },
+    {
+      "prompt_tokens": 550,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 294,
+      "request_id": "shared_tool_scaffold_agent-24",
+      "reused_tokens": 256
+    },
+    {
+      "prompt_tokens": 550,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 294,
+      "request_id": "shared_tool_scaffold_agent-25",
+      "reused_tokens": 256
+    },
+    {
+      "prompt_tokens": 550,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 294,
+      "request_id": "shared_tool_scaffold_agent-26",
+      "reused_tokens": 256
+    },
+    {
+      "prompt_tokens": 550,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 294,
+      "request_id": "shared_tool_scaffold_agent-27",
+      "reused_tokens": 256
+    },
+    {
+      "prompt_tokens": 550,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 294,
+      "request_id": "shared_tool_scaffold_agent-28",
+      "reused_tokens": 256
+    },
+    {
+      "prompt_tokens": 550,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 294,
+      "request_id": "shared_tool_scaffold_agent-29",
+      "reused_tokens": 256
+    },
+    {
+      "prompt_tokens": 375,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 375,
+      "request_id": "shared_tool_scaffold_agent-3",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 550,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 294,
+      "request_id": "shared_tool_scaffold_agent-30",
+      "reused_tokens": 256
+    },
+    {
+      "prompt_tokens": 550,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 294,
+      "request_id": "shared_tool_scaffold_agent-31",
+      "reused_tokens": 256
+    },
+    {
+      "prompt_tokens": 375,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 375,
+      "request_id": "shared_tool_scaffold_agent-4",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 375,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 375,
+      "request_id": "shared_tool_scaffold_agent-5",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 375,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 375,
+      "request_id": "shared_tool_scaffold_agent-6",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 375,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 375,
+      "request_id": "shared_tool_scaffold_agent-7",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 424,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 424,
+      "request_id": "shared_tool_scaffold_agent-8",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 424,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 424,
+      "request_id": "shared_tool_scaffold_agent-9",
+      "reused_tokens": 0
+    }
+  ],
+  "engine_event_count": 8224,
+  "errors": [],
+  "failed": 0,
+  "observation_count": 32,
+  "realized_decision_mix": {
+    "partial_reuse": 16,
+    "recompute": 16
+  },
+  "request_count": 32,
+  "valid": true
+}
