@@ -1,0 +1,39 @@
+INFO 07-31 12:48:05 [__init__.py:44] Available plugins for group vllm.platform_plugins:
+INFO 07-31 12:48:05 [__init__.py:46] - ascend -> vllm_ascend:register
+INFO 07-31 12:48:05 [__init__.py:58] Loading plugin ascend
+INFO 07-31 12:48:05 [__init__.py:246] Platform plugin ascend is activated
+INFO 07-31 12:48:05 [platform.py:60] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.
+INFO 07-31 12:48:13 [api_utils.py:285] Running Ascend torch_npu preflight before vLLM engine startup
+Failed to import vLLM during plugin registration.
+Traceback (most recent call last):
+  File "/root/kv_materialization_arrival_control/kv-materialization-arrival-control/src/vllm_kv_materialization/plugin.py", line 76, in register_plugin
+    from vllm.entrypoints.serve.render.serving import OpenAIServingRender
+ModuleNotFoundError: No module named 'vllm.entrypoints.serve.render'
+(APIServer pid=2214668) INFO 07-31 12:48:29 [api_utils.py:458] 
+(APIServer pid=2214668) INFO 07-31 12:48:29 [api_utils.py:458]        █     █     █▄   ▄█
+(APIServer pid=2214668) INFO 07-31 12:48:29 [api_utils.py:458]  ▄▄ ▄█ █     █     █ ▀▄▀ █  version 0.23.1.post1.dev572+g6a71cd4bc
+(APIServer pid=2214668) INFO 07-31 12:48:29 [api_utils.py:458]   █▄█▀ █     █     █     █  model   /root/models/Qwen2.5-7B-Instruct
+(APIServer pid=2214668) INFO 07-31 12:48:29 [api_utils.py:458]    ▀▀  ▀▀▀▀▀ ▀▀▀▀▀ ▀     ▀
+(APIServer pid=2214668) INFO 07-31 12:48:29 [api_utils.py:458] 
+(APIServer pid=2214668) INFO 07-31 12:48:29 [api_utils.py:392] non-default args: {'model_tag': '/root/models/Qwen2.5-7B-Instruct', 'host': '127.0.0.1', 'port': 8011, 'model': '/root/models/Qwen2.5-7B-Instruct', 'max_model_len': 32768, 'served_model_name': ['Qwen2.5-7B-Instruct'], 'block_size': 16, 'gpu_memory_utilization': 0.85, 'enable_prefix_caching': True}
+(APIServer pid=2214668) WARNING 07-31 12:48:29 [envs.py:2064] Unknown vLLM environment variable detected: VLLM_KV_CONFIDENCE_PENALTY_MS
+(APIServer pid=2214668) WARNING 07-31 12:48:29 [envs.py:2064] Unknown vLLM environment variable detected: VLLM_KV_MATERIALIZATION_LOG_PATH
+(APIServer pid=2214668) WARNING 07-31 12:48:29 [envs.py:2064] Unknown vLLM environment variable detected: VLLM_KV_RUNTIME_BLOCK_SIZE
+(APIServer pid=2214668) WARNING 07-31 12:48:29 [envs.py:2064] Unknown vLLM environment variable detected: VLLM_KV_RUNTIME_HASH_BLOCK_SIZE
+(APIServer pid=2214668) WARNING 07-31 12:48:29 [envs.py:2064] Unknown vLLM environment variable detected: VLLM_KV_PARTIAL_REUSE_FLOOR_TOKENS
+(APIServer pid=2214668) INFO 07-31 12:48:47 [model.py:606] Resolved architecture: Qwen2ForCausalLM
+(APIServer pid=2214668) INFO 07-31 12:48:47 [model.py:1736] Using max model len 32768
+(APIServer pid=2214668) INFO 07-31 12:48:47 [vllm.py:1040] Asynchronous scheduling is enabled.
+(APIServer pid=2214668) INFO 07-31 12:48:47 [kernel.py:286] Final IR op priority after setting platform defaults: IrOpPriorityConfig(rms_norm=['native'], fused_add_rms_norm=['native'])
+(APIServer pid=2214668) INFO 07-31 12:48:47 [utils.py:203] No quantization signature detected from model files for "/root/models/Qwen2.5-7B-Instruct". The model will be loaded as float. To force a quantization method, pass "--quantization <method>" explicitly.
+(APIServer pid=2214668) WARNING 07-31 12:48:47 [platform.py:1182] GPU-specific parameter is not supported on Ascend. parameter=disable_cascade_attn, value=True, action: resetting to False.
+(APIServer pid=2214668) INFO 07-31 12:48:47 [ascend_config.py:914] Dynamic EPLB is False
+(APIServer pid=2214668) INFO 07-31 12:48:47 [ascend_config.py:915] The number of redundant experts is 0
+(APIServer pid=2214668) INFO 07-31 12:48:47 [utils.py:1458] Block size is set to 128 if prefix cache or chunked prefill is enabled.
+(APIServer pid=2214668) INFO 07-31 12:48:47 [platform.py:892] Set PYTORCH_NPU_ALLOC_CONF=expandable_segments:True
+(APIServer pid=2214668) INFO 07-31 12:48:47 [compilation.py:312] Enabled custom fusions: norm_quant, act_quant
+INFO 07-31 12:49:01 [__init__.py:44] Available plugins for group vllm.platform_plugins:
+INFO 07-31 12:49:01 [__init__.py:46] - ascend -> vllm_ascend:register
+INFO 07-31 12:49:01 [__init__.py:58] Loading plugin ascend
+INFO 07-31 12:49:01 [__init__.py:246] Platform plugin ascend is activated
+INFO 07-31 12:49:01 [platform.py:60] Breakable cudagraph is force disabled on Ascend because DeepSeek V4 PIECEWISE cudagraph is not supported yet.

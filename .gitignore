@@ -10,6 +10,7 @@ dist/
 .tectonic-cache/
 *.build.log
 *.log
+!/paper/kv_materialization_control/experiments/results/**/*.log
 *.orig
 *.rej
 .ipynb_checkpoints/
