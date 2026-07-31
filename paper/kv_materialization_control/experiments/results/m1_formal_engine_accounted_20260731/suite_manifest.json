@@ -1,0 +1,282 @@
+{
+  "finished_at_s": 1785508866.0349457,
+  "runs": [
+    {
+      "bundle_dir": "/root/kv_materialization_arrival_control/kv-materialization-arrival-control/paper/kv_materialization_control/experiments/results/m1_formal_engine_accounted_20260731/shared_scenario_multi_turn_knowledge_service/old_baseline/round_01_sequence_01",
+      "returncode": 0,
+      "sequence": 1,
+      "spec": {
+        "condition": "baseline",
+        "max_output_tokens": 64,
+        "order_index": 1,
+        "request_rate": 24.0,
+        "round_index": 1,
+        "seam": "old",
+        "workload": "shared_scenario_multi_turn_knowledge_service"
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/root/kv_materialization_arrival_control/kv-materialization-arrival-control/paper/kv_materialization_control/experiments/results/m1_formal_engine_accounted_20260731/shared_scenario_multi_turn_knowledge_service/segmented_tuned/round_01_sequence_02",
+      "returncode": 3,
+      "sequence": 2,
+      "spec": {
+        "condition": "tuned",
+        "max_output_tokens": 64,
+        "order_index": 2,
+        "request_rate": 24.0,
+        "round_index": 1,
+        "seam": "segmented",
+        "workload": "shared_scenario_multi_turn_knowledge_service"
+      }
+    }
+  ],
+  "schedule": [
+    {
+      "condition": "baseline",
+      "max_output_tokens": 64,
+      "order_index": 1,
+      "request_rate": 24.0,
+      "round_index": 1,
+      "seam": "old",
+      "workload": "shared_scenario_multi_turn_knowledge_service"
+    },
+    {
+      "condition": "tuned",
+      "max_output_tokens": 64,
+      "order_index": 2,
+      "request_rate": 24.0,
+      "round_index": 1,
+      "seam": "segmented",
+      "workload": "shared_scenario_multi_turn_knowledge_service"
+    },
+    {
+      "condition": "tuned",
+      "max_output_tokens": 64,
+      "order_index": 3,
+      "request_rate": 24.0,
+      "round_index": 1,
+      "seam": "old",
+      "workload": "shared_scenario_multi_turn_knowledge_service"
+    },
+    {
+      "condition": "baseline",
+      "max_output_tokens": 64,
+      "order_index": 4,
+      "request_rate": 24.0,
+      "round_index": 1,
+      "seam": "segmented",
+      "workload": "shared_scenario_multi_turn_knowledge_service"
+    },
+    {
+      "condition": "tuned",
+      "max_output_tokens": 64,
+      "order_index": 1,
+      "request_rate": 24.0,
+      "round_index": 2,
+      "seam": "segmented",
+      "workload": "shared_scenario_multi_turn_knowledge_service"
+    },
+    {
+      "condition": "baseline",
+      "max_output_tokens": 64,
+      "order_index": 2,
+      "request_rate": 24.0,
+      "round_index": 2,
+      "seam": "old",
+      "workload": "shared_scenario_multi_turn_knowledge_service"
+    },
+    {
+      "condition": "baseline",
+      "max_output_tokens": 64,
+      "order_index": 3,
+      "request_rate": 24.0,
+      "round_index": 2,
+      "seam": "segmented",
+      "workload": "shared_scenario_multi_turn_knowledge_service"
+    },
+    {
+      "condition": "tuned",
+      "max_output_tokens": 64,
+      "order_index": 4,
+      "request_rate": 24.0,
+      "round_index": 2,
+      "seam": "old",
+      "workload": "shared_scenario_multi_turn_knowledge_service"
+    },
+    {
+      "condition": "tuned",
+      "max_output_tokens": 64,
+      "order_index": 1,
+      "request_rate": 24.0,
+      "round_index": 3,
+      "seam": "old",
+      "workload": "shared_scenario_multi_turn_knowledge_service"
+    },
+    {
+      "condition": "baseline",
+      "max_output_tokens": 64,
+      "order_index": 2,
+      "request_rate": 24.0,
+      "round_index": 3,
+      "seam": "segmented",
+      "workload": "shared_scenario_multi_turn_knowledge_service"
+    },
+    {
+      "condition": "baseline",
+      "max_output_tokens": 64,
+      "order_index": 3,
+      "request_rate": 24.0,
+      "round_index": 3,
+      "seam": "old",
+      "workload": "shared_scenario_multi_turn_knowledge_service"
+    },
+    {
+      "condition": "tuned",
+      "max_output_tokens": 64,
+      "order_index": 4,
+      "request_rate": 24.0,
+      "round_index": 3,
+      "seam": "segmented",
+      "workload": "shared_scenario_multi_turn_knowledge_service"
+    },
+    {
+      "condition": "baseline",
+      "max_output_tokens": 128,
+      "order_index": 1,
+      "request_rate": 18.0,
+      "round_index": 1,
+      "seam": "old",
+      "workload": "shared_tool_scaffold_agent"
+    },
+    {
+      "condition": "tuned",
+      "max_output_tokens": 128,
+      "order_index": 2,
+      "request_rate": 18.0,
+      "round_index": 1,
+      "seam": "segmented",
+      "workload": "shared_tool_scaffold_agent"
+    },
+    {
+      "condition": "tuned",
+      "max_output_tokens": 128,
+      "order_index": 3,
+      "request_rate": 18.0,
+      "round_index": 1,
+      "seam": "old",
+      "workload": "shared_tool_scaffold_agent"
+    },
+    {
+      "condition": "baseline",
+      "max_output_tokens": 128,
+      "order_index": 4,
+      "request_rate": 18.0,
+      "round_index": 1,
+      "seam": "segmented",
+      "workload": "shared_tool_scaffold_agent"
+    },
+    {
+      "condition": "tuned",
+      "max_output_tokens": 128,
+      "order_index": 1,
+      "request_rate": 18.0,
+      "round_index": 2,
+      "seam": "segmented",
+      "workload": "shared_tool_scaffold_agent"
+    },
+    {
+      "condition": "baseline",
+      "max_output_tokens": 128,
+      "order_index": 2,
+      "request_rate": 18.0,
+      "round_index": 2,
+      "seam": "old",
+      "workload": "shared_tool_scaffold_agent"
+    },
+    {
+      "condition": "baseline",
+      "max_output_tokens": 128,
+      "order_index": 3,
+      "request_rate": 18.0,
+      "round_index": 2,
+      "seam": "segmented",
+      "workload": "shared_tool_scaffold_agent"
+    },
+    {
+      "condition": "tuned",
+      "max_output_tokens": 128,
+      "order_index": 4,
+      "request_rate": 18.0,
+      "round_index": 2,
+      "seam": "old",
+      "workload": "shared_tool_scaffold_agent"
+    },
+    {
+      "condition": "tuned",
+      "max_output_tokens": 128,
+      "order_index": 1,
+      "request_rate": 18.0,
+      "round_index": 3,
+      "seam": "old",
+      "workload": "shared_tool_scaffold_agent"
+    },
+    {
+      "condition": "baseline",
+      "max_output_tokens": 128,
+      "order_index": 2,
+      "request_rate": 18.0,
+      "round_index": 3,
+      "seam": "segmented",
+      "workload": "shared_tool_scaffold_agent"
+    },
+    {
+      "condition": "baseline",
+      "max_output_tokens": 128,
+      "order_index": 3,
+      "request_rate": 18.0,
+      "round_index": 3,
+      "seam": "old",
+      "workload": "shared_tool_scaffold_agent"
+    },
+    {
+      "condition": "tuned",
+      "max_output_tokens": 128,
+      "order_index": 4,
+      "request_rate": 18.0,
+      "round_index": 3,
+      "seam": "segmented",
+      "workload": "shared_tool_scaffold_agent"
+    },
+    {
+      "condition": "tuned",
+      "max_output_tokens": 72,
+      "order_index": 1,
+      "request_rate": 18.0,
+      "round_index": 1,
+      "seam": "segmented",
+      "workload": "dynamic_rag_corpus_update"
+    },
+    {
+      "condition": "tuned",
+      "max_output_tokens": 72,
+      "order_index": 1,
+      "request_rate": 18.0,
+      "round_index": 2,
+      "seam": "segmented",
+      "workload": "dynamic_rag_corpus_update"
+    },
+    {
+      "condition": "tuned",
+      "max_output_tokens": 72,
+      "order_index": 1,
+      "request_rate": 18.0,
+      "round_index": 3,
+      "seam": "segmented",
+      "workload": "dynamic_rag_corpus_update"
+    }
+  ],
+  "schema_version": 1,
+  "started_at_s": 1785508716.591371,
+  "status": "blocked"
+}
