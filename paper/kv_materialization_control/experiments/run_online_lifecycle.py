@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import signal
 import socket
 import subprocess
@@ -93,6 +94,22 @@ def wait_until_healthy(base_url: str, server: subprocess.Popen, timeout_s: int) 
     )
 
 
+def validate_server_carrier_log(
+    server_log_path: Path, requested_block_size: int
+) -> None:
+    log = server_log_path.read_text(encoding="utf-8", errors="replace")
+    if "Failed to import vLLM during plugin registration" in log:
+        raise RuntimeError("KV materialization plugin registration failed")
+    if "Registered vLLM KV materialization plugin" not in log:
+        raise RuntimeError("KV materialization plugin registration was not confirmed")
+    forced_block_match = re.search(r"Block size is set to (\d+)", log)
+    if forced_block_match and int(forced_block_match.group(1)) != requested_block_size:
+        raise RuntimeError(
+            f"effective block size {forced_block_match.group(1)} "
+            f"!= requested {requested_block_size}"
+        )
+
+
 def stop_process_group(
     process: subprocess.Popen, timeout_s: int = 90
 ) -> dict[str, object]:
@@ -132,7 +149,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--device", type=int, default=7)
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8011)
-    parser.add_argument("--block-size", type=int, default=16)
+    parser.add_argument("--block-size", type=int, default=128)
     parser.add_argument("--max-model-len", type=int, default=32768)
     parser.add_argument("--gpu-memory-utilization", type=float, default=0.85)
     parser.add_argument("--request-rate", type=float, default=24.0)
@@ -345,6 +362,7 @@ def main() -> int:
                 start_new_session=True,
             )
         wait_until_healthy(base_url, server, args.health_timeout_s)
+        validate_server_carrier_log(server_log_path, args.block_size)
         client_env = os.environ.copy()
         client_env["PYTHONPATH"] = str(repo_root / "src")
         with client_log_path.open("w", encoding="utf-8") as client_log:
@@ -366,7 +384,7 @@ def main() -> int:
         run_manifest["client_returncode"] = client_result.returncode
         write_json(run_manifest_path, run_manifest)
         return 0
-    except Exception as exc:  # noqa: BLE001 - every failure must be preserved in the bundle
+    except (Exception, KeyboardInterrupt) as exc:  # noqa: BLE001 - preserve every failure
         failed_path.write_text(f"{type(exc).__name__}: {exc}\n", encoding="utf-8")
         if run_manifest_path.exists():
             run_manifest = json.loads(run_manifest_path.read_text())

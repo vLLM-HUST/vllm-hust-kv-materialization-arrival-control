@@ -1,0 +1,10 @@
+Interrupted after carrier validation exposed two invalidating conditions:
+
+1. KV materialization plugin registration failed because the pinned carrier no
+   longer provides vllm.entrypoints.serve.render.serving.OpenAIServingRender.
+2. Ascend forced the requested block size from 16 to 128 when prefix caching
+   was enabled, so the requested and effective block sizes were not matched.
+
+No workload requests were issued. The service was terminated and cleanup.json
+confirms that NPU 7 and port 8011 were released. This directory is retained as
+a failed carrier-validation lifecycle and is excluded from all statistics.

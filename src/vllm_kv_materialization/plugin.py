@@ -4,13 +4,15 @@ import logging
 import os
 from typing import Any
 
-from vllm_kv_materialization.live_control import apply_runtime_control
-from vllm_kv_materialization.live_control import bind_request_headers
-from vllm_kv_materialization.live_control import compute_runtime_control
-from vllm_kv_materialization.live_control import merge_runtime_control_extra_args
-from vllm_kv_materialization.live_control import observe_request
-from vllm_kv_materialization.live_control import reset_request_headers
-from vllm_kv_materialization.live_control import RuntimeControlPlan
+from vllm_kv_materialization.live_control import (
+    RuntimeControlPlan,
+    apply_runtime_control,
+    bind_request_headers,
+    compute_runtime_control,
+    merge_runtime_control_extra_args,
+    observe_request,
+    reset_request_headers,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -68,12 +70,13 @@ def register_plugin() -> None:
 
     try:
         from vllm import envs as vllm_envs
-        from vllm.entrypoints.openai.chat_completion.protocol import ChatCompletionRequest
+        from vllm.entrypoints.openai.chat_completion.protocol import (
+            ChatCompletionRequest,
+        )
         from vllm.entrypoints.openai.chat_completion.serving import OpenAIServingChat
         from vllm.entrypoints.openai.completion.protocol import CompletionRequest
         from vllm.entrypoints.openai.completion.serving import OpenAIServingCompletion
         from vllm.entrypoints.openai.engine.serving import OpenAIServing
-        from vllm.entrypoints.serve.render.serving import OpenAIServingRender
         from vllm.renderers.inputs.preprocess import extract_prompt_components
     except Exception:
         logger.exception("Failed to import vLLM during plugin registration.")
@@ -82,8 +85,17 @@ def register_plugin() -> None:
     original_log_inputs = OpenAIServing._log_inputs
     original_chat_create = OpenAIServingChat.create_chat_completion
     original_completion_create = OpenAIServingCompletion.create_completion
-    original_render_chat = OpenAIServingRender.render_chat
-    original_render_completion = OpenAIServingRender.render_completion
+    try:
+        from vllm.entrypoints.serve.render.serving import OpenAIServingRender
+    except ImportError:
+        OpenAIServingRender = None
+
+    if OpenAIServingRender is None:
+        original_render_chat = OpenAIServingChat.render_chat_request
+        original_render_completion = OpenAIServingCompletion.render_completion_request
+    else:
+        original_render_chat = OpenAIServingRender.render_chat
+        original_render_completion = OpenAIServingRender.render_completion
     original_chat_to_sampling_params = ChatCompletionRequest.to_sampling_params
     original_completion_to_sampling_params = CompletionRequest.to_sampling_params
 
@@ -92,7 +104,9 @@ def register_plugin() -> None:
             components = extract_prompt_components(model_config, prompt)
             return len(components.token_ids or [])
         except Exception:
-            logger.exception("Failed to extract prompt components for KV materialization control.")
+            logger.exception(
+                "Failed to extract prompt components for KV materialization control."
+            )
             return 0
 
     async def patched_render_chat(self, request):
@@ -127,7 +141,9 @@ def register_plugin() -> None:
         for index, engine_prompt in enumerate(result):
             prompt_tokens = _prompt_token_count(self.model_config, engine_prompt)
             output_tokens = int(getattr(request, "max_tokens", 0) or 0)
-            request_id = str(getattr(request, "request_id", None) or f"completion-{index}")
+            request_id = str(
+                getattr(request, "request_id", None) or f"completion-{index}"
+            )
             _, plan = compute_runtime_control(request_id, prompt_tokens, output_tokens)
             runtime_plans.append(plan)
             controlled_prompts.append(apply_runtime_control(engine_prompt, plan))
@@ -142,7 +158,9 @@ def register_plugin() -> None:
             default_sampling_params,
         )
 
-    def patched_completion_to_sampling_params(self, max_tokens, default_sampling_params):
+    def patched_completion_to_sampling_params(
+        self, max_tokens, default_sampling_params
+    ):
         return _attach_runtime_plan_to_sampling_params(
             self,
             original_completion_to_sampling_params,
@@ -177,17 +195,21 @@ def register_plugin() -> None:
     OpenAIServing._log_inputs = patched_log_inputs
     OpenAIServingChat.create_chat_completion = patched_chat_create
     OpenAIServingCompletion.create_completion = patched_completion_create
-    OpenAIServingRender.render_chat = patched_render_chat
-    OpenAIServingRender.render_completion = patched_render_completion
+    if OpenAIServingRender is None:
+        OpenAIServingChat.render_chat_request = patched_render_chat
+        OpenAIServingCompletion.render_completion_request = patched_render_completion
+    else:
+        OpenAIServingRender.render_chat = patched_render_chat
+        OpenAIServingRender.render_completion = patched_render_completion
     ChatCompletionRequest.to_sampling_params = patched_chat_to_sampling_params
     CompletionRequest.to_sampling_params = patched_completion_to_sampling_params
 
-    setattr(vllm_envs, "VLLM_KV_MATERIALIZATION_PLUGIN_LOADED", True)
-    setattr(
-        vllm_envs,
-        "VLLM_KV_MATERIALIZATION_PLUGIN_MODE",
-        os.getenv("VLLM_KV_MATERIALIZATION_PLUGIN_MODE", "prefix_cache_runtime_control"),
+    vllm_envs.VLLM_KV_MATERIALIZATION_PLUGIN_LOADED = True
+    vllm_envs.VLLM_KV_MATERIALIZATION_PLUGIN_MODE = os.getenv(
+        "VLLM_KV_MATERIALIZATION_PLUGIN_MODE", "prefix_cache_runtime_control"
     )
 
     _PATCHED = True
-    logger.info("Registered vLLM KV materialization plugin with prefix-cache runtime control.")
+    logger.info(
+        "Registered vLLM KV materialization plugin with prefix-cache runtime control."
+    )
