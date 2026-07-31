@@ -1,0 +1,21 @@
+{
+  "completed": 32,
+  "concurrency": 4,
+  "dataset_name": "session-affine-multi-turn",
+  "failures": [],
+  "finished_at_utc": "2026-07-31T14:36:18.014476Z",
+  "mean_latency_ms": 1149.814,
+  "mean_ttft_ms": 150.865,
+  "output_throughput_toks": 219.964,
+  "p95_latency_ms": 1221.104,
+  "p95_ttft_ms": 217.244,
+  "request_rate": 24.0,
+  "request_throughput_rps": 3.437,
+  "requests": 32,
+  "requests_output": "/root/kv_materialization_arrival_control/kv-materialization-arrival-control/paper/kv_materialization_control/experiments/results/m1_dry_run/shared_scenario_multi_turn_knowledge_service/segmented_tuned/20260731T143346Z/request_results.jsonl",
+  "seed": 7,
+  "started_at_utc": "2026-07-31T14:36:08.703875Z",
+  "workload_case": "shared_scenario_multi_turn_knowledge_service",
+  "workload_family": "session-affine-multi-turn",
+  "workload_label": "Scenario: multi-turn knowledge service"
+}

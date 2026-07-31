@@ -83,7 +83,7 @@ def main() -> int:
     )
     parser.add_argument("--suite-dir", required=True)
     parser.add_argument("--model", required=True)
-    parser.add_argument("--old-carrier-root", required=True)
+    parser.add_argument("--old-carrier-root", default="vendor/vllm")
     parser.add_argument("--segmented-carrier-root", default="vendor/vllm")
     parser.add_argument("--device", type=int, default=7)
     parser.add_argument("--port", type=int, default=8011)
