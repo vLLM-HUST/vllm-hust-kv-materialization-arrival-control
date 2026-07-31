@@ -1,0 +1,21 @@
+{
+  "completed": 32,
+  "concurrency": 4,
+  "dataset_name": "tool-scaffold-agent",
+  "failures": [],
+  "finished_at_utc": "2026-07-31T13:54:46.347738Z",
+  "mean_latency_ms": 2160.997,
+  "mean_ttft_ms": 142.658,
+  "output_throughput_toks": 233.66,
+  "p95_latency_ms": 2206.514,
+  "p95_ttft_ms": 186.206,
+  "request_rate": 18.0,
+  "request_throughput_rps": 1.825,
+  "requests": 32,
+  "requests_output": "/tmp/kvmat-m1-formal-20260731/shared_tool_scaffold_agent/segmented_baseline/round_02_sequence_19/request_results.jsonl",
+  "seed": 7,
+  "started_at_utc": "2026-07-31T13:54:28.817997Z",
+  "workload_case": "shared_tool_scaffold_agent",
+  "workload_family": "tool-scaffold-agent",
+  "workload_label": "Scenario: structured agent decode"
+}

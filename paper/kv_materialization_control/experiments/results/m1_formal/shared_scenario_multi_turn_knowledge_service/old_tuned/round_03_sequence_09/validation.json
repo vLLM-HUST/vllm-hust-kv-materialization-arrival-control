@@ -1,0 +1,14 @@
+{
+  "completed": 32,
+  "decision_mix": {
+    "full_reuse": 32,
+    "partial_reuse": 0,
+    "recompute": 0
+  },
+  "errors": [],
+  "failed": 0,
+  "observation_count": 32,
+  "request_count": 32,
+  "runtime_event_request_count": 32,
+  "valid": true
+}

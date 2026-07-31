@@ -16,7 +16,7 @@ PAPER_DIR := paper/kv_materialization_control
 
 .DEFAULT_GOAL := help
 
-.PHONY: help bootstrap-env install-dev smoke test shared-workloads-smoke shared-workloads-test lint format build bench paper offline-experiment experiment decision-study study-experiment shared-workloads-offline paper-experiment runtime-boundary-live live-benchmark shared-workloads-live optimization-live pdf paper-pdf evidence clean
+.PHONY: help bootstrap-env install-dev smoke test shared-workloads-smoke shared-workloads-test lint format build bench paper offline-experiment experiment decision-study study-experiment shared-workloads-offline paper-experiment runtime-boundary-live live-benchmark shared-workloads-live optimization-live m1-online-rebuild pdf paper-pdf evidence clean
 
 help:
 	@printf '%s\n' \
@@ -33,6 +33,7 @@ help:
 		'  make experiment   Compatibility alias of make decision-study' \
 		'  make shared-workloads-offline [WORKLOAD_CASES="..."]  Compatibility alias of make decision-study' \
 		'  make runtime-boundary-live MODEL=<model> [WORKLOAD_CASE=<case>]  Run the live runtime-boundary benchmark' \
+		'  make m1-online-rebuild  Rebuild M1 online CSV/TeX from committed raw bundles' \
 		'  make shared-workloads-live MODEL=<model> [WORKLOAD_CASE=<case>]  Compatibility alias of make runtime-boundary-live' \
 		'  make optimization-live MODEL=<model> [WORKLOAD_CASE=<case>]  Compatibility alias of make runtime-boundary-live' \
 		'  make pdf          Build the paper PDF after refreshing latest offline-study results' \
@@ -90,6 +91,11 @@ live-benchmark: runtime-boundary-live
 shared-workloads-live: runtime-boundary-live
 
 optimization-live: runtime-boundary-live
+
+m1-online-rebuild:
+	PYTHONPATH=src $(PYTHON) $(BENCH_DIR)/aggregate_online_results.py \
+		--input-dir $(BENCH_DIR)/results/m1_formal \
+		--output-dir $(BENCH_DIR)/results/m1_formal/generated
 
 pdf: paper-pdf
 
