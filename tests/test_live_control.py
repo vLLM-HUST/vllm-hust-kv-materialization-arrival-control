@@ -2,24 +2,27 @@ from __future__ import annotations
 
 import hashlib
 
-from vllm_kv_materialization.live_control import HEADER_PRIMARY_ANCHOR
-from vllm_kv_materialization.live_control import HEADER_REUSE_CONFIDENCE
-from vllm_kv_materialization.live_control import HEADER_SECONDARY_ANCHORS
-from vllm_kv_materialization.live_control import HEADER_SHARED_PREFIX_TOKENS
-from vllm_kv_materialization.live_control import HEADER_TURN_INDEX
-from vllm_kv_materialization.live_control import PARTIAL_REUSE_ALIGNMENT_FALLBACK_REASON
-from vllm_kv_materialization.live_control import PARTIAL_REUSE_FALLBACK_REASON
-from vllm_kv_materialization.live_control import PARTIAL_REUSE_RUNTIME_REALIGN_TO_FULL_REUSE
-from vllm_kv_materialization.live_control import RUNTIME_KV_TRANSFER_CONTROL_KEY
-from vllm_kv_materialization.live_control import RUNTIME_SUPPORT_FALLBACK
-from vllm_kv_materialization.live_control import apply_runtime_control
-from vllm_kv_materialization.live_control import bind_request_headers
-from vllm_kv_materialization.live_control import build_runtime_control_extra_args
-from vllm_kv_materialization.live_control import compute_runtime_control
-from vllm_kv_materialization.live_control import estimate_reusable_prefix_tokens
-from vllm_kv_materialization.live_control import merge_runtime_control_extra_args
-from vllm_kv_materialization.live_control import observe_request
-from vllm_kv_materialization.live_control import reset_request_headers
+from vllm_kv_materialization.live_control import (
+    HEADER_PRIMARY_ANCHOR,
+    HEADER_REQUEST_ID,
+    HEADER_REUSE_CONFIDENCE,
+    HEADER_SECONDARY_ANCHORS,
+    HEADER_SHARED_PREFIX_TOKENS,
+    HEADER_TURN_INDEX,
+    PARTIAL_REUSE_ALIGNMENT_FALLBACK_REASON,
+    PARTIAL_REUSE_FALLBACK_REASON,
+    PARTIAL_REUSE_RUNTIME_REALIGN_TO_FULL_REUSE,
+    RUNTIME_KV_TRANSFER_CONTROL_KEY,
+    RUNTIME_SUPPORT_FALLBACK,
+    apply_runtime_control,
+    bind_request_headers,
+    build_runtime_control_extra_args,
+    compute_runtime_control,
+    estimate_reusable_prefix_tokens,
+    merge_runtime_control_extra_args,
+    observe_request,
+    reset_request_headers,
+)
 
 
 class _RecordingCoordinator:
@@ -89,7 +92,9 @@ def test_compute_runtime_control_uses_unique_salt_for_recompute(monkeypatch) -> 
     assert "req-c" in plan.cache_salt
 
 
-def test_compute_runtime_control_marks_partial_as_degraded_full_reuse(monkeypatch) -> None:
+def test_compute_runtime_control_marks_partial_as_degraded_full_reuse(
+    monkeypatch,
+) -> None:
     monkeypatch.delenv("VLLM_KV_MATERIALIZATION_LOG_PATH", raising=False)
 
     headers = {
@@ -120,17 +125,20 @@ def test_compute_runtime_control_marks_partial_as_degraded_full_reuse(monkeypatc
     assert plan.fallback_reason == PARTIAL_REUSE_FALLBACK_REASON
     assert "partial_reuse_fallback" in observation.runtime_control_path
 
-    runtime_hint = build_runtime_control_extra_args(plan)[RUNTIME_KV_TRANSFER_CONTROL_KEY]
+    runtime_hint = build_runtime_control_extra_args(plan)[
+        RUNTIME_KV_TRANSFER_CONTROL_KEY
+    ]
 
     assert runtime_hint["target_reuse_tokens"] == observation.reusable_prefix_tokens
     assert (
-        runtime_hint["target_tail_tokens"]
-        == 1600 - observation.reusable_prefix_tokens
+        runtime_hint["target_tail_tokens"] == 1600 - observation.reusable_prefix_tokens
     )
     assert runtime_hint["requires_segmented_materialization"] is True
 
 
-def test_partial_reuse_fallback_keeps_primary_anchor_without_scaffold(monkeypatch) -> None:
+def test_partial_reuse_fallback_keeps_primary_anchor_without_scaffold(
+    monkeypatch,
+) -> None:
     monkeypatch.delenv("VLLM_KV_MATERIALIZATION_LOG_PATH", raising=False)
 
     headers = {
@@ -150,7 +158,9 @@ def test_partial_reuse_fallback_keeps_primary_anchor_without_scaffold(monkeypatc
     assert plan.cache_salt == "kvmat:anchor:anchor-fallback"
 
 
-def test_merge_runtime_control_extra_args_preserves_existing_fields(monkeypatch) -> None:
+def test_merge_runtime_control_extra_args_preserves_existing_fields(
+    monkeypatch,
+) -> None:
     monkeypatch.delenv("VLLM_KV_MATERIALIZATION_LOG_PATH", raising=False)
 
     headers = {
@@ -226,7 +236,33 @@ def test_compute_runtime_control_aligns_partial_to_runtime_blocks(monkeypatch) -
     assert plan.fallback_reason == PARTIAL_REUSE_ALIGNMENT_FALLBACK_REASON
 
 
-def test_compute_runtime_control_realigns_unusable_partial_to_full_reuse(monkeypatch) -> None:
+def test_old_seam_truthfully_falls_partial_back_to_full_reuse(monkeypatch) -> None:
+    monkeypatch.delenv("VLLM_KV_MATERIALIZATION_LOG_PATH", raising=False)
+    monkeypatch.setenv("VLLM_KV_RUNTIME_SEAM", "old")
+    monkeypatch.setenv("VLLM_KV_RUNTIME_BLOCK_SIZE", "128")
+    token = bind_request_headers(
+        {
+            HEADER_REQUEST_ID: "req-old",
+            HEADER_PRIMARY_ANCHOR: "anchor-old",
+            HEADER_SECONDARY_ANCHORS: "tenant::0,shared-scaffold::2,tail-class::interactive",
+            HEADER_SHARED_PREFIX_TOKENS: "1200",
+            HEADER_REUSE_CONFIDENCE: "0.2",
+        }
+    )
+    try:
+        observation, plan = compute_runtime_control("req-old", 1600, 64)
+    finally:
+        reset_request_headers(token)
+
+    assert observation.decision == "partial_reuse"
+    assert plan.effective_decision == "full_reuse"
+    assert plan.decision_supported is False
+    assert plan.fallback_reason == PARTIAL_REUSE_FALLBACK_REASON
+
+
+def test_compute_runtime_control_realigns_unusable_partial_to_full_reuse(
+    monkeypatch,
+) -> None:
     monkeypatch.delenv("VLLM_KV_MATERIALIZATION_LOG_PATH", raising=False)
     monkeypatch.setenv("VLLM_KV_RUNTIME_BLOCK_SIZE", "4096")
 
@@ -293,17 +329,21 @@ def test_partial_reuse_exports_segmented_tail_salt(monkeypatch) -> None:
     finally:
         reset_request_headers(token)
 
-    runtime_hint = build_runtime_control_extra_args(plan)[RUNTIME_KV_TRANSFER_CONTROL_KEY]
+    runtime_hint = build_runtime_control_extra_args(plan)[
+        RUNTIME_KV_TRANSFER_CONTROL_KEY
+    ]
 
     assert plan.effective_decision == "partial_reuse"
     assert runtime_hint["segmented_tail_cache_salt"] == plan.segmented_tail_cache_salt
-    assert runtime_hint["segmented_tail_cache_salt"] == "kvmat:recompute:anchor-tail-salt:req-tail-salt"
+    assert (
+        runtime_hint["segmented_tail_cache_salt"]
+        == "kvmat:recompute:anchor-tail-salt:req-tail-salt"
+    )
 
 
 def test_partial_reuse_resets_tail_hash_chain_at_boundary() -> None:
     from vllm.sampling_params import SamplingParams
-    from vllm.v1.core.kv_cache_utils import get_request_block_hasher
-    from vllm.v1.core.kv_cache_utils import init_none_hash
+    from vllm.v1.core.kv_cache_utils import get_request_block_hasher, init_none_hash
     from vllm.v1.request import Request
 
     def _stable_hash(value: object) -> bytes:

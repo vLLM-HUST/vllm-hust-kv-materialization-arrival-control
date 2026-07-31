@@ -279,6 +279,7 @@ def main() -> int:
                 ),
                 "VLLM_KV_RUNTIME_BLOCK_SIZE": str(args.block_size),
                 "VLLM_KV_RUNTIME_HASH_BLOCK_SIZE": str(args.block_size),
+                "VLLM_KV_RUNTIME_SEAM": args.seam,
                 "VLLM_KV_MATERIALIZATION_LOG_PATH": str(runtime_observations_path),
                 "VLLM_DEBUG_PREFIX_CACHE_TRACE": "1",
                 "CARRIER_VLLM_HUST_ROOT": str(carrier_root),

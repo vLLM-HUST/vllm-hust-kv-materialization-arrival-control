@@ -505,7 +505,10 @@ def compute_runtime_control(
         )
         aligned_tail_tokens = max(max(prompt_tokens, 0) - aligned_reuse_tokens, 0)
 
-        if runtime_hash_block_size > 0:
+        runtime_seam = os.getenv("VLLM_KV_RUNTIME_SEAM", "segmented").strip().lower()
+        if runtime_seam == "old":
+            realizable_action = "full_reuse"
+        elif runtime_hash_block_size > 0:
             realizable_action = _pick_realizable_runtime_action(
                 signals,
                 policy,
@@ -574,9 +577,13 @@ def compute_runtime_control(
                 decision_supported=False,
                 support_tier=RUNTIME_SUPPORT_FALLBACK,
                 fallback_reason=(
-                    PARTIAL_REUSE_RUNTIME_REALIGN_TO_FULL_REUSE
-                    if runtime_hash_block_size > 0
-                    else PARTIAL_REUSE_FALLBACK_REASON
+                    PARTIAL_REUSE_FALLBACK_REASON
+                    if runtime_seam == "old"
+                    else (
+                        PARTIAL_REUSE_RUNTIME_REALIGN_TO_FULL_REUSE
+                        if runtime_hash_block_size > 0
+                        else PARTIAL_REUSE_FALLBACK_REASON
+                    )
                 ),
             )
 
