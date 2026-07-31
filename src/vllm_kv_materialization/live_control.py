@@ -108,8 +108,6 @@ class LiveObservation:
     runtime_decision_supported: bool
     runtime_support_tier: str
     runtime_fallback_reason: str | None
-    runtime_reused_tokens: int = 0
-    runtime_recomputed_tokens: int = 0
 
 
 def bind_request_headers(
@@ -618,8 +616,6 @@ def compute_runtime_control(
         runtime_decision_supported=plan.decision_supported,
         runtime_support_tier=plan.support_tier,
         runtime_fallback_reason=plan.fallback_reason,
-        runtime_reused_tokens=plan.target_reuse_tokens,
-        runtime_recomputed_tokens=plan.target_tail_tokens,
     )
     return observation, plan
 

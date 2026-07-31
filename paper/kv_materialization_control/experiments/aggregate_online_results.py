@@ -7,6 +7,18 @@ import statistics
 from collections import Counter, defaultdict
 from pathlib import Path
 
+FORMAL_LABEL = "real-online/formal-matrix"
+REQUIRED_CELLS = {
+    (workload, seam, condition): 3
+    for workload in (
+        "shared_scenario_multi_turn_knowledge_service",
+        "shared_tool_scaffold_agent",
+    )
+    for seam in ("old", "segmented")
+    for condition in ("baseline", "tuned")
+}
+REQUIRED_CELLS[("dynamic_rag_corpus_update", "segmented", "tuned")] = 3
+
 METRICS = (
     "mean_ttft_ms",
     "p95_ttft_ms",
@@ -33,13 +45,38 @@ def read_jsonl(path: Path) -> list[dict]:
 
 
 def collect_runs(input_dir: Path) -> list[dict]:
+    if (input_dir / "INVALIDATED.txt").exists():
+        raise ValueError(
+            f"suite is explicitly invalidated: {input_dir / 'INVALIDATED.txt'}"
+        )
+    execution_path = input_dir / "suite_execution.json"
+    if not execution_path.is_file():
+        raise ValueError("suite_execution.json is missing")
+    execution = json.loads(execution_path.read_text())
+    if execution.get("status") != "completed":
+        raise ValueError(f"suite execution status is {execution.get('status')!r}")
     runs: list[dict] = []
     for validation_path in sorted(input_dir.rglob("validation.json")):
         validation = json.loads(validation_path.read_text())
         if not validation.get("valid"):
-            continue
+            raise ValueError(f"invalid formal bundle: {validation_path.parent}")
+        if not validation.get("engine_accounting"):
+            raise ValueError(
+                f"bundle lacks independent engine accounting: {validation_path.parent}"
+            )
         bundle = validation_path.parent
         manifest = json.loads(bundle.joinpath("run_manifest.json").read_text())
+        environment = json.loads(
+            bundle.joinpath("environment_manifest.json").read_text()
+        )
+        cleanup = json.loads(bundle.joinpath("cleanup.json").read_text())
+        if (
+            manifest.get("evidence_label") != FORMAL_LABEL
+            or environment.get("evidence_label") != FORMAL_LABEL
+        ):
+            raise ValueError(f"non-formal evidence label in {bundle}")
+        if not cleanup.get("port_free_after") or not cleanup.get("device_idle_after"):
+            raise ValueError(f"cleanup evidence failed in {bundle}")
         summary = json.loads(bundle.joinpath("request_summary.json").read_text())
         observations = read_jsonl(bundle / "runtime_observations.jsonl")
         decision_mix = Counter(
@@ -50,6 +87,9 @@ def collect_runs(input_dir: Path) -> list[dict]:
             "workload": manifest["workload_case"],
             "seam": manifest["seam"],
             "condition": manifest["condition"],
+            "service_lifecycle_id": manifest.get("service_lifecycle_id"),
+            "started_at_utc": manifest.get("started_at_utc"),
+            "protocol_fingerprint": environment.get("protocol_fingerprint"),
             "completed": summary["completed"],
             "failed": len(summary["failures"]),
             "effective_recompute": decision_mix["recompute"],
@@ -58,6 +98,28 @@ def collect_runs(input_dir: Path) -> list[dict]:
         }
         row.update({metric: summary[metric] for metric in METRICS})
         runs.append(row)
+    counts = Counter((row["workload"], row["seam"], row["condition"]) for row in runs)
+    if counts != Counter(REQUIRED_CELLS):
+        raise ValueError(
+            f"formal matrix is incomplete or contains extra cells: {counts}"
+        )
+    lifecycle_ids = [row["service_lifecycle_id"] for row in runs]
+    if None in lifecycle_ids or len(set(lifecycle_ids)) != len(lifecycle_ids):
+        raise ValueError("service lifecycle IDs are missing or not independent")
+    for workload in {row["workload"] for row in runs}:
+        fingerprints = {
+            row["protocol_fingerprint"] for row in runs if row["workload"] == workload
+        }
+        if None in fingerprints or len(fingerprints) != 1:
+            raise ValueError(
+                f"protocol drift detected for workload {workload}: {fingerprints}"
+            )
+    scheduled = execution.get("runs", [])
+    if len(scheduled) != len(runs) or any(
+        record.get("returncode") != 0 or record.get("validation_returncode") != 0
+        for record in scheduled
+    ):
+        raise ValueError("suite execution records do not prove all lifecycles passed")
     return runs
 
 

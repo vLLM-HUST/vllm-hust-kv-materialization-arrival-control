@@ -2,21 +2,19 @@ from __future__ import annotations
 
 import argparse
 import json
-import re
+from collections import Counter, defaultdict
 from pathlib import Path
 
-PREFIX_EVENT_RE = re.compile(r"Prefix cache trace (lookup|commit) request_id=([^ ]+)")
 REQUIRED_OBSERVATION_FIELDS = {
     "request_id",
     "decision",
-    "reused_tokens",
     "runtime_effective_decision",
     "runtime_target_reuse_tokens",
     "runtime_target_tail_tokens",
-    "runtime_reused_tokens",
-    "runtime_recomputed_tokens",
     "runtime_fallback_reason",
 }
+FORMAL_LABEL = "real-online/formal-matrix"
+DRY_RUN_LABEL = "real-online/carrier-validation-dry-run"
 
 
 def read_jsonl(path: Path) -> list[dict]:
@@ -37,7 +35,12 @@ def normalize_engine_request_id(request_id: str, workload_request_ids: set[str])
     return max(matches, key=len) if matches else normalized
 
 
-def validate_bundle(bundle_dir: Path) -> dict[str, object]:
+def validate_bundle(
+    bundle_dir: Path,
+    *,
+    expected_evidence_label: str | None = None,
+    require_realized_partial: bool = False,
+) -> dict[str, object]:
     errors: list[str] = []
     required_files = [
         "environment_manifest.json",
@@ -45,6 +48,7 @@ def validate_bundle(bundle_dir: Path) -> dict[str, object]:
         "request_summary.json",
         "request_results.jsonl",
         "runtime_observations.jsonl",
+        "runtime_events.jsonl",
         "server.log",
         "client.log",
         "cleanup.json",
@@ -55,17 +59,13 @@ def validate_bundle(bundle_dir: Path) -> dict[str, object]:
     if errors:
         return {"valid": False, "errors": errors}
 
-    environment = json.loads(
-        bundle_dir.joinpath("environment_manifest.json").read_text()
-    )
-    run_manifest = json.loads(bundle_dir.joinpath("run_manifest.json").read_text())
-    summary = json.loads(bundle_dir.joinpath("request_summary.json").read_text())
-    cleanup = json.loads(bundle_dir.joinpath("cleanup.json").read_text())
+    environment = json.loads((bundle_dir / "environment_manifest.json").read_text())
+    manifest = json.loads((bundle_dir / "run_manifest.json").read_text())
+    summary = json.loads((bundle_dir / "request_summary.json").read_text())
+    cleanup = json.loads((bundle_dir / "cleanup.json").read_text())
     requests = read_jsonl(bundle_dir / "request_results.jsonl")
     observations = read_jsonl(bundle_dir / "runtime_observations.jsonl")
-    server_log = bundle_dir.joinpath("server.log").read_text(
-        encoding="utf-8", errors="replace"
-    )
+    engine_events = read_jsonl(bundle_dir / "runtime_events.jsonl")
 
     request_ids = {row.get("request_id") for row in requests}
     observation_ids = {row.get("request_id") for row in observations}
@@ -77,39 +77,132 @@ def validate_bundle(bundle_dir: Path) -> dict[str, object]:
         errors.append("per-request IDs are missing or duplicated")
     if request_ids != observation_ids:
         errors.append(
-            f"request/observation ID mismatch: missing={sorted(request_ids - observation_ids)} extra={sorted(observation_ids - request_ids)}"
+            "request/observation ID mismatch: "
+            f"missing={sorted(request_ids - observation_ids)} "
+            f"extra={sorted(observation_ids - request_ids)}"
         )
+    observations_by_id = {row.get("request_id"): row for row in observations}
     for index, observation in enumerate(observations):
         missing = REQUIRED_OBSERVATION_FIELDS - observation.keys()
         if missing:
             errors.append(f"observation {index} missing fields: {sorted(missing)}")
+        if (
+            "runtime_reused_tokens" in observation
+            or "runtime_recomputed_tokens" in observation
+        ):
+            errors.append(
+                f"observation {index} contains deprecated planner-derived runtime counters"
+            )
     for index, request in enumerate(requests):
         if request.get("ok") and request.get("ttft_s") is None:
             errors.append(f"successful request {index} missing TTFT")
         if request.get("ok") and not request.get("raw_events"):
             errors.append(f"successful request {index} missing raw SSE events")
 
-    runtime_events: dict[str, set[str]] = {}
-    for event, raw_request_id in PREFIX_EVENT_RE.findall(server_log):
-        request_id = normalize_engine_request_id(raw_request_id, request_ids)
-        runtime_events.setdefault(request_id, set()).add(event)
-    missing_runtime_events = sorted(
-        request_id
-        for request_id in request_ids
-        if runtime_events.get(str(request_id)) != {"lookup", "commit"}
-    )
-    if missing_runtime_events:
-        errors.append(
-            f"requests missing runtime lookup/commit events: {missing_runtime_events}"
+    events_by_id: dict[str, list[dict]] = defaultdict(list)
+    for index, event in enumerate(engine_events):
+        raw_id = event.get("request_id")
+        if not isinstance(raw_id, str):
+            errors.append(f"engine event {index} missing request_id")
+            continue
+        normalized = normalize_engine_request_id(raw_id, request_ids)
+        if normalized not in request_ids:
+            errors.append(f"engine event {index} has unknown request_id: {raw_id}")
+            continue
+        events_by_id[normalized].append(event)
+
+    realized_mix: Counter[str] = Counter()
+    accounting_rows: list[dict] = []
+    for request_id in sorted(str(value) for value in request_ids):
+        events = events_by_id.get(request_id, [])
+        lookups = [row for row in events if row.get("event") == "lookup"]
+        commits = [row for row in events if row.get("event") == "commit"]
+        if len(lookups) != 1:
+            errors.append(
+                f"request {request_id} has {len(lookups)} engine lookup events"
+            )
+            continue
+        if not commits:
+            errors.append(f"request {request_id} has no engine commit event")
+        lookup = lookups[0]
+        observation = observations_by_id.get(request_id, {})
+        prompt = lookup.get("engine_prompt_tokens")
+        reused = lookup.get("engine_reused_tokens")
+        recomputed = lookup.get("engine_recomputed_tokens")
+        if not all(isinstance(value, int) for value in (prompt, reused, recomputed)):
+            errors.append(f"request {request_id} engine counters are not integers")
+            continue
+        if prompt != observation.get("prompt_tokens"):
+            errors.append(
+                f"request {request_id} prompt mismatch engine={prompt} "
+                f"planner={observation.get('prompt_tokens')}"
+            )
+        if reused < 0 or recomputed < 0 or reused + recomputed != prompt:
+            errors.append(
+                f"request {request_id} token accounting does not close: "
+                f"reused={reused} recomputed={recomputed} prompt={prompt}"
+            )
+        if lookup.get("applied_decision") != observation.get(
+            "runtime_effective_decision"
+        ):
+            errors.append(f"request {request_id} applied/effective decision mismatch")
+        if lookup.get("observed_decision") != observation.get("decision"):
+            errors.append(f"request {request_id} observed decision mismatch")
+        if lookup.get("fallback_reason") != observation.get("runtime_fallback_reason"):
+            errors.append(f"request {request_id} fallback reason mismatch")
+        if lookup.get("target_reuse_tokens") != observation.get(
+            "runtime_target_reuse_tokens"
+        ):
+            errors.append(f"request {request_id} target reuse mismatch")
+        block_size = lookup.get("hash_block_size")
+        if reused and (not isinstance(block_size, int) or reused % block_size):
+            errors.append(f"request {request_id} reused boundary is not block aligned")
+        realized = lookup.get("realized_decision")
+        expected_realized = (
+            "recompute"
+            if reused == 0
+            else "full_reuse"
+            if recomputed == 0
+            else "partial_reuse"
         )
+        if realized != expected_realized:
+            errors.append(f"request {request_id} realized decision is inconsistent")
+        realized_mix[str(realized)] += 1
+        accounting_rows.append(
+            {
+                "request_id": request_id,
+                "prompt_tokens": prompt,
+                "reused_tokens": reused,
+                "recomputed_tokens": recomputed,
+                "realized_decision": realized,
+            }
+        )
+
+    labels = {environment.get("evidence_label"), manifest.get("evidence_label")}
+    expected_label = expected_evidence_label
+    if len(labels) != 1 or None in labels:
+        errors.append(
+            f"environment/run evidence labels disagree: {sorted(map(str, labels))}"
+        )
+    elif expected_label and labels != {expected_label}:
+        errors.append(f"evidence label {next(iter(labels))!r} != {expected_label!r}")
+    if not environment.get("protocol_fingerprint"):
+        errors.append("environment manifest missing protocol fingerprint")
     if environment.get("parent", {}).get("dirty") or environment.get("carrier", {}).get(
         "dirty"
     ):
         errors.append("parent or carrier was dirty at run start")
-    if run_manifest.get("status") != "completed":
-        errors.append(f"run status is not completed: {run_manifest.get('status')}")
+    if manifest.get("status") != "completed":
+        errors.append(f"run status is not completed: {manifest.get('status')}")
     if not cleanup.get("port_free_after") or not cleanup.get("device_idle_after"):
         errors.append("cleanup did not prove both port and device idle")
+    graph_evidence = environment.get("execution_mode_evidence", [])
+    if not graph_evidence or not any(
+        "enforce_eager=False" in line for line in graph_evidence
+    ):
+        errors.append("server log did not prove graph-mode configuration")
+    if require_realized_partial and realized_mix["partial_reuse"] == 0:
+        errors.append("dry run did not produce a nonzero realized partial reuse")
 
     return {
         "valid": not errors,
@@ -118,14 +211,16 @@ def validate_bundle(bundle_dir: Path) -> dict[str, object]:
         "completed": sum(bool(row.get("ok")) for row in requests),
         "failed": sum(not bool(row.get("ok")) for row in requests),
         "observation_count": len(observations),
-        "runtime_event_request_count": len(runtime_events),
-        "decision_mix": {
+        "engine_event_count": len(engine_events),
+        "engine_accounting": accounting_rows,
+        "applied_decision_mix": {
             decision: sum(
                 row.get("runtime_effective_decision") == decision
                 for row in observations
             )
             for decision in ("recompute", "partial_reuse", "full_reuse")
         },
+        "realized_decision_mix": dict(sorted(realized_mix.items())),
     }
 
 
@@ -135,8 +230,16 @@ def main() -> int:
     )
     parser.add_argument("bundle_dir")
     parser.add_argument("--output")
+    parser.add_argument(
+        "--expected-evidence-label", choices=(FORMAL_LABEL, DRY_RUN_LABEL)
+    )
+    parser.add_argument("--require-realized-partial", action="store_true")
     args = parser.parse_args()
-    result = validate_bundle(Path(args.bundle_dir).resolve())
+    result = validate_bundle(
+        Path(args.bundle_dir).resolve(),
+        expected_evidence_label=args.expected_evidence_label,
+        require_realized_partial=args.require_realized_partial,
+    )
     rendered = json.dumps(result, indent=2, sort_keys=True) + "\n"
     if args.output:
         Path(args.output).write_text(rendered, encoding="utf-8")

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -190,6 +191,7 @@ def main() -> int:
     server_log_path = bundle_dir / "server.log"
     client_log_path = bundle_dir / "client.log"
     runtime_observations_path = bundle_dir / "runtime_observations.jsonl"
+    runtime_events_path = bundle_dir / "runtime_events.jsonl"
     summary_path = bundle_dir / "request_summary.json"
     requests_path = bundle_dir / "request_results.jsonl"
     base_url = f"http://{args.host}:{args.port}"
@@ -239,6 +241,26 @@ def main() -> int:
         "block_size": args.block_size,
         "max_model_len": args.max_model_len,
     }
+    protocol = {
+        "workload_case": args.workload_case,
+        "workload_source": workload_source,
+        "model": str(model),
+        "model_config_commit": manifest["model_config"].get("_commit_hash"),
+        "device": args.device,
+        "served_model_name": args.served_model_name,
+        "block_size": args.block_size,
+        "max_model_len": args.max_model_len,
+        "gpu_memory_utilization": args.gpu_memory_utilization,
+        "request_rate": args.request_rate,
+        "concurrency": args.concurrency,
+        "max_output_tokens": args.max_output_tokens,
+        "seed": args.seed,
+        "execution_mode": "graph",
+    }
+    manifest["protocol"] = protocol
+    manifest["protocol_fingerprint"] = hashlib.sha256(
+        json.dumps(protocol, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
     write_json(manifest_path, manifest)
 
     try:
@@ -281,6 +303,9 @@ def main() -> int:
                 "VLLM_KV_RUNTIME_HASH_BLOCK_SIZE": str(args.block_size),
                 "VLLM_KV_RUNTIME_SEAM": args.seam,
                 "VLLM_KV_MATERIALIZATION_LOG_PATH": str(runtime_observations_path),
+                "VLLM_KV_MATERIALIZATION_RUNTIME_EVENT_LOG_PATH": str(
+                    runtime_events_path
+                ),
                 "VLLM_DEBUG_PREFIX_CACHE_TRACE": "1",
                 "CARRIER_VLLM_HUST_ROOT": str(carrier_root),
             }
@@ -359,6 +384,11 @@ def main() -> int:
                 text=True,
                 start_new_session=True,
             )
+        run_manifest["server_pid"] = server.pid
+        run_manifest["service_lifecycle_id"] = (
+            f"{utc_timestamp(started_at)}-pid-{server.pid}"
+        )
+        write_json(run_manifest_path, run_manifest)
         wait_until_healthy(base_url, server, args.health_timeout_s)
         validate_server_carrier_log(server_log_path, args.block_size)
         client_env = os.environ.copy()

@@ -165,6 +165,8 @@ def main() -> int:
                     str(run_dir),
                     "--output",
                     str(validation_path),
+                    "--expected-evidence-label",
+                    "real-online/formal-matrix",
                 ],
                 cwd=repo_root,
                 check=False,

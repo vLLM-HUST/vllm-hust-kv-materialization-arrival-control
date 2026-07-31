@@ -1,0 +1,8 @@
+PRE-FIX SUITE — NOT VALID FORMAL M1 EVIDENCE
+
+This preserved suite predates independent engine-side token accounting. Its
+runtime_reused_tokens/runtime_recomputed_tokens fields copied planner targets,
+and its validator checked only event presence. Do not aggregate or cite it as
+submission-grade evidence. It is retained to satisfy the no-delete/no-overwrite
+audit rule. A new suite must be created after the strengthened carrier dry run
+passes numeric closure with nonzero realized partial reuse.
