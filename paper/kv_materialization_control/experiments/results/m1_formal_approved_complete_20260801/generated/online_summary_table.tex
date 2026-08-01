@@ -1,0 +1,29 @@
+% Generated from committed real-online bundles; do not edit.
+\begin{tabular}{lllrrr}
+Workload & Seam & Knobs & Runs & Median TTFT (ms) & IQR TTFT (ms) \\
+\hline
+dynamic\_rag\_corpus\_update & segmented & tuned & 3 & 407.102 & 6.861 \\
+shared\_scenario\_multi\_turn\_knowledge\_service & old & baseline & 3 & 170.956 & 3.236 \\
+shared\_scenario\_multi\_turn\_knowledge\_service & old & tuned & 3 & 153.58 & 3.221 \\
+shared\_scenario\_multi\_turn\_knowledge\_service & segmented & baseline & 3 & 165.213 & 5.005 \\
+shared\_scenario\_multi\_turn\_knowledge\_service & segmented & tuned & 3 & 167.737 & 3.445 \\
+shared\_tool\_scaffold\_agent & old & baseline & 3 & 147.322 & 2.227 \\
+shared\_tool\_scaffold\_agent & old & tuned & 3 & 146.947 & 1.501 \\
+shared\_tool\_scaffold\_agent & segmented & baseline & 3 & 149.218 & 2.802 \\
+shared\_tool\_scaffold\_agent & segmented & tuned & 3 & 149.093 & 4.076 \\
+\end{tabular}
+
+% R/P/F means recompute/partial-reuse/full-reuse request counts.
+\begin{tabular}{lllll}
+Workload & Seam & Knobs & Applied R/P/F & Realized R/P/F \\
+\hline
+dynamic\_rag\_corpus\_update & segmented & tuned & 0/8/24 & 16/16/0 \\
+shared\_scenario\_multi\_turn\_knowledge\_service & old & baseline & 8/0/24 & 16/16/0 \\
+shared\_scenario\_multi\_turn\_knowledge\_service & old & tuned & 0/0/32 & 8/24/0 \\
+shared\_scenario\_multi\_turn\_knowledge\_service & segmented & baseline & 8/0/24 & 16/16/0 \\
+shared\_scenario\_multi\_turn\_knowledge\_service & segmented & tuned & 0/16/16 & 8/24/0 \\
+shared\_tool\_scaffold\_agent & old & baseline & 8/0/24 & 16/16/0 \\
+shared\_tool\_scaffold\_agent & old & tuned & 8/0/24 & 16/16/0 \\
+shared\_tool\_scaffold\_agent & segmented & baseline & 8/0/24 & 16/16/0 \\
+shared\_tool\_scaffold\_agent & segmented & tuned & 8/8/16 & 16/16/0 \\
+\end{tabular}

@@ -1,0 +1,244 @@
+{
+  "applied_decision_mix": {
+    "full_reuse": 24,
+    "partial_reuse": 8,
+    "recompute": 0
+  },
+  "completed": 32,
+  "engine_accounting": [
+    {
+      "prompt_tokens": 3075,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3075,
+      "request_id": "dynamic_rag_corpus_update-0",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3075,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3075,
+      "request_id": "dynamic_rag_corpus_update-1",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3075,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 2435,
+      "request_id": "dynamic_rag_corpus_update-10",
+      "reused_tokens": 640
+    },
+    {
+      "prompt_tokens": 3075,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 2435,
+      "request_id": "dynamic_rag_corpus_update-11",
+      "reused_tokens": 640
+    },
+    {
+      "prompt_tokens": 3076,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 2436,
+      "request_id": "dynamic_rag_corpus_update-12",
+      "reused_tokens": 640
+    },
+    {
+      "prompt_tokens": 3078,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 2438,
+      "request_id": "dynamic_rag_corpus_update-13",
+      "reused_tokens": 640
+    },
+    {
+      "prompt_tokens": 3076,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 2436,
+      "request_id": "dynamic_rag_corpus_update-14",
+      "reused_tokens": 640
+    },
+    {
+      "prompt_tokens": 3075,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 2435,
+      "request_id": "dynamic_rag_corpus_update-15",
+      "reused_tokens": 640
+    },
+    {
+      "prompt_tokens": 3075,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3075,
+      "request_id": "dynamic_rag_corpus_update-16",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3075,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3075,
+      "request_id": "dynamic_rag_corpus_update-17",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3075,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3075,
+      "request_id": "dynamic_rag_corpus_update-18",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3075,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3075,
+      "request_id": "dynamic_rag_corpus_update-19",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3075,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3075,
+      "request_id": "dynamic_rag_corpus_update-2",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3076,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3076,
+      "request_id": "dynamic_rag_corpus_update-20",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3078,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3078,
+      "request_id": "dynamic_rag_corpus_update-21",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3076,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3076,
+      "request_id": "dynamic_rag_corpus_update-22",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3075,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3075,
+      "request_id": "dynamic_rag_corpus_update-23",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3075,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 387,
+      "request_id": "dynamic_rag_corpus_update-24",
+      "reused_tokens": 2688
+    },
+    {
+      "prompt_tokens": 3075,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 387,
+      "request_id": "dynamic_rag_corpus_update-25",
+      "reused_tokens": 2688
+    },
+    {
+      "prompt_tokens": 3075,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 387,
+      "request_id": "dynamic_rag_corpus_update-26",
+      "reused_tokens": 2688
+    },
+    {
+      "prompt_tokens": 3075,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 387,
+      "request_id": "dynamic_rag_corpus_update-27",
+      "reused_tokens": 2688
+    },
+    {
+      "prompt_tokens": 3076,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 388,
+      "request_id": "dynamic_rag_corpus_update-28",
+      "reused_tokens": 2688
+    },
+    {
+      "prompt_tokens": 3078,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 390,
+      "request_id": "dynamic_rag_corpus_update-29",
+      "reused_tokens": 2688
+    },
+    {
+      "prompt_tokens": 3075,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3075,
+      "request_id": "dynamic_rag_corpus_update-3",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3076,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 388,
+      "request_id": "dynamic_rag_corpus_update-30",
+      "reused_tokens": 2688
+    },
+    {
+      "prompt_tokens": 3075,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 387,
+      "request_id": "dynamic_rag_corpus_update-31",
+      "reused_tokens": 2688
+    },
+    {
+      "prompt_tokens": 3076,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3076,
+      "request_id": "dynamic_rag_corpus_update-4",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3078,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3078,
+      "request_id": "dynamic_rag_corpus_update-5",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3076,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3076,
+      "request_id": "dynamic_rag_corpus_update-6",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3075,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3075,
+      "request_id": "dynamic_rag_corpus_update-7",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3075,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 2435,
+      "request_id": "dynamic_rag_corpus_update-8",
+      "reused_tokens": 640
+    },
+    {
+      "prompt_tokens": 3075,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 2435,
+      "request_id": "dynamic_rag_corpus_update-9",
+      "reused_tokens": 640
+    }
+  ],
+  "engine_event_count": 4672,
+  "errors": [],
+  "failed": 0,
+  "observation_count": 32,
+  "realized_decision_mix": {
+    "partial_reuse": 16,
+    "recompute": 16
+  },
+  "request_count": 32,
+  "valid": true
+}

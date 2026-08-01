@@ -1,0 +1,21 @@
+{
+  "completed": 32,
+  "concurrency": 4,
+  "dataset_name": "dynamic-rag-corpus-update",
+  "failures": [],
+  "finished_at_utc": "2026-08-01T05:31:45.482875Z",
+  "mean_latency_ms": 1797.301,
+  "mean_ttft_ms": 404.249,
+  "output_throughput_toks": 158.718,
+  "p95_latency_ms": 2062.017,
+  "p95_ttft_ms": 667.946,
+  "request_rate": 18.0,
+  "request_throughput_rps": 2.204,
+  "requests": 32,
+  "requests_output": "/tmp/kvmat-m1-formal-approved-final-20260801-2d2b1af/dynamic_rag_corpus_update/segmented_tuned/round_01_sequence_25/request_results.jsonl",
+  "seed": 7,
+  "started_at_utc": "2026-08-01T05:31:30.966532Z",
+  "workload_case": "dynamic_rag_corpus_update",
+  "workload_family": "dynamic-rag-corpus-update",
+  "workload_label": "Scenario: dynamic RAG corpus update"
+}
