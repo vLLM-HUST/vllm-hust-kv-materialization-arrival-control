@@ -10,13 +10,14 @@ included in these statistics.
 - Device/model: NPU 7, Qwen2.5-7B-Instruct
 - Mode/block size: graph, 128 tokens
 - Suite status: completed
-- Valid independent lifecycles: 27/27
+- Valid independently restarted service lifecycles: 27/27
 - Request completion: 864/864, 0 failed
 - Cleanup: 27/27 port and device checks passed
 
 The knowledge and tool workloads contain all four preregistered cells with
-three independent service starts per cell. Dynamic RAG has three independent
-segmented+tuned tokenizer-faithful checks. Execution order is retained in
+three independently restarted service lifecycles per cell. Dynamic RAG has
+three independently restarted segmented+tuned tokenizer-faithful checks.
+Execution order is retained in
 `suite_manifest.json`.
 
 Both per-run and aggregate artifacts distinguish applied policy actions from
@@ -27,8 +28,8 @@ raw bundles with:
 make m1-online-rebuild
 ```
 
-The lifecycle-level matched 2x2 analysis, confidence intervals, prospective
-minimum meaningful effects, and stopping rule are documented in
+The non-randomized temporally blocked 2x2 descriptive analysis, exploratory
+intervals, prospective minimum meaningful effects, and stopping rule are documented in
 `FACTORIAL_ANALYSIS.md`. Generated factorial artifacts are stored alongside the
 existing per-run and median/IQR outputs in `generated/`.
 

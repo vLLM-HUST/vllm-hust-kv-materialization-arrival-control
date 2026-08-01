@@ -93,6 +93,9 @@ shared-workloads-live: runtime-boundary-live
 optimization-live: runtime-boundary-live
 
 m1-online-rebuild:
+	PYTHONPATH=src $(PYTHON) $(BENCH_DIR)/verify_m1_online_rebuild.py \
+		--input-dir $(BENCH_DIR)/results/m1_formal_approved_complete_20260801 \
+		--generated-dir $(BENCH_DIR)/results/m1_formal_approved_complete_20260801/generated
 	PYTHONPATH=src $(PYTHON) $(BENCH_DIR)/aggregate_online_results.py \
 		--input-dir $(BENCH_DIR)/results/m1_formal_approved_complete_20260801 \
 		--output-dir $(BENCH_DIR)/results/m1_formal_approved_complete_20260801/generated

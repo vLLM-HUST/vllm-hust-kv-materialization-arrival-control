@@ -4,6 +4,7 @@ import argparse
 import json
 from collections import Counter, defaultdict
 from pathlib import Path
+from statistics import mean
 
 REQUIRED_OBSERVATION_FIELDS = {
     "request_id",
@@ -15,6 +16,15 @@ REQUIRED_OBSERVATION_FIELDS = {
 }
 FORMAL_LABEL = "real-online/formal-matrix"
 DRY_RUN_LABEL = "real-online/carrier-validation-dry-run"
+RAW_RECOMPUTABLE_SUMMARY_FIELDS = (
+    "requests",
+    "completed",
+    "failures",
+    "mean_latency_ms",
+    "p95_latency_ms",
+    "mean_ttft_ms",
+    "p95_ttft_ms",
+)
 
 
 def read_jsonl(path: Path) -> list[dict]:
@@ -33,6 +43,52 @@ def normalize_engine_request_id(request_id: str, workload_request_ids: set[str])
         if normalized == candidate or normalized.startswith(f"{candidate}-")
     ]
     return max(matches, key=len) if matches else normalized
+
+
+def request_percentile(values: list[float], q: float) -> float:
+    if not values:
+        return 0.0
+    ordered = sorted(values)
+    index = min(len(ordered) - 1, max(0, round((q / 100.0) * (len(ordered) - 1))))
+    return ordered[index]
+
+
+def recompute_request_summary(requests: list[dict]) -> dict[str, object]:
+    successful = [row for row in requests if row.get("ok")]
+    failures = [row for row in requests if not row.get("ok")]
+    latencies_ms = [float(row["latency_s"]) * 1000.0 for row in successful]
+    ttfts_ms = [
+        float(row["ttft_s"]) * 1000.0
+        for row in successful
+        if row.get("ttft_s") is not None
+    ]
+    return {
+        "requests": len(requests),
+        "completed": len(successful),
+        "failures": failures,
+        "mean_latency_ms": round(mean(latencies_ms), 3) if latencies_ms else 0.0,
+        "p95_latency_ms": (
+            round(request_percentile(latencies_ms, 95), 3) if latencies_ms else 0.0
+        ),
+        "mean_ttft_ms": round(mean(ttfts_ms), 3) if ttfts_ms else 0.0,
+        "p95_ttft_ms": (
+            round(request_percentile(ttfts_ms, 95), 3) if ttfts_ms else 0.0
+        ),
+    }
+
+
+def verify_request_summary(
+    summary: dict, requests: list[dict]
+) -> tuple[dict[str, object], list[str]]:
+    recomputed = recompute_request_summary(requests)
+    errors = []
+    for field in RAW_RECOMPUTABLE_SUMMARY_FIELDS:
+        if summary.get(field) != recomputed[field]:
+            errors.append(
+                f"summary {field}={summary.get(field)!r} does not match "
+                f"raw request result {recomputed[field]!r}"
+            )
+    return recomputed, errors
 
 
 def validate_bundle(
@@ -66,6 +122,9 @@ def validate_bundle(
     requests = read_jsonl(bundle_dir / "request_results.jsonl")
     observations = read_jsonl(bundle_dir / "runtime_observations.jsonl")
     engine_events = read_jsonl(bundle_dir / "runtime_events.jsonl")
+
+    recomputed_summary, summary_errors = verify_request_summary(summary, requests)
+    errors.extend(summary_errors)
 
     request_ids = {row.get("request_id") for row in requests}
     observation_ids = {row.get("request_id") for row in observations}
@@ -210,6 +269,18 @@ def validate_bundle(
         "request_count": len(requests),
         "completed": sum(bool(row.get("ok")) for row in requests),
         "failed": sum(not bool(row.get("ok")) for row in requests),
+        "raw_summary_verification": {
+            "valid": not summary_errors,
+            "recomputed": recomputed_summary,
+            "throughput": {
+                "status": "not_raw_recomputable",
+                "reason": (
+                    "the historical bundle does not contain an independent raw "
+                    "suite measurement duration; throughput remains sourced from "
+                    "request_summary.json"
+                ),
+            },
+        },
         "observation_count": len(observations),
         "engine_event_count": len(engine_events),
         "engine_accounting": accounting_rows,

@@ -235,6 +235,22 @@
   "errors": [],
   "failed": 0,
   "observation_count": 32,
+  "raw_summary_verification": {
+    "recomputed": {
+      "completed": 32,
+      "failures": [],
+      "mean_latency_ms": 2187.224,
+      "mean_ttft_ms": 147.104,
+      "p95_latency_ms": 2231.857,
+      "p95_ttft_ms": 190.943,
+      "requests": 32
+    },
+    "throughput": {
+      "reason": "the historical bundle does not contain an independent raw suite measurement duration; throughput remains sourced from request_summary.json",
+      "status": "not_raw_recomputable"
+    },
+    "valid": true
+  },
   "realized_decision_mix": {
     "partial_reuse": 16,
     "recompute": 16
