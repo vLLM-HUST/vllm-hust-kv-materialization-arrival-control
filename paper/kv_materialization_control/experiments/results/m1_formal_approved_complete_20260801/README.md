@@ -27,6 +27,11 @@ raw bundles with:
 make m1-online-rebuild
 ```
 
+The lifecycle-level matched 2x2 analysis, confidence intervals, prospective
+minimum meaningful effects, and stopping rule are documented in
+`FACTORIAL_ANALYSIS.md`. Generated factorial artifacts are stored alongside the
+existing per-run and median/IQR outputs in `generated/`.
+
 ## Direction check
 
 Comparing `old + baseline` with `segmented + tuned` medians:
@@ -37,3 +42,7 @@ Comparing `old + baseline` with `segmented + tuned` medians:
   The negative boundary remains and is retained.
 
 This suite supplies M1 evidence only and does not rewrite paper conclusions.
+The factorial closure supports the narrower statement that the mechanism is
+feasible but the performance benefit is workload-dependent; it does not support
+a strong general seam-benefit claim. Dynamic RAG remains a path check without a
+matched performance control.

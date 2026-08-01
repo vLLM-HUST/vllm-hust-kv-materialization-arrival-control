@@ -3,6 +3,8 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import math
+import re
 import statistics
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -35,6 +37,17 @@ DECISION_METRICS = (
     "realized_partial_reuse",
     "realized_full_reuse",
 )
+FACTORIAL_WORKLOADS = (
+    "shared_scenario_multi_turn_knowledge_service",
+    "shared_tool_scaffold_agent",
+)
+PRIMARY_METRICS = (
+    "mean_ttft_ms",
+    "mean_latency_ms",
+    "request_throughput_rps",
+)
+# Two-sided 95% Student-t critical value for three matched lifecycle blocks (df=2).
+T_CRITICAL_95_DF2 = 4.302652729911275
 
 
 def percentile(values: list[float], q: float) -> float:
@@ -154,6 +167,98 @@ def aggregate_runs(runs: list[dict]) -> list[dict]:
     return aggregates
 
 
+def _round_number(bundle: str) -> int:
+    match = re.search(r"(?:^|/)round_(\d+)_sequence_\d+$", bundle)
+    if match is None:
+        raise ValueError(f"cannot recover matched round from bundle path: {bundle}")
+    return int(match.group(1))
+
+
+def _mean_ci(values: list[float]) -> tuple[float, float, float]:
+    if len(values) != 3:
+        raise ValueError(f"factorial analysis requires exactly 3 matched rounds, got {len(values)}")
+    mean = statistics.mean(values)
+    half_width = T_CRITICAL_95_DF2 * statistics.stdev(values) / math.sqrt(len(values))
+    return mean, mean - half_width, mean + half_width
+
+
+def factorial_effects(runs: list[dict]) -> tuple[list[dict], list[dict]]:
+    """Compute 2x2 contrasts with lifecycle round as the matched unit.
+
+    Relative effects are calculated within each round before their mean and
+    Student-t CI are computed. Negative latency effects and positive throughput
+    effects are favorable. The interaction is the segmented tuning effect minus
+    the old-seam tuning effect.
+    """
+    indexed = {
+        (row["workload"], _round_number(row["bundle"]), row["seam"], row["condition"]): row
+        for row in runs
+        if row["workload"] in FACTORIAL_WORKLOADS
+    }
+    round_rows: list[dict] = []
+    summaries: list[dict] = []
+    for workload in FACTORIAL_WORKLOADS:
+        for metric in PRIMARY_METRICS:
+            values_by_effect: dict[str, list[tuple[float, float]]] = defaultdict(list)
+            for round_number in (1, 2, 3):
+                cell = {
+                    (seam, condition): float(indexed[(workload, round_number, seam, condition)][metric])
+                    for seam in ("old", "segmented")
+                    for condition in ("baseline", "tuned")
+                }
+                old_mean = statistics.mean(cell[("old", condition)] for condition in ("baseline", "tuned"))
+                segmented_mean = statistics.mean(cell[("segmented", condition)] for condition in ("baseline", "tuned"))
+                baseline_mean = statistics.mean(cell[(seam, "baseline")] for seam in ("old", "segmented"))
+                tuned_mean = statistics.mean(cell[(seam, "tuned")] for seam in ("old", "segmented"))
+                contrasts = {
+                    "seam_main": (segmented_mean - old_mean, 100.0 * (segmented_mean / old_mean - 1.0)),
+                    "tuning_main": (tuned_mean - baseline_mean, 100.0 * (tuned_mean / baseline_mean - 1.0)),
+                    "interaction": (
+                        (cell[("segmented", "tuned")] - cell[("segmented", "baseline")])
+                        - (cell[("old", "tuned")] - cell[("old", "baseline")]),
+                        100.0
+                        * (
+                            cell[("segmented", "tuned")] / cell[("segmented", "baseline")]
+                            - cell[("old", "tuned")] / cell[("old", "baseline")]
+                        ),
+                    ),
+                    "segmented_tuned_vs_old_baseline": (
+                        cell[("segmented", "tuned")] - cell[("old", "baseline")],
+                        100.0 * (cell[("segmented", "tuned")] / cell[("old", "baseline")] - 1.0),
+                    ),
+                }
+                for effect, (absolute, relative) in contrasts.items():
+                    values_by_effect[effect].append((absolute, relative))
+                    round_rows.append(
+                        {
+                            "workload": workload,
+                            "metric": metric,
+                            "effect": effect,
+                            "round": round_number,
+                            "absolute_delta": round(absolute, 6),
+                            "relative_delta_pct": round(relative, 6),
+                        }
+                    )
+            for effect, values in values_by_effect.items():
+                absolute_mean, absolute_low, absolute_high = _mean_ci([value[0] for value in values])
+                relative_mean, relative_low, relative_high = _mean_ci([value[1] for value in values])
+                summaries.append(
+                    {
+                        "workload": workload,
+                        "metric": metric,
+                        "effect": effect,
+                        "matched_rounds": 3,
+                        "absolute_delta_mean": round(absolute_mean, 6),
+                        "absolute_delta_ci95_low": round(absolute_low, 6),
+                        "absolute_delta_ci95_high": round(absolute_high, 6),
+                        "relative_delta_pct_mean": round(relative_mean, 6),
+                        "relative_delta_pct_ci95_low": round(relative_low, 6),
+                        "relative_delta_pct_ci95_high": round(relative_high, 6),
+                    }
+                )
+    return round_rows, summaries
+
+
 def write_csv(path: Path, rows: list[dict]) -> None:
     if not rows:
         raise ValueError("no valid formal bundles found")
@@ -212,6 +317,31 @@ def write_tex(path: Path, aggregates: list[dict]) -> None:
     path.write_text("\n".join(lines), encoding="utf-8")
 
 
+def write_factorial_tex(path: Path, summaries: list[dict]) -> None:
+    row_end = " " + "\\" * 2
+    labels = {
+        "mean_ttft_ms": "Mean TTFT",
+        "mean_latency_ms": "Mean E2E",
+        "request_throughput_rps": "Request throughput",
+    }
+    lines = [
+        "% Lifecycle-level matched 2x2 analysis; do not edit.",
+        "\\begin{tabular}{lllrrr}",
+        "Workload & Metric & Effect & Mean (\\%) & 95\\% CI low & 95\\% CI high" + row_end,
+        "\\hline",
+    ]
+    for row in summaries:
+        workload = str(row["workload"]).replace("_", "\\_")
+        lines.append(
+            f"{workload} & {labels[str(row['metric'])]} & {row['effect']} & "
+            f"{row['relative_delta_pct_mean']:.3f} & "
+            f"{row['relative_delta_pct_ci95_low']:.3f} & "
+            f"{row['relative_delta_pct_ci95_high']:.3f}{row_end}"
+        )
+    lines.extend(["\\end{tabular}", ""])
+    path.write_text("\n".join(lines), encoding="utf-8")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Aggregate valid M1 online bundles into per-run and median/IQR artifacts."
@@ -224,9 +354,13 @@ def main() -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     runs = collect_runs(input_dir)
     aggregates = aggregate_runs(runs)
+    factorial_rounds, factorial_summaries = factorial_effects(runs)
     write_csv(output_dir / "online_runs.csv", runs)
     write_csv(output_dir / "online_summary_median_iqr.csv", aggregates)
+    write_csv(output_dir / "factorial_paired_round_deltas.csv", factorial_rounds)
+    write_csv(output_dir / "factorial_effects_ci95.csv", factorial_summaries)
     write_tex(output_dir / "online_summary_table.tex", aggregates)
+    write_factorial_tex(output_dir / "factorial_effects_ci95.tex", factorial_summaries)
 
 
 if __name__ == "__main__":
