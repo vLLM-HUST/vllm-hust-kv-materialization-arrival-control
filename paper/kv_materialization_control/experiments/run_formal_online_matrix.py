@@ -92,6 +92,11 @@ def main() -> int:
 
     repo_root = Path(__file__).resolve().parents[3]
     suite_dir = Path(args.suite_dir).resolve()
+    if suite_dir.is_relative_to(repo_root):
+        raise SystemExit(
+            "suite-dir must be outside the parent worktree so lifecycle evidence "
+            "cannot trip the clean-worktree gate; import the completed suite afterward"
+        )
     if suite_dir.exists():
         raise SystemExit(f"refusing to overwrite suite directory: {suite_dir}")
     suite_dir.mkdir(parents=True)

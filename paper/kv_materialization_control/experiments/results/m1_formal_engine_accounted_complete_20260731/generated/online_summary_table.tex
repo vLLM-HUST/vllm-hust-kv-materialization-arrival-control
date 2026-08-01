@@ -12,3 +12,18 @@ shared\_tool\_scaffold\_agent & old & tuned & 3 & 146.933 & 2.308 \\
 shared\_tool\_scaffold\_agent & segmented & baseline & 3 & 147.241 & 1.12 \\
 shared\_tool\_scaffold\_agent & segmented & tuned & 3 & 144.695 & 3.382 \\
 \end{tabular}
+
+% R/P/F means recompute/partial-reuse/full-reuse request counts.
+\begin{tabular}{lllll}
+Workload & Seam & Knobs & Applied R/P/F & Realized R/P/F \\
+\hline
+dynamic\_rag\_corpus\_update & segmented & tuned & 0/8/24 & 16/16/0 \\
+shared\_scenario\_multi\_turn\_knowledge\_service & old & baseline & 8/0/24 & 16/16/0 \\
+shared\_scenario\_multi\_turn\_knowledge\_service & old & tuned & 0/0/32 & 8/24/0 \\
+shared\_scenario\_multi\_turn\_knowledge\_service & segmented & baseline & 8/0/24 & 16/16/0 \\
+shared\_scenario\_multi\_turn\_knowledge\_service & segmented & tuned & 0/16/16 & 8/24/0 \\
+shared\_tool\_scaffold\_agent & old & baseline & 8/0/24 & 16/16/0 \\
+shared\_tool\_scaffold\_agent & old & tuned & 8/0/24 & 16/16/0 \\
+shared\_tool\_scaffold\_agent & segmented & baseline & 8/0/24 & 16/16/0 \\
+shared\_tool\_scaffold\_agent & segmented & tuned & 8/8/16 & 16/16/0 \\
+\end{tabular}

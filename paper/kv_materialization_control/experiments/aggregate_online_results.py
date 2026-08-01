@@ -27,6 +27,14 @@ METRICS = (
     "request_throughput_rps",
     "output_throughput_toks",
 )
+DECISION_METRICS = (
+    "applied_recompute",
+    "applied_partial_reuse",
+    "applied_full_reuse",
+    "realized_recompute",
+    "realized_partial_reuse",
+    "realized_full_reuse",
+)
 
 
 def percentile(values: list[float], q: float) -> float:
@@ -38,10 +46,6 @@ def percentile(values: list[float], q: float) -> float:
     upper = min(lower + 1, len(ordered) - 1)
     fraction = position - lower
     return ordered[lower] + (ordered[upper] - ordered[lower]) * fraction
-
-
-def read_jsonl(path: Path) -> list[dict]:
-    return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
 
 
 def collect_runs(input_dir: Path) -> list[dict]:
@@ -78,10 +82,10 @@ def collect_runs(input_dir: Path) -> list[dict]:
         if not cleanup.get("port_free_after") or not cleanup.get("device_idle_after"):
             raise ValueError(f"cleanup evidence failed in {bundle}")
         summary = json.loads(bundle.joinpath("request_summary.json").read_text())
-        observations = read_jsonl(bundle / "runtime_observations.jsonl")
-        decision_mix = Counter(
-            row["runtime_effective_decision"] for row in observations
-        )
+        applied_mix = validation.get("applied_decision_mix")
+        realized_mix = validation.get("realized_decision_mix")
+        if not isinstance(applied_mix, dict) or not isinstance(realized_mix, dict):
+            raise TypeError(f"bundle lacks applied/realized decision mix: {bundle}")
         row = {
             "bundle": str(bundle.relative_to(input_dir)),
             "workload": manifest["workload_case"],
@@ -92,9 +96,12 @@ def collect_runs(input_dir: Path) -> list[dict]:
             "protocol_fingerprint": environment.get("protocol_fingerprint"),
             "completed": summary["completed"],
             "failed": len(summary["failures"]),
-            "effective_recompute": decision_mix["recompute"],
-            "effective_partial_reuse": decision_mix["partial_reuse"],
-            "effective_full_reuse": decision_mix["full_reuse"],
+            "applied_recompute": int(applied_mix.get("recompute", 0)),
+            "applied_partial_reuse": int(applied_mix.get("partial_reuse", 0)),
+            "applied_full_reuse": int(applied_mix.get("full_reuse", 0)),
+            "realized_recompute": int(realized_mix.get("recompute", 0)),
+            "realized_partial_reuse": int(realized_mix.get("partial_reuse", 0)),
+            "realized_full_reuse": int(realized_mix.get("full_reuse", 0)),
         }
         row.update({metric: summary[metric] for metric in METRICS})
         runs.append(row)
@@ -135,7 +142,7 @@ def aggregate_runs(runs: list[dict]) -> list[dict]:
             "condition": condition,
             "runs": len(rows),
         }
-        for metric in METRICS:
+        for metric in (*METRICS, *DECISION_METRICS):
             values = [float(row[metric]) for row in rows]
             q1 = percentile(values, 0.25)
             q3 = percentile(values, 0.75)
@@ -151,23 +158,55 @@ def write_csv(path: Path, rows: list[dict]) -> None:
     if not rows:
         raise ValueError("no valid formal bundles found")
     with path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+        writer = csv.DictWriter(
+            handle, fieldnames=list(rows[0]), lineterminator="\n"
+        )
         writer.writeheader()
         writer.writerows(rows)
 
 
 def write_tex(path: Path, aggregates: list[dict]) -> None:
+    row_end = " " + "\\" * 2
+
+    def count_text(value: object) -> str:
+        number = float(value)
+        return str(int(number)) if number.is_integer() else str(number)
+
     lines = [
         "% Generated from committed real-online bundles; do not edit.",
         "\\begin{tabular}{lllrrr}",
-        "Workload & Seam & Knobs & Runs & Median TTFT (ms) & IQR TTFT (ms) \\\\",
+        ("Workload & Seam & Knobs & Runs & Median TTFT (ms) & IQR TTFT (ms)" + row_end),
         "\\hline",
     ]
     for row in aggregates:
         workload = str(row["workload"]).replace("_", "\\_")
         lines.append(
             f"{workload} & {row['seam']} & {row['condition']} & {row['runs']} & "
-            f"{row['mean_ttft_ms_median']} & {row['mean_ttft_ms_iqr']} \\\\"
+            f"{row['mean_ttft_ms_median']} & {row['mean_ttft_ms_iqr']}{row_end}"
+        )
+    lines.extend(
+        [
+            "\\end{tabular}",
+            "",
+            "% R/P/F means recompute/partial-reuse/full-reuse request counts.",
+            "\\begin{tabular}{lllll}",
+            "Workload & Seam & Knobs & Applied R/P/F & Realized R/P/F" + row_end,
+            "\\hline",
+        ]
+    )
+    for row in aggregates:
+        workload = str(row["workload"]).replace("_", "\\_")
+        applied = "/".join(
+            count_text(row[f"applied_{decision}_median"])
+            for decision in ("recompute", "partial_reuse", "full_reuse")
+        )
+        realized = "/".join(
+            count_text(row[f"realized_{decision}_median"])
+            for decision in ("recompute", "partial_reuse", "full_reuse")
+        )
+        lines.append(
+            f"{workload} & {row['seam']} & {row['condition']} & "
+            f"{applied} & {realized}{row_end}"
         )
     lines.extend(["\\end{tabular}", ""])
     path.write_text("\n".join(lines), encoding="utf-8")
