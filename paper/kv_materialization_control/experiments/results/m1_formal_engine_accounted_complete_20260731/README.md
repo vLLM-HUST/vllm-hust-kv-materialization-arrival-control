@@ -19,6 +19,12 @@ engine-owned lookup/commit JSONL, token-accounting closure, environment and
 commands, validation, and cleanup evidence. `suite_manifest.json` preserves the
 balanced execution order.
 
+The generated per-run CSV and TeX now report both the applied policy-action mix
+and the realized engine lookup mix. The post-review protocol-identical old/
+segmented carrier-validation pair is retained separately under
+`../m1_paired_dry_20260801T021223Z_f2ddea6` and is not mixed into these formal
+statistics.
+
 Rebuild the committed CSV and TeX artifacts from raw bundles with:
 
 ```bash
