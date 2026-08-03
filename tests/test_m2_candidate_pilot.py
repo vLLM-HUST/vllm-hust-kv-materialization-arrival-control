@@ -2,6 +2,7 @@ from paper.kv_materialization_control.experiments.aggregate_m2_candidate_pilot i
     passes_promotion_gate,
 )
 from paper.kv_materialization_control.experiments.run_m2_candidate_pilot import (
+    ANCHOR_TOPOLOGY_CANDIDATES,
     CANDIDATES,
     POLICIES,
     build_schedule,
@@ -19,6 +20,13 @@ def test_candidate_pilot_schedule_is_complete_and_independent() -> None:
         (candidate[0], policy) for candidate in CANDIDATES for policy in POLICIES
     }
     assert M2_PILOT_LABEL == "real-online/m2-candidate-pilot"
+
+    anchor_schedule = build_schedule(ANCHOR_TOPOLOGY_CANDIDATES)
+    assert {(spec.workload, spec.policy_mode) for spec in anchor_schedule} == {
+        (candidate[0], policy)
+        for candidate in ANCHOR_TOPOLOGY_CANDIDATES
+        for policy in POLICIES
+    }
 
 
 def test_candidate_pilot_promotion_gate_is_fail_closed() -> None:

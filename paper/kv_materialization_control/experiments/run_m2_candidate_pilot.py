@@ -8,12 +8,20 @@ import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-EVIDENCE_LABEL = "real-online/m2-candidate-pilot"
+EVIDENCE_LABELS = {
+    "offline-ranked": "real-online/m2-candidate-pilot",
+    "anchor-topology": "real-online/m2-anchor-candidate-pilot",
+}
 POLICIES = ("always_recompute", "always_full_reuse", "controller")
-CANDIDATES = (
+OFFLINE_RANKED_CANDIDATES = (
     ("shared_async_document_pipeline", 18.0, 96),
     ("shared_public_sharegpt_boundary", 24.0, 64),
 )
+ANCHOR_TOPOLOGY_CANDIDATES = (
+    ("shared_session_continuation_maintenance", 18.0, 112),
+    ("shared_shared_prefix_multi_tenant_assistant", 18.0, 128),
+)
+CANDIDATES = OFFLINE_RANKED_CANDIDATES
 
 
 @dataclass(frozen=True)
@@ -30,7 +38,9 @@ def write_json(path: Path, payload: object) -> None:
     )
 
 
-def build_schedule() -> list[RunSpec]:
+def build_schedule(
+    candidates: tuple[tuple[str, float, int], ...] = CANDIDATES,
+) -> list[RunSpec]:
     orders = (
         ("controller", "always_full_reuse", "always_recompute"),
         ("always_recompute", "controller", "always_full_reuse"),
@@ -38,7 +48,7 @@ def build_schedule() -> list[RunSpec]:
     return [
         RunSpec(workload, policy, request_rate, max_output_tokens)
         for (workload, request_rate, max_output_tokens), order in zip(
-            CANDIDATES, orders, strict=True
+            candidates, orders, strict=True
         )
         for policy in order
     ]
@@ -51,6 +61,11 @@ def main() -> int:
     parser.add_argument("--carrier-root", default="vendor/vllm")
     parser.add_argument("--device", type=int, default=7)
     parser.add_argument("--port", type=int, default=8011)
+    parser.add_argument(
+        "--candidate-set",
+        choices=tuple(EVIDENCE_LABELS),
+        default="offline-ranked",
+    )
     args = parser.parse_args()
 
     repo_root = Path(__file__).resolve().parents[3]
@@ -61,11 +76,18 @@ def main() -> int:
         raise SystemExit(f"refusing to overwrite suite directory: {suite_dir}")
     suite_dir.mkdir(parents=True)
 
-    schedule = build_schedule()
+    candidates = (
+        OFFLINE_RANKED_CANDIDATES
+        if args.candidate_set == "offline-ranked"
+        else ANCHOR_TOPOLOGY_CANDIDATES
+    )
+    evidence_label = EVIDENCE_LABELS[args.candidate_set]
+    schedule = build_schedule(candidates)
     suite: dict[str, object] = {
         "schema_version": 1,
         "study": "M2 preregistered positive-candidate pilot",
-        "evidence_label": EVIDENCE_LABEL,
+        "evidence_label": evidence_label,
+        "candidate_set": args.candidate_set,
         "started_at_s": time.time(),
         "promotion_gate": {
             "controller_vs_best_fixed_ttft_pct_max": 2.0,
@@ -119,7 +141,7 @@ def main() -> int:
             "--seed",
             "7",
             "--evidence-label",
-            EVIDENCE_LABEL,
+            evidence_label,
         ]
         result = subprocess.run(command, cwd=repo_root, check=False)
         record = {
@@ -137,7 +159,7 @@ def main() -> int:
                     "--output",
                     str(run_dir / "validation.json"),
                     "--expected-evidence-label",
-                    EVIDENCE_LABEL,
+                    evidence_label,
                 ],
                 cwd=repo_root,
                 check=False,

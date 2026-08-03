@@ -7,6 +7,7 @@ from pathlib import Path
 
 POLICIES = ("always_recompute", "always_full_reuse", "controller")
 EVIDENCE_LABEL = "real-online/m2-candidate-pilot"
+ANCHOR_EVIDENCE_LABEL = "real-online/m2-anchor-candidate-pilot"
 
 
 def read_json(path: Path) -> dict:
@@ -29,6 +30,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Aggregate the M2 pilot.")
     parser.add_argument("--input-dir", required=True)
     parser.add_argument("--output-dir", required=True)
+    parser.add_argument(
+        "--expected-evidence-label",
+        choices=(EVIDENCE_LABEL, ANCHOR_EVIDENCE_LABEL),
+        default=EVIDENCE_LABEL,
+    )
     args = parser.parse_args()
     input_dir = Path(args.input_dir)
     output_dir = Path(args.output_dir)
@@ -37,7 +43,7 @@ def main() -> None:
     suite = read_json(input_dir / "suite_manifest.json")
     if suite.get("status") != "completed":
         raise ValueError(f"pilot suite is not completed: {suite.get('status')}")
-    if suite.get("evidence_label") != EVIDENCE_LABEL:
+    if suite.get("evidence_label") != args.expected_evidence_label:
         raise ValueError("wrong pilot evidence label")
 
     runs = []

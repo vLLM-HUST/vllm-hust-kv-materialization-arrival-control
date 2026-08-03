@@ -18,6 +18,7 @@ FORMAL_LABEL = "real-online/formal-matrix"
 DRY_RUN_LABEL = "real-online/carrier-validation-dry-run"
 M2_LABEL = "real-online/m2-benefit-boundary"
 M2_PILOT_LABEL = "real-online/m2-candidate-pilot"
+M2_ANCHOR_PILOT_LABEL = "real-online/m2-anchor-candidate-pilot"
 RAW_RECOMPUTABLE_SUMMARY_FIELDS = (
     "requests",
     "completed",
@@ -395,7 +396,13 @@ def main() -> int:
     parser.add_argument("--output")
     parser.add_argument(
         "--expected-evidence-label",
-        choices=(FORMAL_LABEL, DRY_RUN_LABEL, M2_LABEL, M2_PILOT_LABEL),
+        choices=(
+            FORMAL_LABEL,
+            DRY_RUN_LABEL,
+            M2_LABEL,
+            M2_PILOT_LABEL,
+            M2_ANCHOR_PILOT_LABEL,
+        ),
     )
     parser.add_argument("--require-realized-partial", action="store_true")
     args = parser.parse_args()
