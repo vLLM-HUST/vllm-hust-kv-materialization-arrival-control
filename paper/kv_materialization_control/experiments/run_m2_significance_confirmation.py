@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import itertools
 import json
 import subprocess
 import sys
@@ -9,35 +8,29 @@ import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-EVIDENCE_LABELS = {
-    "offline-ranked": "real-online/m2-candidate-pilot",
-    "anchor-topology": "real-online/m2-anchor-candidate-pilot",
-    "stateful-secondary": "real-online/m2-stateful-secondary-pilot",
-}
+EVIDENCE_LABEL = "real-online/m2-significance-confirmation"
 POLICIES = ("always_recompute", "always_full_reuse", "controller")
-OFFLINE_RANKED_CANDIDATES = (
-    ("shared_async_document_pipeline", 18.0, 96),
-    ("shared_public_sharegpt_boundary", 24.0, 64),
+ROUND_ORDERS = (
+    POLICIES,
+    ("controller", "always_recompute", "always_full_reuse"),
+    ("always_full_reuse", "controller", "always_recompute"),
+    ("always_recompute", "controller", "always_full_reuse"),
+    ("always_full_reuse", "always_recompute", "controller"),
 )
-ANCHOR_TOPOLOGY_CANDIDATES = (
-    ("shared_session_continuation_maintenance", 18.0, 112),
-    ("shared_shared_prefix_multi_tenant_assistant", 18.0, 128),
-)
-STATEFUL_SECONDARY_CANDIDATES = (
-    ("shared_code_eval_judge", 18.0, 96),
-    ("shared_structured_json_generation", 18.0, 96),
-    ("shared_multi_turn_support_chat", 20.0, 96),
-    ("shared_memory_write_then_reuse", 16.0, 96),
-)
-CANDIDATES = OFFLINE_RANKED_CANDIDATES
 
 
 @dataclass(frozen=True)
 class RunSpec:
-    workload: str
+    round_index: int
     policy_mode: str
-    request_rate: float
-    max_output_tokens: int
+
+
+def build_schedule() -> list[RunSpec]:
+    return [
+        RunSpec(round_index, policy)
+        for round_index, order in enumerate(ROUND_ORDERS, start=1)
+        for policy in order
+    ]
 
 
 def write_json(path: Path, payload: object) -> None:
@@ -46,34 +39,18 @@ def write_json(path: Path, payload: object) -> None:
     )
 
 
-def build_schedule(
-    candidates: tuple[tuple[str, float, int], ...] = CANDIDATES,
-) -> list[RunSpec]:
-    orders = (
-        ("controller", "always_full_reuse", "always_recompute"),
-        ("always_recompute", "controller", "always_full_reuse"),
-    )
-    return [
-        RunSpec(workload, policy, request_rate, max_output_tokens)
-        for (workload, request_rate, max_output_tokens), order in zip(
-            candidates, itertools.cycle(orders)
-        )
-        for policy in order
-    ]
-
-
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Run the preregistered M2 pilot.")
+    parser = argparse.ArgumentParser(
+        description="Run a five-round significance confirmation for one promoted M2 workload."
+    )
     parser.add_argument("--suite-dir", required=True)
+    parser.add_argument("--workload", required=True)
     parser.add_argument("--model", required=True)
+    parser.add_argument("--request-rate", type=float, required=True)
+    parser.add_argument("--max-output-tokens", type=int, required=True)
     parser.add_argument("--carrier-root", default="vendor/vllm")
     parser.add_argument("--device", type=int, default=7)
     parser.add_argument("--port", type=int, default=8011)
-    parser.add_argument(
-        "--candidate-set",
-        choices=tuple(EVIDENCE_LABELS),
-        default="offline-ranked",
-    )
     args = parser.parse_args()
 
     repo_root = Path(__file__).resolve().parents[3]
@@ -84,23 +61,18 @@ def main() -> int:
         raise SystemExit(f"refusing to overwrite suite directory: {suite_dir}")
     suite_dir.mkdir(parents=True)
 
-    candidates = {
-        "offline-ranked": OFFLINE_RANKED_CANDIDATES,
-        "anchor-topology": ANCHOR_TOPOLOGY_CANDIDATES,
-        "stateful-secondary": STATEFUL_SECONDARY_CANDIDATES,
-    }[args.candidate_set]
-    evidence_label = EVIDENCE_LABELS[args.candidate_set]
-    schedule = build_schedule(candidates)
+    schedule = build_schedule()
     suite: dict[str, object] = {
         "schema_version": 1,
-        "study": "M2 preregistered positive-candidate pilot",
-        "evidence_label": evidence_label,
-        "candidate_set": args.candidate_set,
+        "study": "M2 promoted-workload five-round significance confirmation",
+        "evidence_label": EVIDENCE_LABEL,
+        "workload": args.workload,
         "started_at_s": time.time(),
-        "promotion_gate": {
-            "controller_vs_best_fixed_ttft_pct_max": 2.0,
-            "controller_vs_best_fixed_e2e_pct_max": 5.0,
-            "controller_vs_best_fixed_throughput_pct_min": -5.0,
+        "positive_rule": {
+            "controller_vs_best_fixed_ttft_pct_mean_max": -5.0,
+            "paired_ttft_delta_one_sided_95pct_upper_max": 0.0,
+            "controller_vs_best_fixed_e2e_pct_mean_max": 5.0,
+            "controller_vs_best_fixed_throughput_pct_mean_min": -5.0,
         },
         "schedule": [asdict(spec) for spec in schedule],
         "runs": [],
@@ -111,9 +83,9 @@ def main() -> int:
     for sequence, spec in enumerate(schedule, start=1):
         run_dir = (
             suite_dir
-            / spec.workload
+            / args.workload
             / spec.policy_mode
-            / f"pilot_sequence_{sequence:02d}"
+            / f"round_{spec.round_index:02d}_sequence_{sequence:02d}"
         )
         command = [
             sys.executable,
@@ -121,7 +93,7 @@ def main() -> int:
             "--bundle-dir",
             str(run_dir),
             "--workload-case",
-            spec.workload,
+            args.workload,
             "--condition",
             "tuned",
             "--policy-mode",
@@ -141,15 +113,15 @@ def main() -> int:
             "--max-model-len",
             "32768",
             "--request-rate",
-            str(spec.request_rate),
+            str(args.request_rate),
             "--concurrency",
             "4",
             "--max-output-tokens",
-            str(spec.max_output_tokens),
+            str(args.max_output_tokens),
             "--seed",
             "7",
             "--evidence-label",
-            evidence_label,
+            EVIDENCE_LABEL,
         ]
         result = subprocess.run(command, cwd=repo_root, check=False)
         record = {
@@ -167,7 +139,7 @@ def main() -> int:
                     "--output",
                     str(run_dir / "validation.json"),
                     "--expected-evidence-label",
-                    evidence_label,
+                    EVIDENCE_LABEL,
                 ],
                 cwd=repo_root,
                 check=False,

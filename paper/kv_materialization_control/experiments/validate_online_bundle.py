@@ -20,6 +20,16 @@ M2_LABEL = "real-online/m2-benefit-boundary"
 M2_PILOT_LABEL = "real-online/m2-candidate-pilot"
 M2_ANCHOR_PILOT_LABEL = "real-online/m2-anchor-candidate-pilot"
 M2_ANCHOR_CONFIRMATION_LABEL = "real-online/m2-anchor-confirmation"
+M2_STATEFUL_SECONDARY_PILOT_LABEL = "real-online/m2-stateful-secondary-pilot"
+M2_SIGNIFICANCE_CONFIRMATION_LABEL = "real-online/m2-significance-confirmation"
+M2_EVIDENCE_LABELS = {
+    M2_LABEL,
+    M2_PILOT_LABEL,
+    M2_ANCHOR_PILOT_LABEL,
+    M2_ANCHOR_CONFIRMATION_LABEL,
+    M2_STATEFUL_SECONDARY_PILOT_LABEL,
+    M2_SIGNIFICANCE_CONFIRMATION_LABEL,
+}
 RAW_RECOMPUTABLE_SUMMARY_FIELDS = (
     "requests",
     "completed",
@@ -126,9 +136,9 @@ def validate_bundle(
     requests = read_jsonl(bundle_dir / "request_results.jsonl")
     observations = read_jsonl(bundle_dir / "runtime_observations.jsonl")
     engine_events = read_jsonl(bundle_dir / "runtime_events.jsonl")
-    is_m2 = expected_evidence_label == M2_LABEL or (
-        environment.get("evidence_label") == M2_LABEL
-        and manifest.get("evidence_label") == M2_LABEL
+    is_m2 = expected_evidence_label in M2_EVIDENCE_LABELS or (
+        environment.get("evidence_label") in M2_EVIDENCE_LABELS
+        and manifest.get("evidence_label") in M2_EVIDENCE_LABELS
     )
 
     recomputed_summary, summary_errors = verify_request_summary(summary, requests)
@@ -404,6 +414,8 @@ def main() -> int:
             M2_PILOT_LABEL,
             M2_ANCHOR_PILOT_LABEL,
             M2_ANCHOR_CONFIRMATION_LABEL,
+            M2_STATEFUL_SECONDARY_PILOT_LABEL,
+            M2_SIGNIFICANCE_CONFIRMATION_LABEL,
         ),
     )
     parser.add_argument("--require-realized-partial", action="store_true")

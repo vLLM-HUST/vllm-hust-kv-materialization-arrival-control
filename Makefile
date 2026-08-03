@@ -23,8 +23,11 @@ M2_PILOT_SUITE_DIR ?= /tmp/kv_materialization_m2_candidate_pilot
 M2_PILOT_RESULTS_DIR ?= $(M2_PILOT_SUITE_DIR)/generated
 M2_ANCHOR_CONFIRMATION_DIR ?= /tmp/kv_materialization_m2_anchor_confirmation
 M2_ANCHOR_CONFIRMATION_RESULTS_DIR ?= $(M2_ANCHOR_CONFIRMATION_DIR)/generated
+M2_PILOT_CANDIDATE_SET ?= offline-ranked
+M2_SIGNIFICANCE_CONFIRMATION_DIR ?= /tmp/kv_materialization_m2_significance_confirmation
+M2_SIGNIFICANCE_CONFIRMATION_RESULTS_DIR ?= $(M2_SIGNIFICANCE_CONFIRMATION_DIR)/generated
 
-.PHONY: help bootstrap-env install-dev smoke test shared-workloads-smoke shared-workloads-test lint format build bench paper offline-experiment experiment decision-study study-experiment shared-workloads-offline paper-experiment runtime-boundary-live live-benchmark shared-workloads-live optimization-live m1-online-rebuild m2-online-boundary m2-online-rebuild m2-candidate-pilot m2-candidate-pilot-rebuild m2-anchor-confirmation m2-anchor-confirmation-rebuild pdf paper-pdf evidence clean
+.PHONY: help bootstrap-env install-dev smoke test shared-workloads-smoke shared-workloads-test lint format build bench paper offline-experiment experiment decision-study study-experiment shared-workloads-offline paper-experiment runtime-boundary-live live-benchmark shared-workloads-live optimization-live m1-online-rebuild m2-online-boundary m2-online-rebuild m2-candidate-pilot m2-candidate-pilot-rebuild m2-anchor-confirmation m2-anchor-confirmation-rebuild m2-significance-confirmation m2-significance-confirmation-rebuild pdf paper-pdf evidence clean
 
 help:
 	@printf '%s\n' \
@@ -48,6 +51,7 @@ help:
 		'  make m2-candidate-pilot-rebuild M2_PILOT_SUITE_DIR=<suite>  Rebuild pilot verdict' \
 		'  make m2-anchor-confirmation MODEL=<model>  Run promoted-workload confirmation' \
 		'  make m2-anchor-confirmation-rebuild M2_ANCHOR_CONFIRMATION_DIR=<suite>  Rebuild confirmation verdict' \
+		'  make m2-significance-confirmation MODEL=<model> WORKLOAD_CASE=<promoted> REQUEST_RATE=<rate>  Run five-round significance confirmation' \
 		'  make shared-workloads-live MODEL=<model> [WORKLOAD_CASE=<case>]  Compatibility alias of make runtime-boundary-live' \
 		'  make optimization-live MODEL=<model> [WORKLOAD_CASE=<case>]  Compatibility alias of make runtime-boundary-live' \
 		'  make pdf          Build the paper PDF after refreshing latest offline-study results' \
@@ -127,7 +131,8 @@ m2-online-rebuild:
 m2-candidate-pilot:
 	PYTHONPATH=src $(PYTHON) $(BENCH_DIR)/run_m2_candidate_pilot.py \
 		--suite-dir '$(M2_PILOT_SUITE_DIR)' \
-		--model '$(MODEL)'
+		--model '$(MODEL)' \
+		--candidate-set '$(M2_PILOT_CANDIDATE_SET)'
 
 m2-candidate-pilot-rebuild:
 	PYTHONPATH=src $(PYTHON) $(BENCH_DIR)/aggregate_m2_candidate_pilot.py \
@@ -143,6 +148,19 @@ m2-anchor-confirmation-rebuild:
 	PYTHONPATH=src $(PYTHON) $(BENCH_DIR)/aggregate_m2_anchor_confirmation.py \
 		--input-dir '$(M2_ANCHOR_CONFIRMATION_DIR)' \
 		--output-dir '$(M2_ANCHOR_CONFIRMATION_RESULTS_DIR)'
+
+m2-significance-confirmation:
+	PYTHONPATH=src $(PYTHON) $(BENCH_DIR)/run_m2_significance_confirmation.py \
+		--suite-dir '$(M2_SIGNIFICANCE_CONFIRMATION_DIR)' \
+		--model '$(MODEL)' \
+		--workload '$(WORKLOAD_CASE)' \
+		--request-rate '$(REQUEST_RATE)' \
+		--max-output-tokens '$(MAX_OUTPUT_TOKENS)'
+
+m2-significance-confirmation-rebuild:
+	PYTHONPATH=src $(PYTHON) $(BENCH_DIR)/aggregate_m2_significance_confirmation.py \
+		--input-dir '$(M2_SIGNIFICANCE_CONFIRMATION_DIR)' \
+		--output-dir '$(M2_SIGNIFICANCE_CONFIRMATION_RESULTS_DIR)'
 
 pdf: paper-pdf
 

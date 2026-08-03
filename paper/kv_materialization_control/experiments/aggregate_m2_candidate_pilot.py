@@ -8,6 +8,7 @@ from pathlib import Path
 POLICIES = ("always_recompute", "always_full_reuse", "controller")
 EVIDENCE_LABEL = "real-online/m2-candidate-pilot"
 ANCHOR_EVIDENCE_LABEL = "real-online/m2-anchor-candidate-pilot"
+STATEFUL_SECONDARY_EVIDENCE_LABEL = "real-online/m2-stateful-secondary-pilot"
 
 
 def read_json(path: Path) -> dict:
@@ -32,7 +33,11 @@ def main() -> None:
     parser.add_argument("--output-dir", required=True)
     parser.add_argument(
         "--expected-evidence-label",
-        choices=(EVIDENCE_LABEL, ANCHOR_EVIDENCE_LABEL),
+        choices=(
+            EVIDENCE_LABEL,
+            ANCHOR_EVIDENCE_LABEL,
+            STATEFUL_SECONDARY_EVIDENCE_LABEL,
+        ),
         default=EVIDENCE_LABEL,
     )
     args = parser.parse_args()
@@ -78,9 +83,17 @@ def main() -> None:
         )
 
     workloads = sorted({row["workload"] for row in runs})
+    scheduled_workloads = sorted(
+        {str(row["workload"]) for row in suite.get("schedule", [])}
+    )
     expected = {(w, p) for w in workloads for p in POLICIES}
     actual = {(row["workload"], row["policy_mode"]) for row in runs}
-    if len(workloads) != 2 or actual != expected or len(runs) != 6:
+    if (
+        not workloads
+        or workloads != scheduled_workloads
+        or actual != expected
+        or len(runs) != len(workloads) * len(POLICIES)
+    ):
         raise ValueError("pilot matrix is incomplete")
     ids = [row["service_lifecycle_id"] for row in runs]
     if len(ids) != len(set(ids)):
