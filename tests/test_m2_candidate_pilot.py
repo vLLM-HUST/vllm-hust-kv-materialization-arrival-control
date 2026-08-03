@@ -1,6 +1,9 @@
 from paper.kv_materialization_control.experiments.aggregate_m2_candidate_pilot import (
     passes_promotion_gate,
 )
+from paper.kv_materialization_control.experiments.run_m2_anchor_confirmation import (
+    build_schedule as build_confirmation_schedule,
+)
 from paper.kv_materialization_control.experiments.run_m2_candidate_pilot import (
     ANCHOR_TOPOLOGY_CANDIDATES,
     CANDIDATES,
@@ -34,3 +37,11 @@ def test_candidate_pilot_promotion_gate_is_fail_closed() -> None:
     assert not passes_promotion_gate(2.01, 0.0, 0.0)
     assert not passes_promotion_gate(0.0, 5.01, 0.0)
     assert not passes_promotion_gate(0.0, 0.0, -5.01)
+
+
+def test_anchor_confirmation_schedule_has_three_balanced_rounds() -> None:
+    schedule = build_confirmation_schedule()
+    assert len(schedule) == 9
+    assert {(spec.round_index, spec.policy_mode) for spec in schedule} == {
+        (round_index, policy) for round_index in (1, 2, 3) for policy in POLICIES
+    }
