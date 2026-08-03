@@ -1,0 +1,29 @@
+{
+  "claims": [
+    {
+      "artifact": "m2_benefit_boundary.csv",
+      "claim": "three-policy online benefit boundary",
+      "evidence_class": "real-online",
+      "status": "negative"
+    },
+    {
+      "artifact": "m2_online_runs.csv",
+      "claim": "requested, effective, and realized actions plus physical costs",
+      "evidence_class": "real-online",
+      "status": "supported"
+    },
+    {
+      "artifact": "m2_cost_model_agreement.csv",
+      "claim": "cost-model ordering agrees with online ordering",
+      "evidence_class": "simulation/model",
+      "status": "supported"
+    },
+    {
+      "artifact": "m2_mechanism_table.tex,m2_action_table.tex,m2_verdict.json",
+      "claim": "paper-facing mechanism decomposition and direction verdict",
+      "evidence_class": "derived-artifact",
+      "status": "supported"
+    }
+  ],
+  "schema_version": 1
+}

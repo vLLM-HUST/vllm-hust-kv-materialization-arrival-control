@@ -1,5 +1,28 @@
 # Changelog
 
+## Unreleased
+
+- Added the preregistered M2 matched online boundary study comparing
+  `always_recompute`, `always_full_reuse`, and the three-action controller over
+  independent service lifecycles.
+- Added explicit fixed-policy runtime modes and scheduler-owned timing for
+  lookup, cache commit, block-boundary alignment, and segmented-tail isolation;
+  recompute now bypasses cache lookup and commit as a native action.
+- Added fail-closed M2 bundle validation, action/fallback/work decomposition,
+  cost-model ordering checks, a paper-facing TeX table, a typed claim ledger,
+  and a deterministic continue/stop verdict.
+- Completed the 18-lifecycle M2 matrix (576/576 requests): the controller
+  regressed TTFT versus the best fixed policy by 9.24% and 6.60% on the two
+  preregistered workloads, so the mechanism direction stops as a negative
+  result rather than receiving workload-specific retuning.
+- Closed M2 issue #3 with a consolidated 20-workload benefit-boundary ledger
+  (`paper/kv_materialization_control/experiments/M2_ISSUE_CLOSURE.md`):
+  18 extension workloads were screened without retuning, all four promoted
+  workloads failed five-round confirmations (+0.87% to +3.70% TTFT, all
+  one-sided 95% upper bounds above zero), and the final verdict is
+  `stop_mechanism_direction` across 141 validated lifecycles and 8208/8208
+  requests.
+
 ## [Unreleased]
 
 ### Added

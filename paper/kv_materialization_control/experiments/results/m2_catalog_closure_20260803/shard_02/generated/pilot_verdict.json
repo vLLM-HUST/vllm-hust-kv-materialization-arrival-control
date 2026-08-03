@@ -1,0 +1,21 @@
+{
+  "promoted_workloads": [],
+  "workloads": [
+    {
+      "best_fixed_ttft_policy": "always_full_reuse",
+      "controller_vs_best_fixed_e2e_pct": 8.056505,
+      "controller_vs_best_fixed_throughput_pct": -7.424658,
+      "controller_vs_best_fixed_ttft_pct": 39.904919,
+      "promotion": false,
+      "workload": "shared_rag_followup"
+    },
+    {
+      "best_fixed_ttft_policy": "always_full_reuse",
+      "controller_vs_best_fixed_e2e_pct": 3.000188,
+      "controller_vs_best_fixed_throughput_pct": -2.941176,
+      "controller_vs_best_fixed_ttft_pct": 23.313557,
+      "promotion": false,
+      "workload": "shared_realtime_voice_assistant"
+    }
+  ]
+}

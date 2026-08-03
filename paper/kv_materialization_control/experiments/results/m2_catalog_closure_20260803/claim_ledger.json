@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "claims": [
+    {
+      "claim": "Fourteen additional canonical workloads completed a three-policy real-online pilot.",
+      "evidence_class": "real-online",
+      "status": "supported",
+      "evidence": "42/42 pilot lifecycles valid"
+    },
+    {
+      "claim": "All four promoted workloads failed the five-round meaningful-significant positive rule.",
+      "evidence_class": "real-online",
+      "status": "negative",
+      "evidence": "60/60 confirmation lifecycles valid; all four TTFT means were positive regressions and all one-sided 95% upper bounds exceeded zero"
+    },
+    {
+      "claim": "The offline cost-model boundary and confirmation winner ordering agree.",
+      "evidence_class": "simulation/model",
+      "status": "supported_at_confirmation_boundary",
+      "evidence": "no offline case predicted a 5% controller gain; always_full_reuse won 20/20 confirmation rounds"
+    },
+    {
+      "claim": "The existing catalog contains a meaningful significant positive workload for the current controller and matched runtime.",
+      "evidence_class": "derived-artifact",
+      "status": "negative_stop",
+      "evidence": "102/102 new lifecycles and 6192/6192 requests valid; stop post-hoc workload search and parameter tuning"
+    }
+  ]
+}

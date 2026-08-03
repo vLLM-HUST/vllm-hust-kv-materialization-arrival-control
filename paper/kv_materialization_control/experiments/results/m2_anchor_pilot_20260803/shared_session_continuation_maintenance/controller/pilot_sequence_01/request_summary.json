@@ -1,0 +1,23 @@
+{
+  "completed": 80,
+  "completed_output_tokens": 8960,
+  "concurrency": 4,
+  "dataset_name": "session-continuation-maintenance",
+  "failures": [],
+  "finished_at_utc": "2026-08-03T06:44:01.452917Z",
+  "mean_latency_ms": 2105.445,
+  "mean_ttft_ms": 304.799,
+  "measurement_duration_s": 42.52927279472351,
+  "output_throughput_toks": 210.678,
+  "p95_latency_ms": 2047.384,
+  "p95_ttft_ms": 275.151,
+  "request_rate": 18.0,
+  "request_throughput_rps": 1.881,
+  "requests": 80,
+  "requests_output": "/tmp/kvmat_m2_anchor_pilot_20260803/shared_session_continuation_maintenance/controller/pilot_sequence_01/request_results.jsonl",
+  "seed": 7,
+  "started_at_utc": "2026-08-03T06:43:18.923644Z",
+  "workload_case": "shared_session_continuation_maintenance",
+  "workload_family": "session-continuation-maintenance",
+  "workload_label": "Shared workload: session continuation with maintenance"
+}

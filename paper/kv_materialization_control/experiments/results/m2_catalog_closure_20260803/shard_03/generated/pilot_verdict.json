@@ -1,0 +1,23 @@
+{
+  "promoted_workloads": [
+    "shared_long_context_doc_analysis"
+  ],
+  "workloads": [
+    {
+      "best_fixed_ttft_policy": "always_full_reuse",
+      "controller_vs_best_fixed_e2e_pct": 6.283375,
+      "controller_vs_best_fixed_throughput_pct": -5.877378,
+      "controller_vs_best_fixed_ttft_pct": 24.671161,
+      "promotion": false,
+      "workload": "shared_dynamic_rag_corpus_update"
+    },
+    {
+      "best_fixed_ttft_policy": "always_full_reuse",
+      "controller_vs_best_fixed_e2e_pct": 1.257445,
+      "controller_vs_best_fixed_throughput_pct": -1.173798,
+      "controller_vs_best_fixed_ttft_pct": -2.418745,
+      "promotion": true,
+      "workload": "shared_long_context_doc_analysis"
+    }
+  ]
+}

@@ -1,6 +1,12 @@
 # Experiment Notes
 
-This artifact has two experiment paths, and they mean different things.
+This artifact has three experiment paths, and they mean different things.
+
+The preregistered M2 fixed-policy benefit-boundary study is specified in
+[`M2_PROTOCOL.md`](M2_PROTOCOL.md). Its evidence must not
+be inferred from the M1 seam matrix: matched `always_recompute`,
+`always_full_reuse`, and `controller` lifecycles with scheduler-owned physical
+cost counters.
 
 ## Decision Study
 
@@ -104,3 +110,50 @@ Current truthful interpretation:
 - materialization latency
 - KV bytes loaded or transferred
 - p95 end-to-end latency
+
+## M2 Online Benefit Boundary
+
+Canonical execution and rebuild entries:
+
+```bash
+make m2-online-boundary MODEL=/path/to/model \
+  M2_SUITE_DIR=/outside/the/worktree/m2_suite
+make m2-online-rebuild \
+  M2_SUITE_DIR=/outside/the/worktree/m2_suite \
+  M2_RESULTS_DIR=paper/kv_materialization_control/experiments/results/m2_online_boundary
+```
+
+The runner stops after three temporally blocked rounds. The aggregator rejects
+incomplete, unmatched, dirty, non-independent, or unvalidated evidence and
+emits both the paper-facing mechanism table and the submission/stop verdict.
+
+The completed suite is
+`results/m2_online_boundary_20260803/`: 18/18 independent lifecycles and
+576/576 requests passed raw validation. The controller did not beat
+`always_full_reuse`; its mean matched TTFT regression versus the best fixed
+policy was 9.24% on tool scaffold and 6.60% on knowledge service. The emitted
+verdict is therefore `stop_mechanism_direction`.
+
+## M2 Existing-Catalog Closure
+
+The later catalog closure is preregistered in
+`M2_SIGNIFICANCE_EXPANSION_PROTOCOL.md` and
+`M2_CATALOG_CLOSURE_PROTOCOL.md`. Fourteen additional canonical workloads were
+screened without changing controller parameters. Four passed a permissive pilot
+gate and received five fresh matched rounds.
+
+All four confirmations were negative: controller TTFT means relative to the
+per-round best fixed policy were +0.87%, +0.87%, +3.70%, and +2.29%, and all
+one-sided 95% upper bounds were above zero. Full reuse was the best fixed TTFT
+policy in 20/20 confirmation rounds. The finite conclusion is therefore “no
+meaningful significant positive workload in the existing catalog under the
+matched model/runtime,” not a universal impossibility theorem.
+
+The auditable summary and mechanism CSV are under
+`results/m2_catalog_closure_20260803/`. Rebuild a five-round verdict with:
+
+```bash
+make m2-significance-confirmation-rebuild \
+  M2_SIGNIFICANCE_CONFIRMATION_DIR=/outside/worktree/confirmation_suite \
+  M2_SIGNIFICANCE_CONFIRMATION_RESULTS_DIR=/tmp/rebuilt
+```

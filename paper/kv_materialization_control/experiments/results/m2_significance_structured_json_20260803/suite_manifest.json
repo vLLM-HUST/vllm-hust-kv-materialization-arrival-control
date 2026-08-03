@@ -1,0 +1,229 @@
+{
+  "evidence_label": "real-online/m2-significance-confirmation",
+  "finished_at_s": 1785750461.885908,
+  "positive_rule": {
+    "controller_vs_best_fixed_e2e_pct_mean_max": 5.0,
+    "controller_vs_best_fixed_throughput_pct_mean_min": -5.0,
+    "controller_vs_best_fixed_ttft_pct_mean_max": -5.0,
+    "paired_ttft_delta_one_sided_95pct_upper_max": 0.0
+  },
+  "runs": [
+    {
+      "bundle_dir": "/tmp/kvmat_m2_significance_structured_json_20260803/shared_structured_json_generation/always_recompute/round_01_sequence_01",
+      "returncode": 0,
+      "sequence": 1,
+      "spec": {
+        "policy_mode": "always_recompute",
+        "round_index": 1
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_significance_structured_json_20260803/shared_structured_json_generation/always_full_reuse/round_01_sequence_02",
+      "returncode": 0,
+      "sequence": 2,
+      "spec": {
+        "policy_mode": "always_full_reuse",
+        "round_index": 1
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_significance_structured_json_20260803/shared_structured_json_generation/controller/round_01_sequence_03",
+      "returncode": 0,
+      "sequence": 3,
+      "spec": {
+        "policy_mode": "controller",
+        "round_index": 1
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_significance_structured_json_20260803/shared_structured_json_generation/controller/round_02_sequence_04",
+      "returncode": 0,
+      "sequence": 4,
+      "spec": {
+        "policy_mode": "controller",
+        "round_index": 2
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_significance_structured_json_20260803/shared_structured_json_generation/always_recompute/round_02_sequence_05",
+      "returncode": 0,
+      "sequence": 5,
+      "spec": {
+        "policy_mode": "always_recompute",
+        "round_index": 2
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_significance_structured_json_20260803/shared_structured_json_generation/always_full_reuse/round_02_sequence_06",
+      "returncode": 0,
+      "sequence": 6,
+      "spec": {
+        "policy_mode": "always_full_reuse",
+        "round_index": 2
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_significance_structured_json_20260803/shared_structured_json_generation/always_full_reuse/round_03_sequence_07",
+      "returncode": 0,
+      "sequence": 7,
+      "spec": {
+        "policy_mode": "always_full_reuse",
+        "round_index": 3
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_significance_structured_json_20260803/shared_structured_json_generation/controller/round_03_sequence_08",
+      "returncode": 0,
+      "sequence": 8,
+      "spec": {
+        "policy_mode": "controller",
+        "round_index": 3
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_significance_structured_json_20260803/shared_structured_json_generation/always_recompute/round_03_sequence_09",
+      "returncode": 0,
+      "sequence": 9,
+      "spec": {
+        "policy_mode": "always_recompute",
+        "round_index": 3
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_significance_structured_json_20260803/shared_structured_json_generation/always_recompute/round_04_sequence_10",
+      "returncode": 0,
+      "sequence": 10,
+      "spec": {
+        "policy_mode": "always_recompute",
+        "round_index": 4
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_significance_structured_json_20260803/shared_structured_json_generation/controller/round_04_sequence_11",
+      "returncode": 0,
+      "sequence": 11,
+      "spec": {
+        "policy_mode": "controller",
+        "round_index": 4
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_significance_structured_json_20260803/shared_structured_json_generation/always_full_reuse/round_04_sequence_12",
+      "returncode": 0,
+      "sequence": 12,
+      "spec": {
+        "policy_mode": "always_full_reuse",
+        "round_index": 4
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_significance_structured_json_20260803/shared_structured_json_generation/always_full_reuse/round_05_sequence_13",
+      "returncode": 0,
+      "sequence": 13,
+      "spec": {
+        "policy_mode": "always_full_reuse",
+        "round_index": 5
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_significance_structured_json_20260803/shared_structured_json_generation/always_recompute/round_05_sequence_14",
+      "returncode": 0,
+      "sequence": 14,
+      "spec": {
+        "policy_mode": "always_recompute",
+        "round_index": 5
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_significance_structured_json_20260803/shared_structured_json_generation/controller/round_05_sequence_15",
+      "returncode": 0,
+      "sequence": 15,
+      "spec": {
+        "policy_mode": "controller",
+        "round_index": 5
+      },
+      "validation_returncode": 0
+    }
+  ],
+  "schedule": [
+    {
+      "policy_mode": "always_recompute",
+      "round_index": 1
+    },
+    {
+      "policy_mode": "always_full_reuse",
+      "round_index": 1
+    },
+    {
+      "policy_mode": "controller",
+      "round_index": 1
+    },
+    {
+      "policy_mode": "controller",
+      "round_index": 2
+    },
+    {
+      "policy_mode": "always_recompute",
+      "round_index": 2
+    },
+    {
+      "policy_mode": "always_full_reuse",
+      "round_index": 2
+    },
+    {
+      "policy_mode": "always_full_reuse",
+      "round_index": 3
+    },
+    {
+      "policy_mode": "controller",
+      "round_index": 3
+    },
+    {
+      "policy_mode": "always_recompute",
+      "round_index": 3
+    },
+    {
+      "policy_mode": "always_recompute",
+      "round_index": 4
+    },
+    {
+      "policy_mode": "controller",
+      "round_index": 4
+    },
+    {
+      "policy_mode": "always_full_reuse",
+      "round_index": 4
+    },
+    {
+      "policy_mode": "always_full_reuse",
+      "round_index": 5
+    },
+    {
+      "policy_mode": "always_recompute",
+      "round_index": 5
+    },
+    {
+      "policy_mode": "controller",
+      "round_index": 5
+    }
+  ],
+  "schema_version": 1,
+  "started_at_s": 1785747755.6760807,
+  "status": "completed",
+  "study": "M2 promoted-workload five-round significance confirmation",
+  "workload": "shared_structured_json_generation"
+}

@@ -1,0 +1,11 @@
+{
+  "best_fixed_ttft_wins": {
+    "always_full_reuse": 3
+  },
+  "controller_vs_best_fixed_e2e_pct_mean": -1.364707,
+  "controller_vs_best_fixed_throughput_pct_mean": 1.350902,
+  "controller_vs_best_fixed_ttft_pct_mean": -0.899583,
+  "meaningful_positive_5pct": false,
+  "nominal_positive": true,
+  "workload": "shared_shared_prefix_multi_tenant_assistant"
+}

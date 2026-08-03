@@ -1,10 +1,56 @@
-This is BibTeX, Version 0.99d
-Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+This is BibTeX, Version 0.99d (TeX Live 2021)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: kv_materialization_control.aux
 The style file: IEEEtran.bst
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
 Database file #1: kv_materialization_control.bib
 -- IEEEtran.bst version 1.14 (2015/08/26) by Michael Shell.
 -- http://www.michaelshell.org/tex/ieeetran/bibtex/
 -- See the "IEEEtran_bst_HOWTO.pdf" manual for usage information.
 
 Done.
+You've used 3 entries,
+            4087 wiz_defined-function locations,
+            830 strings with 7550 characters,
+and the built_in function-call counts, 1094 in all, are:
+= -- 63
+> -- 10
+< -- 0
++ -- 6
+- -- 2
+* -- 50
+:= -- 181
+add.period$ -- 6
+call.type$ -- 3
+change.case$ -- 3
+chr.to.int$ -- 0
+cite$ -- 3
+duplicate$ -- 97
+empty$ -- 125
+format.name$ -- 3
+if$ -- 234
+int.to.chr$ -- 0
+int.to.str$ -- 3
+missing$ -- 20
+newline$ -- 32
+num.names$ -- 1
+pop$ -- 64
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 2
+skip$ -- 83
+stack$ -- 0
+substring$ -- 3
+swap$ -- 44
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 5
+type$ -- 3
+warning$ -- 0
+while$ -- 1
+width$ -- 4
+write$ -- 42

@@ -14,6 +14,7 @@ from typing import Any
 
 from vllm_kv_materialization.policy import (
     MaterializationDecision,
+    MaterializationOutcome,
     MaterializationPolicy,
     MaterializationSignals,
     estimate_materialization_ttft_ms,
@@ -97,6 +98,7 @@ class LiveObservation:
     recompute_time_ms: float
     reuse_confidence: float
     queue_pressure: float
+    policy_mode: str
     decision: str
     reused_tokens: int
     rationale: str
@@ -108,6 +110,9 @@ class LiveObservation:
     runtime_decision_supported: bool
     runtime_support_tier: str
     runtime_fallback_reason: str | None
+    decision_latency_ms: float
+    boundary_alignment_latency_ms: float
+    controller_latency_ms: float
 
 
 def bind_request_headers(
@@ -277,6 +282,31 @@ def _make_policy() -> MaterializationPolicy:
         ttft_bonus_ms=_env_float("VLLM_KV_TTFT_BONUS_MS", 1.5),
         low_confidence_cutoff=_env_float("VLLM_KV_LOW_CONFIDENCE_CUTOFF", 0.55),
         confidence_penalty_ms=_env_float("VLLM_KV_CONFIDENCE_PENALTY_MS", 4.0),
+    )
+
+
+def _select_policy_outcome(
+    signals: MaterializationSignals,
+    policy: MaterializationPolicy,
+) -> tuple[str, MaterializationOutcome]:
+    policy_mode = os.getenv("VLLM_KV_POLICY_MODE", "controller").strip().lower()
+    if policy_mode == "controller":
+        return policy_mode, policy.decide(signals)
+    if policy_mode == "always_recompute":
+        return policy_mode, MaterializationOutcome(
+            decision=MaterializationDecision.RECOMPUTE,
+            reused_tokens=0,
+            rationale="fixed_policy_always_recompute",
+        )
+    if policy_mode == "always_full_reuse":
+        return policy_mode, MaterializationOutcome(
+            decision=MaterializationDecision.FULL_REUSE,
+            reused_tokens=max(signals.reusable_prefix_tokens, 0),
+            rationale="fixed_policy_always_full_reuse",
+        )
+    raise ValueError(
+        "VLLM_KV_POLICY_MODE must be controller, always_recompute, or "
+        f"always_full_reuse; got {policy_mode!r}"
     )
 
 
@@ -455,10 +485,14 @@ def compute_runtime_control(
     prompt_tokens: int,
     output_tokens: int,
 ) -> tuple[LiveObservation, RuntimeControlPlan]:
+    controller_started_ns = time.perf_counter_ns()
     headers = get_request_headers()
     signals, extras = estimate_signals(headers, prompt_tokens, output_tokens)
     policy = _make_policy()
-    outcome = policy.decide(signals)
+    decision_started_ns = time.perf_counter_ns()
+    policy_mode, outcome = _select_policy_outcome(signals, policy)
+    decision_latency_ms = (time.perf_counter_ns() - decision_started_ns) / 1_000_000
+    boundary_alignment_latency_ms = 0.0
 
     primary_anchor_id = str(extras["primary_anchor_id"])
     secondary_anchor_ids = tuple(str(value) for value in extras["secondary_anchor_ids"])
@@ -495,6 +529,7 @@ def compute_runtime_control(
             fallback_reason=None,
         )
     else:
+        boundary_alignment_started_ns = time.perf_counter_ns()
         runtime_hash_block_size = _get_runtime_hash_block_size()
         aligned_reuse_tokens = min(
             _align_runtime_reuse_tokens(target_reuse_tokens, runtime_hash_block_size),
@@ -584,6 +619,11 @@ def compute_runtime_control(
                     )
                 ),
             )
+        boundary_alignment_latency_ms = (
+            time.perf_counter_ns() - boundary_alignment_started_ns
+        ) / 1_000_000
+
+    controller_latency_ms = (time.perf_counter_ns() - controller_started_ns) / 1_000_000
 
     observation = LiveObservation(
         timestamp_s=time.time(),
@@ -605,6 +645,7 @@ def compute_runtime_control(
         recompute_time_ms=round(signals.recompute_time_ms, 6),
         reuse_confidence=round(signals.reuse_confidence, 6),
         queue_pressure=round(signals.queue_pressure, 6),
+        policy_mode=policy_mode,
         decision=outcome.decision.value,
         reused_tokens=outcome.reused_tokens,
         rationale=outcome.rationale,
@@ -616,6 +657,9 @@ def compute_runtime_control(
         runtime_decision_supported=plan.decision_supported,
         runtime_support_tier=plan.support_tier,
         runtime_fallback_reason=plan.fallback_reason,
+        decision_latency_ms=round(decision_latency_ms, 6),
+        boundary_alignment_latency_ms=round(boundary_alignment_latency_ms, 6),
+        controller_latency_ms=round(controller_latency_ms, 6),
     )
     return observation, plan
 

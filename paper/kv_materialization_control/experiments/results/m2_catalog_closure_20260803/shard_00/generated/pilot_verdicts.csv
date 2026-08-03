@@ -1,0 +1,3 @@
+workload,best_fixed_ttft_policy,controller_vs_best_fixed_ttft_pct,controller_vs_best_fixed_e2e_pct,controller_vs_best_fixed_throughput_pct,promotion
+shared_experiment_planning_assistant,always_full_reuse,4.814395,0.49154,-0.41632,False
+shared_session_affine_multi_turn,always_full_reuse,12.440842,1.676931,-1.554404,False

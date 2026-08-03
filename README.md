@@ -141,19 +141,24 @@ baseline knobs, and new segmented seam + tuned knobs.
   new segmented baseline: mean `9362.399 ms`, p95 `10302.383 ms`, throughput `0.848 rps`
   new segmented tuned: mean `9186.471 ms`, p95 `10182.569 ms`, throughput `0.865 rps`
 
-This matrix supports a narrower and more honest paper claim:
+M1 supports a descriptive runtime-realization claim, not a stable seam gain:
+three independent restart blocks show seam main effects close to zero on both
+workloads, so the unchanged protocol stopped at its 5% minimum meaningful
+effect.
 
-- the stronger segmented carrier seam is what makes the tuned `partial_reuse`
-  path competitive again on both workloads
-- the segmented seam alone is not a universal win under conservative baseline
-  knobs: knowledge-service improves over the old baseline, but tool-scaffold is
-  still mixed and does not beat the old-baseline mean/throughput point
-- runtime realization and guardrails interact: under the new segmented baseline
-  run, knowledge-service split into `8` effective `recompute` requests and `24`
-  effective `partial_reuse` requests, while tool-scaffold observed
-  `partial_reuse` on all `64` requests but realized `48` effective
-  `partial_reuse` requests and `16` effective `full_reuse` requests after
-  block-aligned re-ranking
+M2 then compared `always_recompute`, `always_full_reuse`, and the controller in
+18 matched independent lifecycles (576/576 successful requests). The controller
+did not beat the best fixed policy: matched mean TTFT regressed by `9.24%` on
+tool scaffold and `6.60%` on knowledge service, while `always_full_reuse` won
+all six matched rounds. Cost-model and online winners agreed in `6/6` rounds.
+The preregistered verdict is therefore `stop_mechanism_direction`; the project
+does not continue per-workload controller tuning.
+
+The action accounting remains a useful systems result. For example, the tool
+controller's median lifecycle applied mix was `8/8/16`
+recompute/partial/full, while engine realization was `16/16/0`. Requested or
+effective `partial_reuse` is never reported as realized reuse without the
+scheduler-owned token counters.
 
 That fallback is a real limitation of the current runtime path and should be
 described as such, not widened into a generic “state-management” claim.

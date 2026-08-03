@@ -1,0 +1,3 @@
+workload,matched_rounds,controller_vs_best_fixed_ttft_pct_mean,controller_vs_best_fixed_e2e_pct_mean,controller_vs_best_fixed_throughput_pct_mean,best_fixed_ttft_wins_json,meaningful_gain_threshold_pct,classification
+shared_tool_scaffold_agent,3,9.244533,0.164541,-0.161585,"{""always_full_reuse"": 3}",5.0,fallback_or_no_gain
+shared_scenario_multi_turn_knowledge_service,3,6.600863,0.662073,-0.684564,"{""always_full_reuse"": 3}",5.0,fallback_or_no_gain

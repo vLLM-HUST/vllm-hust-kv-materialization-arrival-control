@@ -1,0 +1,23 @@
+{
+  "completed": 80,
+  "completed_output_tokens": 7680,
+  "concurrency": 4,
+  "dataset_name": "async-document-pipeline",
+  "failures": [],
+  "finished_at_utc": "2026-08-03T06:11:45.359423Z",
+  "mean_latency_ms": 1838.409,
+  "mean_ttft_ms": 290.287,
+  "measurement_duration_s": 37.10012483596802,
+  "output_throughput_toks": 207.007,
+  "p95_latency_ms": 1780.879,
+  "p95_ttft_ms": 238.609,
+  "request_rate": 18.0,
+  "request_throughput_rps": 2.156,
+  "requests": 80,
+  "requests_output": "/tmp/kvmat_m2_candidate_pilot_20260803/shared_async_document_pipeline/controller/pilot_sequence_01/request_results.jsonl",
+  "seed": 7,
+  "started_at_utc": "2026-08-03T06:11:08.259298Z",
+  "workload_case": "shared_async_document_pipeline",
+  "workload_family": "async-document-pipeline",
+  "workload_label": "Shared workload: async document pipeline"
+}

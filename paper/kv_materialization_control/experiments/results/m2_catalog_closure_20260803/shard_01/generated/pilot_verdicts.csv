@@ -1,0 +1,3 @@
+workload,best_fixed_ttft_policy,controller_vs_best_fixed_ttft_pct,controller_vs_best_fixed_e2e_pct,controller_vs_best_fixed_throughput_pct,promotion
+shared_session_affine_bursty,always_full_reuse,1.146891,-0.080973,0.171625,True
+shared_simulation_analysis_verification,always_full_reuse,2.203401,0.551399,-0.519931,False

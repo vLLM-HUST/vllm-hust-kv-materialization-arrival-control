@@ -5,7 +5,7 @@
 唯一 runtime carrier 是 `vendor/vllm` submodule，分支为
 `feature/kv-materialization-runtime-integration`，基于 vLLM-HUST `main`
 commit `e4ce33646f2ef1781289e6dc651fad0d00177c55`，当前 pinned carrier commit
-为 `f8efeebe900e638f178e3b460f50cc750054fa17`。fresh checkout 的最小 CPU 验收命令为：
+为 `475ea49`。fresh checkout 的最小 CPU 验收命令为：
 
 ```bash
 git submodule update --init --recursive
@@ -15,6 +15,22 @@ make test
 
 环境脚本只创建或复用 `vllm-kv-materialization-exp`；如果它尚不存在，
 脚本会从 `vllm-hust-dev` 克隆，但不会向后者安装项目依赖。
+
+## M2 closure checkpoint（2026-08-03）
+
+M0、M1 和 M2 已闭合。M2 在 parent `2e99ce1`、carrier `475ea49` 上完成
+2 workloads × 3 policies × 3 independent lifecycles，18/18 bundle validation
+通过，576/576 请求成功。controller 相对每轮最佳固定策略的 matched mean TTFT
+分别回退 9.24% 和 6.60%；`always_full_reuse` 赢得 6/6 matched rounds，cost model
+排序也 6/6 一致。
+
+因此当前明确判断是 `stop_mechanism_direction`：不再按 workload 调参，不追加同协议
+重复，也不把 M1 的 seam/runtime-realization 结果写成固定策略收益。原始 bundle、机制
+表和机器可读 claim ledger 位于
+`paper/kv_materialization_control/experiments/results/m2_online_boundary_20260803/`。
+
+下文保留的是 M2 之前的研究路线背景；其中“继续做强 partial reuse / deeper seam”不再是
+当前执行计划，除非未来提出 materially different mechanism 后重新预注册。
 
 ## 当前定位
 

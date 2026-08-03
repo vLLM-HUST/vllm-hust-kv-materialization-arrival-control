@@ -1,0 +1,144 @@
+{
+  "evidence_label": "real-online/m2-anchor-confirmation",
+  "finished_at_s": 1785742727.7243073,
+  "positive_rule": {
+    "controller_vs_best_fixed_e2e_pct_max": 5.0,
+    "controller_vs_best_fixed_throughput_pct_min": -5.0,
+    "controller_vs_best_fixed_ttft_pct_max": -5.0
+  },
+  "runs": [
+    {
+      "bundle_dir": "/tmp/kvmat_m2_anchor_confirmation_20260803/shared_shared_prefix_multi_tenant_assistant/always_recompute/round_01_sequence_01",
+      "returncode": 0,
+      "sequence": 1,
+      "spec": {
+        "policy_mode": "always_recompute",
+        "round_index": 1
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_anchor_confirmation_20260803/shared_shared_prefix_multi_tenant_assistant/always_full_reuse/round_01_sequence_02",
+      "returncode": 0,
+      "sequence": 2,
+      "spec": {
+        "policy_mode": "always_full_reuse",
+        "round_index": 1
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_anchor_confirmation_20260803/shared_shared_prefix_multi_tenant_assistant/controller/round_01_sequence_03",
+      "returncode": 0,
+      "sequence": 3,
+      "spec": {
+        "policy_mode": "controller",
+        "round_index": 1
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_anchor_confirmation_20260803/shared_shared_prefix_multi_tenant_assistant/controller/round_02_sequence_04",
+      "returncode": 0,
+      "sequence": 4,
+      "spec": {
+        "policy_mode": "controller",
+        "round_index": 2
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_anchor_confirmation_20260803/shared_shared_prefix_multi_tenant_assistant/always_recompute/round_02_sequence_05",
+      "returncode": 0,
+      "sequence": 5,
+      "spec": {
+        "policy_mode": "always_recompute",
+        "round_index": 2
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_anchor_confirmation_20260803/shared_shared_prefix_multi_tenant_assistant/always_full_reuse/round_02_sequence_06",
+      "returncode": 0,
+      "sequence": 6,
+      "spec": {
+        "policy_mode": "always_full_reuse",
+        "round_index": 2
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_anchor_confirmation_20260803/shared_shared_prefix_multi_tenant_assistant/always_full_reuse/round_03_sequence_07",
+      "returncode": 0,
+      "sequence": 7,
+      "spec": {
+        "policy_mode": "always_full_reuse",
+        "round_index": 3
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_anchor_confirmation_20260803/shared_shared_prefix_multi_tenant_assistant/controller/round_03_sequence_08",
+      "returncode": 0,
+      "sequence": 8,
+      "spec": {
+        "policy_mode": "controller",
+        "round_index": 3
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_anchor_confirmation_20260803/shared_shared_prefix_multi_tenant_assistant/always_recompute/round_03_sequence_09",
+      "returncode": 0,
+      "sequence": 9,
+      "spec": {
+        "policy_mode": "always_recompute",
+        "round_index": 3
+      },
+      "validation_returncode": 0
+    }
+  ],
+  "schedule": [
+    {
+      "policy_mode": "always_recompute",
+      "round_index": 1
+    },
+    {
+      "policy_mode": "always_full_reuse",
+      "round_index": 1
+    },
+    {
+      "policy_mode": "controller",
+      "round_index": 1
+    },
+    {
+      "policy_mode": "controller",
+      "round_index": 2
+    },
+    {
+      "policy_mode": "always_recompute",
+      "round_index": 2
+    },
+    {
+      "policy_mode": "always_full_reuse",
+      "round_index": 2
+    },
+    {
+      "policy_mode": "always_full_reuse",
+      "round_index": 3
+    },
+    {
+      "policy_mode": "controller",
+      "round_index": 3
+    },
+    {
+      "policy_mode": "always_recompute",
+      "round_index": 3
+    }
+  ],
+  "schema_version": 1,
+  "started_at_s": 1785740759.3736126,
+  "status": "completed",
+  "study": "M2 anchor-topology independent confirmation",
+  "workload": "shared_shared_prefix_multi_tenant_assistant"
+}
