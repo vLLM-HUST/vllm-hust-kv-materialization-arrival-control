@@ -11,6 +11,10 @@
 - Added fail-closed M2 bundle validation, action/fallback/work decomposition,
   cost-model ordering checks, a paper-facing TeX table, a typed claim ledger,
   and a deterministic continue/stop verdict.
+- Completed the 18-lifecycle M2 matrix (576/576 requests): the controller
+  regressed TTFT versus the best fixed policy by 9.24% and 6.60% on the two
+  preregistered workloads, so the mechanism direction stops as a negative
+  result rather than receiving workload-specific retuning.
 
 ## [Unreleased]
 

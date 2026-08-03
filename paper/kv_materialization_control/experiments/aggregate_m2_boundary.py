@@ -20,6 +20,10 @@ WORKLOADS = (
     "shared_tool_scaffold_agent",
     "shared_scenario_multi_turn_knowledge_service",
 )
+WORKLOAD_LABELS = {
+    "shared_tool_scaffold_agent": "Tool scaffold",
+    "shared_scenario_multi_turn_knowledge_service": "Knowledge service",
+}
 METRICS = (
     "mean_ttft_ms",
     "p95_ttft_ms",
@@ -387,14 +391,19 @@ def cost_model_agreement(runs: list[dict]) -> list[dict]:
     return rows
 
 
-def write_tex(path: Path, mechanisms: list[dict], boundaries: list[dict]) -> None:
+def write_tex(
+    cost_path: Path,
+    action_path: Path,
+    mechanisms: list[dict],
+    boundaries: list[dict],
+) -> None:
     boundary_index = {row["workload"]: row for row in boundaries}
     lines = [
         "% Generated only from validated M2 real-online bundles; do not edit.",
-        "\\begin{tabular}{llrrrrrrl}",
+        "\\begin{tabular}{lrrrrrrrrrrl}",
         (
-            "Workload & Policy & Avoided tokens & Tail tokens & Lookup ms & "
-            "Commit ms & Tail isolation ms & TTFT vs best fixed (\\%) & "
+            "Workload & Avoided & Tail & Lookup & Align & Commit & Isolation & "
+            "TTFT $\\Delta$ & E2E $\\Delta$ & RPS $\\Delta$ & Peak cache & "
             "Boundary \\\\"
         ),
         "\\hline",
@@ -403,20 +412,58 @@ def write_tex(path: Path, mechanisms: list[dict], boundaries: list[dict]) -> Non
         if row["policy_mode"] != "controller":
             continue
         boundary = boundary_index[row["workload"]]
-        workload = str(row["workload"]).replace("_", "\\_")
+        workload = WORKLOAD_LABELS[str(row["workload"])]
         classification = str(boundary["classification"]).replace("_", "\\_")
         lines.append(
-            f"{workload} & controller & "
+            f"{workload} & "
             f"{row['avoided_prefill_tokens_median']:.0f} & "
             f"{row['recomputed_tail_tokens_median']:.0f} & "
             f"{row['lookup_latency_ms_median']:.3f} & "
+            f"{row['boundary_alignment_latency_ms_median']:.3f} & "
             f"{row['commit_latency_ms_median']:.3f} & "
             f"{row['tail_isolation_latency_ms_median']:.3f} & "
-            f"{boundary['controller_vs_best_fixed_ttft_pct_mean']:.2f} & "
+            f"{boundary['controller_vs_best_fixed_ttft_pct_mean']:+.2f}\\% & "
+            f"{boundary['controller_vs_best_fixed_e2e_pct_mean']:+.2f}\\% & "
+            f"{boundary['controller_vs_best_fixed_throughput_pct_mean']:+.2f}\\% & "
+            f"{100.0 * row['peak_cache_usage_median']:.3f}\\% & "
             f"{classification} \\\\"
         )
     lines.extend(["\\end{tabular}", ""])
-    path.write_text("\n".join(lines), encoding="utf-8")
+    cost_path.write_text("\n".join(lines), encoding="utf-8")
+
+    action_lines = [
+        "% Generated only from validated M2 real-online bundles; do not edit.",
+        "\\begin{tabular}{lcccccc}",
+        (
+            "Workload & Observed R/P/F & Effective R/P/F & Realized R/P/F & "
+            "Realign & To full & To recompute \\\\"
+        ),
+        "\\hline",
+    ]
+    for row in mechanisms:
+        if row["policy_mode"] != "controller":
+            continue
+        workload = WORKLOAD_LABELS[str(row["workload"])]
+        observed = "/".join(
+            f"{row[f'observed_{action}_median']:.0f}"
+            for action in ("recompute", "partial_reuse", "full_reuse")
+        )
+        effective = "/".join(
+            f"{row[f'effective_{action}_median']:.0f}"
+            for action in ("recompute", "partial_reuse", "full_reuse")
+        )
+        realized = "/".join(
+            f"{row[f'realized_{action}_median']:.0f}"
+            for action in ("recompute", "partial_reuse", "full_reuse")
+        )
+        action_lines.append(
+            f"{workload} & {observed} & {effective} & {realized} & "
+            f"{row['realign_count_median']:.0f} & "
+            f"{row['fallback_full_reuse_count_median']:.0f} & "
+            f"{row['fallback_recompute_count_median']:.0f} \\\\"
+        )
+    action_lines.extend(["\\end{tabular}", ""])
+    action_path.write_text("\n".join(action_lines), encoding="utf-8")
 
 
 def build_artifacts(input_dir: Path, output_dir: Path) -> None:
@@ -435,7 +482,12 @@ def build_artifacts(input_dir: Path, output_dir: Path) -> None:
     write_csv(output_dir / "m2_mechanism_breakdown.csv", mechanisms)
     write_csv(output_dir / "m2_benefit_boundary.csv", boundaries)
     write_csv(output_dir / "m2_cost_model_agreement.csv", agreement)
-    write_tex(output_dir / "m2_mechanism_table.tex", mechanisms, boundaries)
+    write_tex(
+        output_dir / "m2_mechanism_table.tex",
+        output_dir / "m2_action_table.tex",
+        mechanisms,
+        boundaries,
+    )
     write_json(
         output_dir / "m2_verdict.json",
         {
@@ -482,7 +534,10 @@ def build_artifacts(input_dir: Path, output_dir: Path) -> None:
                     "claim": "paper-facing mechanism decomposition and direction verdict",
                     "evidence_class": "derived-artifact",
                     "status": "supported",
-                    "artifact": "m2_mechanism_table.tex,m2_verdict.json",
+                    "artifact": (
+                        "m2_mechanism_table.tex,m2_action_table.tex,"
+                        "m2_verdict.json"
+                    ),
                 },
             ],
         },

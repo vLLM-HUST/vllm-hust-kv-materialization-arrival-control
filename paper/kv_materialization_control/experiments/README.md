@@ -126,3 +126,10 @@ make m2-online-rebuild \
 The runner stops after three temporally blocked rounds. The aggregator rejects
 incomplete, unmatched, dirty, non-independent, or unvalidated evidence and
 emits both the paper-facing mechanism table and the submission/stop verdict.
+
+The completed suite is
+`results/m2_online_boundary_20260803/`: 18/18 independent lifecycles and
+576/576 requests passed raw validation. The controller did not beat
+`always_full_reuse`; its mean matched TTFT regression versus the best fixed
+policy was 9.24% on tool scaffold and 6.60% on knowledge service. The emitted
+verdict is therefore `stop_mechanism_direction`.

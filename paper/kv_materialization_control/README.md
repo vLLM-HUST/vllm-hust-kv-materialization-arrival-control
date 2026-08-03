@@ -12,14 +12,19 @@ The paper should stay focused on that three-action surface.
 
 ## Evidence Layers
 
-This directory keeps two evidence layers separate.
+This directory keeps three evidence layers separate.
 
 - `decision-study`: workload-grounded offline analysis of the arrival-time
 	decision surface
 - `runtime-boundary-live`: live execution against a vLLM-compatible endpoint to
 	document which actions the current runtime seam actually realizes
+- `m2-online-boundary`: matched real-online comparison against
+	`always_recompute` and `always_full_reuse`
 
 The manuscript should not blur those layers into a single end-to-end claim.
+The completed M2 result is negative: the controller loses to
+`always_full_reuse` in all six matched rounds, so the current mechanism
+direction stops without per-workload retuning.
 
 ## Local Workflow
 
@@ -27,6 +32,7 @@ From the repository root:
 
 ```bash
 make decision-study
+make m2-online-rebuild
 make pdf
 ```
 

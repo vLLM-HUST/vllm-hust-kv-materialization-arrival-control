@@ -3,11 +3,11 @@
 | Claim | Evidence class | Status | Rebuild source |
 |---|---|---|---|
 | M1 的三轮独立重启矩阵支持 non-randomized、temporally blocked 的描述性 seam 分析 | real-online | supported；不支持稳定的一般 seam 性能收益 | `experiments/results/m1_formal_approved_complete_20260801/` |
-| M2 三动作控制器相对最佳固定策略的在线收益边界 | real-online | pending，必须由完整的 18-cell M2 suite 决定 | `aggregate_m2_boundary.py` → `m2_benefit_boundary.csv` |
-| observed/effective/realized action、fallback 原因和物理开销分解 | real-online | instrumentation ready；online values pending | raw observations/events → `m2_online_runs.csv` |
-| 当前 cost model 的策略排序与在线排序一致 | simulation/model | pending；不得用模型输出替代在线结果 | `aggregate_m2_boundary.py` → `m2_cost_model_agreement.csv` |
-| 论文机制表与继续投稿/停止判断 | derived-artifact | pending；仅从 validated real-online bundle 重建 | `m2_mechanism_table.tex`, `m2_verdict.json` |
+| M2 三动作控制器相对最佳固定策略的在线收益边界 | real-online | negative：两个 workload 的 controller TTFT 分别比最佳固定策略回退 9.24% 和 6.60% | `experiments/results/m2_online_boundary_20260803/generated/m2_benefit_boundary.csv` |
+| observed/effective/realized action、fallback 原因和物理开销分解 | real-online | supported：18 个独立 lifecycle、576/576 请求完成，全部 raw validation 通过 | raw observations/events → `m2_online_runs.csv` |
+| 当前 cost model 的策略排序与在线排序一致 | simulation/model | supported：6/6 matched rounds 的 winner 均为 `always_full_reuse` | `m2_cost_model_agreement.csv` |
+| 论文机制表与继续投稿/停止判断 | derived-artifact | supported：成本/性能和 action/fallback 两个 panel 均由 raw bundle 重建；`stop_mechanism_direction`，不继续逐 workload 调参 | `m2_mechanism_table.tex`, `m2_action_table.tex`, `m2_verdict.json` |
 
-M2 聚合完成后，生成的 `claim_ledger.json` 是该轮结果的机器可读 ledger。未完成真实
-online suite 时，不得手工把 pending 改成 supported，也不得把 requested
-`partial_reuse` 数量写成 realized reuse。
+生成的 `claim_ledger.json` 是该轮结果的机器可读 ledger。requested action 仍不得写成
+realized reuse；例如 tool controller 的 lifecycle 中位 applied mix 是 8/8/16
+（recompute/partial/full），而 engine-realized mix 是 16/16/0。

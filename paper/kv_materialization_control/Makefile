@@ -1,5 +1,7 @@
 PYTHON ?= python3
 TECTONIC ?= tectonic
+PDFLATEX ?= pdflatex
+BIBTEX ?= bibtex
 ROOT_DIR := $(abspath ../..)
 LLM_OPTIMIZATIONS_ROOT ?= $(abspath $(ROOT_DIR)/../llm-optimizations)
 LLM_OPTIMIZATIONS_PDF_DIR ?= $(LLM_OPTIMIZATIONS_ROOT)/docs/papers
@@ -21,7 +23,7 @@ help:
 		'  make runtime-boundary-live Run a shared-workload live runtime-boundary benchmark against a vLLM endpoint' \
 		'  make live-benchmark      Compatibility alias of make runtime-boundary-live' \
 		'  make optimization-live   Compatibility alias of make runtime-boundary-live' \
-		'  make pdf             Build the paper PDF with tectonic' \
+		'  make pdf             Build the paper PDF with tectonic or pdflatex' \
 		'  make evidence-bundle Show the latest generated evidence files' \
 		'  make submission-plan Print the paper submission plan note'
 
@@ -50,7 +52,17 @@ live-benchmark: runtime-boundary-live
 optimization-live: runtime-boundary-live
 
 pdf: decision-study
-	cd $(CURDIR) && $(TECTONIC) --keep-logs $(PAPER_TEX)
+	@if command -v '$(TECTONIC)' >/dev/null 2>&1; then \
+		cd '$(CURDIR)' && '$(TECTONIC)' --keep-logs '$(PAPER_TEX)'; \
+	elif command -v '$(PDFLATEX)' >/dev/null 2>&1 && command -v '$(BIBTEX)' >/dev/null 2>&1; then \
+		cd '$(CURDIR)' && '$(PDFLATEX)' -interaction=nonstopmode -halt-on-error '$(PAPER_TEX)' && \
+		'$(BIBTEX)' '$(basename $(PAPER_TEX))' && \
+		'$(PDFLATEX)' -interaction=nonstopmode -halt-on-error '$(PAPER_TEX)' && \
+		'$(PDFLATEX)' -interaction=nonstopmode -halt-on-error '$(PAPER_TEX)'; \
+	else \
+		echo 'Install tectonic, or install both pdflatex and bibtex.' >&2; \
+		exit 2; \
+	fi
 	@if [ -d "$(LLM_OPTIMIZATIONS_ROOT)" ] && [ -f "$(PAPER_PDF)" ]; then \
 		python3 "$(LLM_OPTIMIZATIONS_ROOT)/scripts/export_paper_pdf.py" \
 			--workspace-file "$(LLM_OPTIMIZATIONS_ROOT)/llm-optimizations.code-workspace" \

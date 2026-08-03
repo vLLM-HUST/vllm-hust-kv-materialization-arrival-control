@@ -1,0 +1,28 @@
+{
+  "cost_model_rounds": 6,
+  "cost_model_winner_agreement_rounds": 6,
+  "reason": "continue only when the preregistered matrix contains both a meaningful positive boundary and a fallback/no-gain boundary",
+  "verdict": "stop_mechanism_direction",
+  "workloads": [
+    {
+      "best_fixed_ttft_wins_json": "{\"always_full_reuse\": 3}",
+      "classification": "fallback_or_no_gain",
+      "controller_vs_best_fixed_e2e_pct_mean": 0.164541,
+      "controller_vs_best_fixed_throughput_pct_mean": -0.161585,
+      "controller_vs_best_fixed_ttft_pct_mean": 9.244533,
+      "matched_rounds": 3,
+      "meaningful_gain_threshold_pct": 5.0,
+      "workload": "shared_tool_scaffold_agent"
+    },
+    {
+      "best_fixed_ttft_wins_json": "{\"always_full_reuse\": 3}",
+      "classification": "fallback_or_no_gain",
+      "controller_vs_best_fixed_e2e_pct_mean": 0.662073,
+      "controller_vs_best_fixed_throughput_pct_mean": -0.684564,
+      "controller_vs_best_fixed_ttft_pct_mean": 6.600863,
+      "matched_rounds": 3,
+      "meaningful_gain_threshold_pct": 5.0,
+      "workload": "shared_scenario_multi_turn_knowledge_service"
+    }
+  ]
+}

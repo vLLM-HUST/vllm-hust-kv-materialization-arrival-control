@@ -55,16 +55,23 @@ make m2-online-boundary \
 
 ```bash
 make m2-online-rebuild \
-  M2_SUITE_DIR=/tmp/kv_materialization_m2_online \
-  M2_RESULTS_DIR=paper/kv_materialization_control/experiments/results/m2_online_boundary
+  M2_REBUILD_INPUT_DIR=paper/kv_materialization_control/experiments/results/m2_online_boundary_20260803 \
+  M2_RESULTS_DIR=paper/kv_materialization_control/experiments/results/m2_online_boundary_20260803/generated
 ```
 
 聚合器只接受状态为 `completed`、18 个 cell 完整、protocol matched、lifecycle ID
 独立且逐 bundle validation 通过的 suite。它生成 per-run CSV、机制分解 CSV、收益
-边界 CSV、cost-model/online 排序检查、论文 TeX 表、claim ledger 和继续/停止判断。
+边界 CSV、cost-model/online 排序检查、论文成本/性能与 action/fallback 两个 TeX panel、
+claim ledger 和继续/停止判断。
 
-## 当前证据状态
+## 完成状态与停止判断
 
-协议、runtime counters、runner、validator 和 deterministic aggregator 已实现；在真实
-NPU suite 完整导入前，M2 的 real-online 收益与投稿判断均保持 pending，不能从 M1
-controller-only 数据推断固定策略边界。
+正式 suite 已在 parent `2e99ce1`、carrier `475ea49` 上完成：18 个独立 graph-mode
+lifecycle、576/576 请求、18/18 raw bundle validation 通过。两个 workload 上 controller
+相对每轮最佳固定策略的平均 TTFT 分别回退 9.24% 和 6.60%；最佳固定策略在 6/6
+matched rounds 中都是 `always_full_reuse`。cost model 的 winner 排序也与在线结果
+6/6 一致。
+
+因此本预注册研究的 derived verdict 是 `stop_mechanism_direction`。结果记录为负结果，
+不追加相同协议重复，不逐 workload 调参，也不把 M1 的 controller-only/seam 对比改写成
+相对固定策略的收益。

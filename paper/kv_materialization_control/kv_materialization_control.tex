@@ -5,6 +5,7 @@
 \usepackage{booktabs}
 \usepackage{enumitem}
 \usepackage{cite}
+\usepackage{graphicx}
 \usepackage{pgfplots}
 
 \usepgfplotslibrary{groupplots}
@@ -29,18 +30,15 @@ recompute from scratch? This artifact studies that narrow three-action control
 surface. Its workload-driven offline path evaluates the arrival-time decision
 surface over named shared cases from \texttt{llm-serving-workloads}; its live
 path documents what the current out-of-tree vLLM seam actually realizes online.
-The resulting claim boundary is explicit: the repository supports decision-side
-evidence for \texttt{full\_reuse}, \texttt{partial\_reuse}, and
-\texttt{recompute}, and live runtime evidence for native
-\texttt{full\_reuse}/\texttt{recompute} plus a block-aligned segmented
-\texttt{partial\_reuse} seam with explicit effective-action and fallback
-reporting on the current prefix-cache path. The resulting empirical message is
-narrow but concrete: the offline study exposes a small yet real
-\texttt{partial\_reuse} regime, while live evidence across prefix-rich,
-continuation-heavy, and tokenizer-faithful dynamic-RAG cases shows that the
-current seam can realize block-aligned \texttt{partial\_reuse}, transition to
-\texttt{full\_reuse} when overlap grows, and only supports truthful online
-claims when workload construction matches the serving tokenizer.
+The resulting claim boundary is explicit: the runtime realizes native
+\texttt{full\_reuse}/\texttt{recompute} and block-aligned segmented
+\texttt{partial\_reuse}, while scheduler-owned counters distinguish requested,
+effective, and realized actions. In a preregistered 18-lifecycle online matrix,
+the controller improves over recompute but fails to beat the best fixed policy:
+mean matched TTFT regresses by 9.24\% and 6.60\% on the two workloads, and
+\texttt{always\_full\_reuse} wins all six matched rounds. We therefore report a
+negative result and stop this mechanism direction instead of tuning per
+workload.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -384,17 +382,13 @@ Dynamic RAG update & 32/32 & 2634.091 & 3073.478 \\
 \end{tabular}
 \end{table}
 
-This matrix supports a narrower but stronger live claim than the earlier
-fallback-only result. On the knowledge-service workload, the stronger segmented
-seam improves even the conservative baseline point over the old baseline by
-7.1\% mean latency and 7.1\% p95 latency, and the new tuned configuration is
-the best of the four settings. On the tool-scaffold workload, the old baseline
-still remains the best mean-latency and throughput point, but the stronger seam
-substantially recovers the old tuned negative result and gives the best p95
-point under the new tuned setting. The correct paper conclusion is therefore
-not that the seam universally wins by itself, but that a stronger realization
-seam is what makes tuned \texttt{partial\_reuse} competitive again and that
-the resulting benefit is workload-dependent.
+This matrix is a descriptive runtime-boundary result, not a stable performance
+gain. The completed M1 analysis uses three independent restarts as temporally
+blocked lifecycle units. Its seam main effects on the knowledge and tool
+workloads are close to zero, and the unchanged protocol stops at the registered
+5\% minimum meaningful effect rather than adding repetitions. The safe claim is
+therefore that the segmented seam realizes and accounts for partial reuse; the
+matrix does not establish a general seam benefit or a win over fixed policies.
 
 Table~\ref{tab:live-boundary-cases} extends that statement beyond the two
 four-setting comparison workloads. The shared-prefix assistant and session
@@ -418,7 +412,7 @@ to the serving tokenizer.
 \subsection{Observed and Effective Actions}
 The new segmented-baseline run also clarifies why the claim must remain tied to
 runtime realization rather than nominal policy choice alone. On
-\texttt{shared\_scenario\_multi\_turn\_knowledge\_service}, the workload
+\path{shared_scenario_multi_turn_knowledge_service}, the workload
 splits into 8 effective \texttt{recompute} requests and 24 effective
 \texttt{partial\_reuse} requests. On \texttt{shared\_tool\_scaffold\_agent},
 all 64 requests are observed as \texttt{partial\_reuse}, but the effective
@@ -426,6 +420,62 @@ runtime actions become 48 block-aligned \texttt{partial\_reuse} requests and
 16 \texttt{full\_reuse} requests after re-ranking. This behavior shows that
 the seam and the guardrails jointly determine the realized action mix: the
 controller cannot be evaluated honestly by observed decisions alone.
+
+\subsection{M2 Fixed-Policy Benefit Boundary}
+The runtime-realization result above does not establish that a controller beats
+a fixed policy. M2 closes that gap with a preregistered comparison of
+\texttt{always\_recompute}, \texttt{always\_full\_reuse}, and the current
+three-action controller. The study uses two existing workloads, three
+temporally blocked rounds per workload, a balanced first-position order, and a
+fresh service lifecycle for every cell. All 18 graph-mode bundles pass raw
+validation, covering 576 successful requests. The statistical unit is the
+lifecycle, not the individual request.
+
+\begin{table*}[t]
+\centering
+\caption{Median per-lifecycle M2 controller mechanism decomposition. Avoided
+prefill and recomputed-tail values come from engine counters, not requested
+actions. Performance columns are mean matched deltas against the best fixed
+policy; positive latency deltas and negative RPS deltas are regressions. Peak
+cache is the maximum runtime cache-usage fraction. R/P/F denotes
+recompute/partial/full. Realign counts block-boundary alignment; To full and To
+recompute count the corresponding dominance and collapse fallback reasons.}
+\label{tab:m2-mechanism}
+\scriptsize
+\resizebox{\textwidth}{!}{%
+\input{experiments/results/m2_online_boundary_20260803/generated/m2_mechanism_table.tex}%
+}
+\par\smallskip
+\resizebox{0.78\textwidth}{!}{%
+\input{experiments/results/m2_online_boundary_20260803/generated/m2_action_table.tex}%
+}
+\end{table*}
+
+Table~\ref{tab:m2-mechanism} shows why nominal action counts are insufficient.
+On tool scaffold, the controller's median applied mix is 8 recompute, 8 partial,
+and 16 full actions, but the engine realizes 16 recompute, 16 partial, and zero
+full requests. It avoids 4096 prefill tokens while recomputing 4192 realized
+tail tokens. On knowledge service, all 32 requested actions are partial; runtime
+re-ranking yields 16 effective partial and 16 effective full actions, while the
+engine realizes 8 recompute and 24 partial requests. The median lifecycle
+avoids 7168 prefill tokens but recomputes 9720 tail tokens. Lookup, cache commit,
+boundary alignment, and tail isolation are all included in the measured online
+path. The realign column corresponds to
+\path{partial_reuse_cut_point_realigned_to_runtime_hash_blocks}; To
+full corresponds to
+\path{block_aligned_partial_reuse_dominated_by_full_reuse}. No M2
+controller lifecycle records a
+\path{block_aligned_partial_reuse_collapses_to_recompute} fallback.
+
+The benefit boundary is negative. Relative to the best fixed policy in each
+matched round, controller TTFT regresses by 9.24\% on tool scaffold and 6.60\%
+on knowledge service. End-to-end latency changes are only +0.16\% and +0.66\%,
+and throughput changes are -0.16\% and -0.68\%, so neither compensates for the
+TTFT regression. \texttt{always\_full\_reuse} is the online winner in all six
+matched rounds. The cost model predicts the same winner in all six rounds;
+there is therefore no evidence that a physically meaningful global parameter
+calibration would reverse the result. Following the stopping rule, we record
+the negative result and do not tune the controller separately per workload.
 
 \section{Offline Decision Study}
 The offline study remains valuable because it is the only place where the full
@@ -461,14 +511,12 @@ pushes too many workloads into \texttt{partial\_reuse} and remains clearly
 worse overall, while the adaptive heuristic recovers only a limited slice of
 that new region.
 
-That result does not invalidate the control formulation, but it does narrow the
-claim. The current artifact now supports a slightly stronger statement than the
-earlier negative result: request-arrival KV materialization is a real control
-surface with a small but measurable partial-reuse regime, and a stronger live
-realization seam can recover part of that value online. It still does not
-support a strong claim that \texttt{partial\_reuse} wins broadly across the
-shared default workload matrix, and it still leaves substantial headroom
-between the heuristic and the oracle.
+That result identifies a model-side control region, but M2 shows that it does
+not translate into an online win over the best fixed policy on the tested
+workloads. The distinction is decisive: offline oracle headroom and realized
+partial requests are not evidence of controller benefit. The current artifact
+therefore supports a negative boundary result, not a claim that the adaptive
+heuristic recovers useful online value.
 
 \section{Related Work Perspective}
 Two threads are most relevant to this artifact.
@@ -510,31 +558,28 @@ shared benchmark case order in \texttt{llm-serving-workloads}, avoiding a
 second repo-local default workload subset.
 \item An explicit evidence boundary separating offline decision-surface claims
 from live runtime-boundary claims.
-\item A narrow out-of-tree vLLM plugin target centered on materialization
-control rather than scheduler, admission, or memory-evolution redesign, with a
-live runtime-boundary taxonomy that truthfully reports the current block-aligned
-\texttt{partial\_reuse} seam, demonstrates stable online behavior on
-shared-prefix and continuation cases, captures the
-\texttt{partial\_reuse}-to-\texttt{full\_reuse} transition on
-tokenizer-faithful dynamic RAG, and keeps the remaining gap to exact
-token-level materialization explicit.
+\item A scheduler-accounted online implementation that separates requested,
+effective, and realized actions and measures lookup, alignment, commit, tail,
+and cache costs.
+\item A preregistered fixed-policy boundary study whose negative result stops
+the current mechanism direction: the controller loses to
+\texttt{always\_full\_reuse} in all six matched rounds.
 \end{enumerate}
 
-\section{Limitations and Next Step}
-The main limitation remains exact token-level online \texttt{partial\_reuse}
-beyond the current block-aligned segmented seam. The next
-milestones are therefore concrete:
+\section{Limitations and Direction Decision}
+The study covers two preregistered, mechanism-relevant workloads and three
+temporally blocked lifecycle rounds; it is descriptive rather than a claim of
+universal dominance. Exact token-level partial materialization remains outside
+the block-aligned seam, and broader semantic candidate generation belongs to a
+separate project boundary.
 
-\begin{enumerate}[leftmargin=1.5em]
-\item implement a deeper runtime path, likely via a custom KV materialization
-or connector seam, that can realize exact online \texttt{partial\_reuse}
-rather than relying on block-aligned segmented reuse plus fallback re-ranking;
-\item keep the live runtime-boundary matrix grounded in shared workload cases
-that stress prefix-rich, long-context continuation, and dynamic retrieval
-follow-up behavior; and
-\item rerun the shared workload suite under the deeper runtime path once exact
-online segmented materialization exists.
-\end{enumerate}
+Nevertheless, the result is sufficient for the decision registered here. Both
+online workloads lose to the same fixed policy, the model agrees with that
+ordering, and the controller's additional realized work explains the gap. We
+therefore stop the current arrival-time three-action mechanism direction and do
+not continue submission-oriented tuning of this controller. Reopening the
+question would require a materially different mechanism or workload semantics,
+not another sweep of the present cost knobs.
 
 \bibliographystyle{IEEEtran}
 \bibliography{kv_materialization_control}

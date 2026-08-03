@@ -1,0 +1,464 @@
+{
+  "evidence_label": "real-online/m2-benefit-boundary",
+  "finished_at_s": 1785731619.868678,
+  "preregistration": {
+    "condition": "tuned",
+    "fallback_or_no_gain_candidate": "shared_scenario_multi_turn_knowledge_service",
+    "matched_block": "workload x round",
+    "positive_candidate": "shared_tool_scaffold_agent",
+    "primary_metrics": [
+      "mean_ttft_ms",
+      "mean_latency_ms",
+      "request_throughput_rps"
+    ],
+    "rounds": 3,
+    "seam": "segmented",
+    "stopping_rule": "Run exactly three temporally blocked rounds. Do not tune by workload. If controller does not beat the best fixed policy, record the negative result and stop.",
+    "treatment": [
+      "always_recompute",
+      "always_full_reuse",
+      "controller"
+    ],
+    "unit": "independently restarted service lifecycle"
+  },
+  "runs": [
+    {
+      "bundle_dir": "/tmp/kvmat_m2_formal_20260803/shared_tool_scaffold_agent/always_recompute/round_01_sequence_01",
+      "returncode": 0,
+      "sequence": 1,
+      "spec": {
+        "boundary_role": "positive_candidate",
+        "max_output_tokens": 128,
+        "order_index": 1,
+        "policy_mode": "always_recompute",
+        "request_rate": 18.0,
+        "round_index": 1,
+        "workload": "shared_tool_scaffold_agent"
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_formal_20260803/shared_tool_scaffold_agent/always_full_reuse/round_01_sequence_02",
+      "returncode": 0,
+      "sequence": 2,
+      "spec": {
+        "boundary_role": "positive_candidate",
+        "max_output_tokens": 128,
+        "order_index": 2,
+        "policy_mode": "always_full_reuse",
+        "request_rate": 18.0,
+        "round_index": 1,
+        "workload": "shared_tool_scaffold_agent"
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_formal_20260803/shared_tool_scaffold_agent/controller/round_01_sequence_03",
+      "returncode": 0,
+      "sequence": 3,
+      "spec": {
+        "boundary_role": "positive_candidate",
+        "max_output_tokens": 128,
+        "order_index": 3,
+        "policy_mode": "controller",
+        "request_rate": 18.0,
+        "round_index": 1,
+        "workload": "shared_tool_scaffold_agent"
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_formal_20260803/shared_tool_scaffold_agent/controller/round_02_sequence_04",
+      "returncode": 0,
+      "sequence": 4,
+      "spec": {
+        "boundary_role": "positive_candidate",
+        "max_output_tokens": 128,
+        "order_index": 1,
+        "policy_mode": "controller",
+        "request_rate": 18.0,
+        "round_index": 2,
+        "workload": "shared_tool_scaffold_agent"
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_formal_20260803/shared_tool_scaffold_agent/always_recompute/round_02_sequence_05",
+      "returncode": 0,
+      "sequence": 5,
+      "spec": {
+        "boundary_role": "positive_candidate",
+        "max_output_tokens": 128,
+        "order_index": 2,
+        "policy_mode": "always_recompute",
+        "request_rate": 18.0,
+        "round_index": 2,
+        "workload": "shared_tool_scaffold_agent"
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_formal_20260803/shared_tool_scaffold_agent/always_full_reuse/round_02_sequence_06",
+      "returncode": 0,
+      "sequence": 6,
+      "spec": {
+        "boundary_role": "positive_candidate",
+        "max_output_tokens": 128,
+        "order_index": 3,
+        "policy_mode": "always_full_reuse",
+        "request_rate": 18.0,
+        "round_index": 2,
+        "workload": "shared_tool_scaffold_agent"
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_formal_20260803/shared_tool_scaffold_agent/always_full_reuse/round_03_sequence_07",
+      "returncode": 0,
+      "sequence": 7,
+      "spec": {
+        "boundary_role": "positive_candidate",
+        "max_output_tokens": 128,
+        "order_index": 1,
+        "policy_mode": "always_full_reuse",
+        "request_rate": 18.0,
+        "round_index": 3,
+        "workload": "shared_tool_scaffold_agent"
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_formal_20260803/shared_tool_scaffold_agent/controller/round_03_sequence_08",
+      "returncode": 0,
+      "sequence": 8,
+      "spec": {
+        "boundary_role": "positive_candidate",
+        "max_output_tokens": 128,
+        "order_index": 2,
+        "policy_mode": "controller",
+        "request_rate": 18.0,
+        "round_index": 3,
+        "workload": "shared_tool_scaffold_agent"
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_formal_20260803/shared_tool_scaffold_agent/always_recompute/round_03_sequence_09",
+      "returncode": 0,
+      "sequence": 9,
+      "spec": {
+        "boundary_role": "positive_candidate",
+        "max_output_tokens": 128,
+        "order_index": 3,
+        "policy_mode": "always_recompute",
+        "request_rate": 18.0,
+        "round_index": 3,
+        "workload": "shared_tool_scaffold_agent"
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_formal_20260803/shared_scenario_multi_turn_knowledge_service/always_recompute/round_01_sequence_10",
+      "returncode": 0,
+      "sequence": 10,
+      "spec": {
+        "boundary_role": "fallback_or_no_gain_candidate",
+        "max_output_tokens": 64,
+        "order_index": 1,
+        "policy_mode": "always_recompute",
+        "request_rate": 24.0,
+        "round_index": 1,
+        "workload": "shared_scenario_multi_turn_knowledge_service"
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_formal_20260803/shared_scenario_multi_turn_knowledge_service/always_full_reuse/round_01_sequence_11",
+      "returncode": 0,
+      "sequence": 11,
+      "spec": {
+        "boundary_role": "fallback_or_no_gain_candidate",
+        "max_output_tokens": 64,
+        "order_index": 2,
+        "policy_mode": "always_full_reuse",
+        "request_rate": 24.0,
+        "round_index": 1,
+        "workload": "shared_scenario_multi_turn_knowledge_service"
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_formal_20260803/shared_scenario_multi_turn_knowledge_service/controller/round_01_sequence_12",
+      "returncode": 0,
+      "sequence": 12,
+      "spec": {
+        "boundary_role": "fallback_or_no_gain_candidate",
+        "max_output_tokens": 64,
+        "order_index": 3,
+        "policy_mode": "controller",
+        "request_rate": 24.0,
+        "round_index": 1,
+        "workload": "shared_scenario_multi_turn_knowledge_service"
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_formal_20260803/shared_scenario_multi_turn_knowledge_service/controller/round_02_sequence_13",
+      "returncode": 0,
+      "sequence": 13,
+      "spec": {
+        "boundary_role": "fallback_or_no_gain_candidate",
+        "max_output_tokens": 64,
+        "order_index": 1,
+        "policy_mode": "controller",
+        "request_rate": 24.0,
+        "round_index": 2,
+        "workload": "shared_scenario_multi_turn_knowledge_service"
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_formal_20260803/shared_scenario_multi_turn_knowledge_service/always_recompute/round_02_sequence_14",
+      "returncode": 0,
+      "sequence": 14,
+      "spec": {
+        "boundary_role": "fallback_or_no_gain_candidate",
+        "max_output_tokens": 64,
+        "order_index": 2,
+        "policy_mode": "always_recompute",
+        "request_rate": 24.0,
+        "round_index": 2,
+        "workload": "shared_scenario_multi_turn_knowledge_service"
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_formal_20260803/shared_scenario_multi_turn_knowledge_service/always_full_reuse/round_02_sequence_15",
+      "returncode": 0,
+      "sequence": 15,
+      "spec": {
+        "boundary_role": "fallback_or_no_gain_candidate",
+        "max_output_tokens": 64,
+        "order_index": 3,
+        "policy_mode": "always_full_reuse",
+        "request_rate": 24.0,
+        "round_index": 2,
+        "workload": "shared_scenario_multi_turn_knowledge_service"
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_formal_20260803/shared_scenario_multi_turn_knowledge_service/always_full_reuse/round_03_sequence_16",
+      "returncode": 0,
+      "sequence": 16,
+      "spec": {
+        "boundary_role": "fallback_or_no_gain_candidate",
+        "max_output_tokens": 64,
+        "order_index": 1,
+        "policy_mode": "always_full_reuse",
+        "request_rate": 24.0,
+        "round_index": 3,
+        "workload": "shared_scenario_multi_turn_knowledge_service"
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_formal_20260803/shared_scenario_multi_turn_knowledge_service/controller/round_03_sequence_17",
+      "returncode": 0,
+      "sequence": 17,
+      "spec": {
+        "boundary_role": "fallback_or_no_gain_candidate",
+        "max_output_tokens": 64,
+        "order_index": 2,
+        "policy_mode": "controller",
+        "request_rate": 24.0,
+        "round_index": 3,
+        "workload": "shared_scenario_multi_turn_knowledge_service"
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_formal_20260803/shared_scenario_multi_turn_knowledge_service/always_recompute/round_03_sequence_18",
+      "returncode": 0,
+      "sequence": 18,
+      "spec": {
+        "boundary_role": "fallback_or_no_gain_candidate",
+        "max_output_tokens": 64,
+        "order_index": 3,
+        "policy_mode": "always_recompute",
+        "request_rate": 24.0,
+        "round_index": 3,
+        "workload": "shared_scenario_multi_turn_knowledge_service"
+      },
+      "validation_returncode": 0
+    }
+  ],
+  "schedule": [
+    {
+      "boundary_role": "positive_candidate",
+      "max_output_tokens": 128,
+      "order_index": 1,
+      "policy_mode": "always_recompute",
+      "request_rate": 18.0,
+      "round_index": 1,
+      "workload": "shared_tool_scaffold_agent"
+    },
+    {
+      "boundary_role": "positive_candidate",
+      "max_output_tokens": 128,
+      "order_index": 2,
+      "policy_mode": "always_full_reuse",
+      "request_rate": 18.0,
+      "round_index": 1,
+      "workload": "shared_tool_scaffold_agent"
+    },
+    {
+      "boundary_role": "positive_candidate",
+      "max_output_tokens": 128,
+      "order_index": 3,
+      "policy_mode": "controller",
+      "request_rate": 18.0,
+      "round_index": 1,
+      "workload": "shared_tool_scaffold_agent"
+    },
+    {
+      "boundary_role": "positive_candidate",
+      "max_output_tokens": 128,
+      "order_index": 1,
+      "policy_mode": "controller",
+      "request_rate": 18.0,
+      "round_index": 2,
+      "workload": "shared_tool_scaffold_agent"
+    },
+    {
+      "boundary_role": "positive_candidate",
+      "max_output_tokens": 128,
+      "order_index": 2,
+      "policy_mode": "always_recompute",
+      "request_rate": 18.0,
+      "round_index": 2,
+      "workload": "shared_tool_scaffold_agent"
+    },
+    {
+      "boundary_role": "positive_candidate",
+      "max_output_tokens": 128,
+      "order_index": 3,
+      "policy_mode": "always_full_reuse",
+      "request_rate": 18.0,
+      "round_index": 2,
+      "workload": "shared_tool_scaffold_agent"
+    },
+    {
+      "boundary_role": "positive_candidate",
+      "max_output_tokens": 128,
+      "order_index": 1,
+      "policy_mode": "always_full_reuse",
+      "request_rate": 18.0,
+      "round_index": 3,
+      "workload": "shared_tool_scaffold_agent"
+    },
+    {
+      "boundary_role": "positive_candidate",
+      "max_output_tokens": 128,
+      "order_index": 2,
+      "policy_mode": "controller",
+      "request_rate": 18.0,
+      "round_index": 3,
+      "workload": "shared_tool_scaffold_agent"
+    },
+    {
+      "boundary_role": "positive_candidate",
+      "max_output_tokens": 128,
+      "order_index": 3,
+      "policy_mode": "always_recompute",
+      "request_rate": 18.0,
+      "round_index": 3,
+      "workload": "shared_tool_scaffold_agent"
+    },
+    {
+      "boundary_role": "fallback_or_no_gain_candidate",
+      "max_output_tokens": 64,
+      "order_index": 1,
+      "policy_mode": "always_recompute",
+      "request_rate": 24.0,
+      "round_index": 1,
+      "workload": "shared_scenario_multi_turn_knowledge_service"
+    },
+    {
+      "boundary_role": "fallback_or_no_gain_candidate",
+      "max_output_tokens": 64,
+      "order_index": 2,
+      "policy_mode": "always_full_reuse",
+      "request_rate": 24.0,
+      "round_index": 1,
+      "workload": "shared_scenario_multi_turn_knowledge_service"
+    },
+    {
+      "boundary_role": "fallback_or_no_gain_candidate",
+      "max_output_tokens": 64,
+      "order_index": 3,
+      "policy_mode": "controller",
+      "request_rate": 24.0,
+      "round_index": 1,
+      "workload": "shared_scenario_multi_turn_knowledge_service"
+    },
+    {
+      "boundary_role": "fallback_or_no_gain_candidate",
+      "max_output_tokens": 64,
+      "order_index": 1,
+      "policy_mode": "controller",
+      "request_rate": 24.0,
+      "round_index": 2,
+      "workload": "shared_scenario_multi_turn_knowledge_service"
+    },
+    {
+      "boundary_role": "fallback_or_no_gain_candidate",
+      "max_output_tokens": 64,
+      "order_index": 2,
+      "policy_mode": "always_recompute",
+      "request_rate": 24.0,
+      "round_index": 2,
+      "workload": "shared_scenario_multi_turn_knowledge_service"
+    },
+    {
+      "boundary_role": "fallback_or_no_gain_candidate",
+      "max_output_tokens": 64,
+      "order_index": 3,
+      "policy_mode": "always_full_reuse",
+      "request_rate": 24.0,
+      "round_index": 2,
+      "workload": "shared_scenario_multi_turn_knowledge_service"
+    },
+    {
+      "boundary_role": "fallback_or_no_gain_candidate",
+      "max_output_tokens": 64,
+      "order_index": 1,
+      "policy_mode": "always_full_reuse",
+      "request_rate": 24.0,
+      "round_index": 3,
+      "workload": "shared_scenario_multi_turn_knowledge_service"
+    },
+    {
+      "boundary_role": "fallback_or_no_gain_candidate",
+      "max_output_tokens": 64,
+      "order_index": 2,
+      "policy_mode": "controller",
+      "request_rate": 24.0,
+      "round_index": 3,
+      "workload": "shared_scenario_multi_turn_knowledge_service"
+    },
+    {
+      "boundary_role": "fallback_or_no_gain_candidate",
+      "max_output_tokens": 64,
+      "order_index": 3,
+      "policy_mode": "always_recompute",
+      "request_rate": 24.0,
+      "round_index": 3,
+      "workload": "shared_scenario_multi_turn_knowledge_service"
+    }
+  ],
+  "schema_version": 2,
+  "started_at_s": 1785728347.274436,
+  "status": "completed",
+  "study": "M2 three-action online benefit boundary"
+}

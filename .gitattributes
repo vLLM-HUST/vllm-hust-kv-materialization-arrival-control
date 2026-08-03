@@ -1,0 +1,1 @@
+paper/kv_materialization_control/experiments/results/**/*.log -diff -text

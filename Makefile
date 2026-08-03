@@ -17,7 +17,8 @@ PAPER_DIR := paper/kv_materialization_control
 .DEFAULT_GOAL := help
 
 M2_SUITE_DIR ?= /tmp/kv_materialization_m2_online
-M2_RESULTS_DIR ?= $(BENCH_DIR)/results/m2_online_boundary
+M2_REBUILD_INPUT_DIR ?= $(BENCH_DIR)/results/m2_online_boundary_20260803
+M2_RESULTS_DIR ?= $(M2_REBUILD_INPUT_DIR)/generated
 
 .PHONY: help bootstrap-env install-dev smoke test shared-workloads-smoke shared-workloads-test lint format build bench paper offline-experiment experiment decision-study study-experiment shared-workloads-offline paper-experiment runtime-boundary-live live-benchmark shared-workloads-live optimization-live m1-online-rebuild m2-online-boundary m2-online-rebuild pdf paper-pdf evidence clean
 
@@ -112,7 +113,7 @@ m2-online-boundary:
 
 m2-online-rebuild:
 	PYTHONPATH=src $(PYTHON) $(BENCH_DIR)/aggregate_m2_boundary.py \
-		--input-dir '$(M2_SUITE_DIR)' \
+		--input-dir '$(M2_REBUILD_INPUT_DIR)' \
 		--output-dir '$(M2_RESULTS_DIR)'
 
 pdf: paper-pdf
