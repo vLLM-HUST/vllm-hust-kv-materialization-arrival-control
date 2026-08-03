@@ -1,0 +1,259 @@
+{
+  "applied_decision_mix": {
+    "full_reuse": 0,
+    "partial_reuse": 0,
+    "recompute": 32
+  },
+  "completed": 32,
+  "engine_accounting": [
+    {
+      "prompt_tokens": 3401,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3401,
+      "request_id": "shared_public_sharegpt_boundary-0",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3401,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3401,
+      "request_id": "shared_public_sharegpt_boundary-1",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3428,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3428,
+      "request_id": "shared_public_sharegpt_boundary-10",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3549,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3549,
+      "request_id": "shared_public_sharegpt_boundary-11",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3422,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3422,
+      "request_id": "shared_public_sharegpt_boundary-12",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3407,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3407,
+      "request_id": "shared_public_sharegpt_boundary-13",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3500,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3500,
+      "request_id": "shared_public_sharegpt_boundary-14",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3420,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3420,
+      "request_id": "shared_public_sharegpt_boundary-15",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3534,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3534,
+      "request_id": "shared_public_sharegpt_boundary-16",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3508,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3508,
+      "request_id": "shared_public_sharegpt_boundary-17",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3429,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3429,
+      "request_id": "shared_public_sharegpt_boundary-18",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3462,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3462,
+      "request_id": "shared_public_sharegpt_boundary-19",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3349,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3349,
+      "request_id": "shared_public_sharegpt_boundary-2",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3493,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3493,
+      "request_id": "shared_public_sharegpt_boundary-20",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3494,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3494,
+      "request_id": "shared_public_sharegpt_boundary-21",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3525,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3525,
+      "request_id": "shared_public_sharegpt_boundary-22",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3536,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3536,
+      "request_id": "shared_public_sharegpt_boundary-23",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3511,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3511,
+      "request_id": "shared_public_sharegpt_boundary-24",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3559,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3559,
+      "request_id": "shared_public_sharegpt_boundary-25",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3492,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3492,
+      "request_id": "shared_public_sharegpt_boundary-26",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3448,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3448,
+      "request_id": "shared_public_sharegpt_boundary-27",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3433,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3433,
+      "request_id": "shared_public_sharegpt_boundary-28",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3534,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3534,
+      "request_id": "shared_public_sharegpt_boundary-29",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3395,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3395,
+      "request_id": "shared_public_sharegpt_boundary-3",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3552,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3552,
+      "request_id": "shared_public_sharegpt_boundary-30",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3511,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3511,
+      "request_id": "shared_public_sharegpt_boundary-31",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3445,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3445,
+      "request_id": "shared_public_sharegpt_boundary-4",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3339,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3339,
+      "request_id": "shared_public_sharegpt_boundary-5",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3455,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3455,
+      "request_id": "shared_public_sharegpt_boundary-6",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3365,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3365,
+      "request_id": "shared_public_sharegpt_boundary-7",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3389,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3389,
+      "request_id": "shared_public_sharegpt_boundary-8",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 3343,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 3343,
+      "request_id": "shared_public_sharegpt_boundary-9",
+      "reused_tokens": 0
+    }
+  ],
+  "engine_event_count": 4134,
+  "errors": [],
+  "failed": 0,
+  "observation_count": 32,
+  "raw_summary_verification": {
+    "recomputed": {
+      "completed": 32,
+      "failures": [],
+      "mean_latency_ms": 1894.111,
+      "mean_ttft_ms": 511.203,
+      "p95_latency_ms": 2077.672,
+      "p95_ttft_ms": 740.849,
+      "requests": 32
+    },
+    "throughput": {
+      "reason": "the historical bundle does not contain an independent raw suite measurement duration; throughput remains sourced from request_summary.json",
+      "status": "not_raw_recomputable"
+    },
+    "valid": true
+  },
+  "realized_decision_mix": {
+    "recompute": 32
+  },
+  "request_count": 32,
+  "valid": true
+}

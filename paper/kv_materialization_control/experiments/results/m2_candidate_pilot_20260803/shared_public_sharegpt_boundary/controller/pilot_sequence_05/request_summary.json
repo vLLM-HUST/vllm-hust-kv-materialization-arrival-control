@@ -1,0 +1,23 @@
+{
+  "completed": 32,
+  "completed_output_tokens": 2045,
+  "concurrency": 4,
+  "dataset_name": "sharegpt",
+  "failures": [],
+  "finished_at_utc": "2026-08-03T06:30:31.181239Z",
+  "mean_latency_ms": 1818.236,
+  "mean_ttft_ms": 519.928,
+  "measurement_duration_s": 14.65418004989624,
+  "output_throughput_toks": 139.551,
+  "p95_latency_ms": 1976.127,
+  "p95_ttft_ms": 645.969,
+  "request_rate": 24.0,
+  "request_throughput_rps": 2.184,
+  "requests": 32,
+  "requests_output": "/tmp/kvmat_m2_candidate_pilot_20260803_v2/shared_public_sharegpt_boundary/controller/pilot_sequence_05/request_results.jsonl",
+  "seed": 7,
+  "started_at_utc": "2026-08-03T06:30:16.527059Z",
+  "workload_case": "shared_public_sharegpt_boundary",
+  "workload_family": "sharegpt-public-boundary",
+  "workload_label": "Public boundary: ShareGPT conversation mix"
+}

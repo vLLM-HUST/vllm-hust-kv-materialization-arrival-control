@@ -1,0 +1,3 @@
+workload,best_fixed_ttft_policy,controller_vs_best_fixed_ttft_pct,controller_vs_best_fixed_e2e_pct,controller_vs_best_fixed_throughput_pct,promotion
+shared_async_document_pipeline,always_full_reuse,14.720402,1.906331,-1.73215,False
+shared_public_sharegpt_boundary,always_full_reuse,130.902599,35.685912,-25.613079,False

@@ -1,0 +1,596 @@
+{
+  "applied_decision_mix": {
+    "full_reuse": 80,
+    "partial_reuse": 0,
+    "recompute": 0
+  },
+  "completed": 80,
+  "engine_accounting": [
+    {
+      "prompt_tokens": 906,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 906,
+      "request_id": "shared_async_document_pipeline-0",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 906,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 906,
+      "request_id": "shared_async_document_pipeline-1",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 901,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 901,
+      "request_id": "shared_async_document_pipeline-10",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 901,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 901,
+      "request_id": "shared_async_document_pipeline-11",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 901,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 901,
+      "request_id": "shared_async_document_pipeline-12",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 901,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 901,
+      "request_id": "shared_async_document_pipeline-13",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 901,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 901,
+      "request_id": "shared_async_document_pipeline-14",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 901,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 901,
+      "request_id": "shared_async_document_pipeline-15",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 901,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 901,
+      "request_id": "shared_async_document_pipeline-16",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 901,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 901,
+      "request_id": "shared_async_document_pipeline-17",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 901,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 901,
+      "request_id": "shared_async_document_pipeline-18",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 901,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 901,
+      "request_id": "shared_async_document_pipeline-19",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 906,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 906,
+      "request_id": "shared_async_document_pipeline-2",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 954,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 186,
+      "request_id": "shared_async_document_pipeline-20",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 954,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 186,
+      "request_id": "shared_async_document_pipeline-21",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 954,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 186,
+      "request_id": "shared_async_document_pipeline-22",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 954,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 186,
+      "request_id": "shared_async_document_pipeline-23",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 954,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 186,
+      "request_id": "shared_async_document_pipeline-24",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 954,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 186,
+      "request_id": "shared_async_document_pipeline-25",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 954,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 186,
+      "request_id": "shared_async_document_pipeline-26",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 954,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 186,
+      "request_id": "shared_async_document_pipeline-27",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 946,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 178,
+      "request_id": "shared_async_document_pipeline-28",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 947,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 179,
+      "request_id": "shared_async_document_pipeline-29",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 906,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 906,
+      "request_id": "shared_async_document_pipeline-3",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 946,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 178,
+      "request_id": "shared_async_document_pipeline-30",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 946,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 178,
+      "request_id": "shared_async_document_pipeline-31",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 946,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 178,
+      "request_id": "shared_async_document_pipeline-32",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 946,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 178,
+      "request_id": "shared_async_document_pipeline-33",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 946,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 178,
+      "request_id": "shared_async_document_pipeline-34",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 946,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 178,
+      "request_id": "shared_async_document_pipeline-35",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 946,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 178,
+      "request_id": "shared_async_document_pipeline-36",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 946,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 178,
+      "request_id": "shared_async_document_pipeline-37",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 946,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 178,
+      "request_id": "shared_async_document_pipeline-38",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 946,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 178,
+      "request_id": "shared_async_document_pipeline-39",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 906,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 906,
+      "request_id": "shared_async_document_pipeline-4",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 1014,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 246,
+      "request_id": "shared_async_document_pipeline-40",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 1014,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 246,
+      "request_id": "shared_async_document_pipeline-41",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 1014,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 246,
+      "request_id": "shared_async_document_pipeline-42",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 1014,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 246,
+      "request_id": "shared_async_document_pipeline-43",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 1014,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 246,
+      "request_id": "shared_async_document_pipeline-44",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 1014,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 246,
+      "request_id": "shared_async_document_pipeline-45",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 1014,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 246,
+      "request_id": "shared_async_document_pipeline-46",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 1014,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 246,
+      "request_id": "shared_async_document_pipeline-47",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 1006,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 238,
+      "request_id": "shared_async_document_pipeline-48",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 1007,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 239,
+      "request_id": "shared_async_document_pipeline-49",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 906,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 906,
+      "request_id": "shared_async_document_pipeline-5",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 1012,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 244,
+      "request_id": "shared_async_document_pipeline-50",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 1012,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 244,
+      "request_id": "shared_async_document_pipeline-51",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 1012,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 244,
+      "request_id": "shared_async_document_pipeline-52",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 1012,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 244,
+      "request_id": "shared_async_document_pipeline-53",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 1012,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 244,
+      "request_id": "shared_async_document_pipeline-54",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 1012,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 244,
+      "request_id": "shared_async_document_pipeline-55",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 1012,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 244,
+      "request_id": "shared_async_document_pipeline-56",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 1012,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 244,
+      "request_id": "shared_async_document_pipeline-57",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 1012,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 244,
+      "request_id": "shared_async_document_pipeline-58",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 1012,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 244,
+      "request_id": "shared_async_document_pipeline-59",
+      "reused_tokens": 768
+    },
+    {
+      "prompt_tokens": 906,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 906,
+      "request_id": "shared_async_document_pipeline-6",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 1077,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 181,
+      "request_id": "shared_async_document_pipeline-60",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1077,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 181,
+      "request_id": "shared_async_document_pipeline-61",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1077,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 181,
+      "request_id": "shared_async_document_pipeline-62",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1077,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 181,
+      "request_id": "shared_async_document_pipeline-63",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1077,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 181,
+      "request_id": "shared_async_document_pipeline-64",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1077,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 181,
+      "request_id": "shared_async_document_pipeline-65",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1077,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 181,
+      "request_id": "shared_async_document_pipeline-66",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1077,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 181,
+      "request_id": "shared_async_document_pipeline-67",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1069,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 173,
+      "request_id": "shared_async_document_pipeline-68",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1070,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 174,
+      "request_id": "shared_async_document_pipeline-69",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 906,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 906,
+      "request_id": "shared_async_document_pipeline-7",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 1072,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 176,
+      "request_id": "shared_async_document_pipeline-70",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1072,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 176,
+      "request_id": "shared_async_document_pipeline-71",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1072,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 176,
+      "request_id": "shared_async_document_pipeline-72",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1072,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 176,
+      "request_id": "shared_async_document_pipeline-73",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1072,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 176,
+      "request_id": "shared_async_document_pipeline-74",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1072,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 176,
+      "request_id": "shared_async_document_pipeline-75",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1072,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 176,
+      "request_id": "shared_async_document_pipeline-76",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1072,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 176,
+      "request_id": "shared_async_document_pipeline-77",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1072,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 176,
+      "request_id": "shared_async_document_pipeline-78",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1072,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 176,
+      "request_id": "shared_async_document_pipeline-79",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 898,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 898,
+      "request_id": "shared_async_document_pipeline-8",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 899,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 899,
+      "request_id": "shared_async_document_pipeline-9",
+      "reused_tokens": 0
+    }
+  ],
+  "engine_event_count": 15443,
+  "errors": [],
+  "failed": 0,
+  "observation_count": 80,
+  "raw_summary_verification": {
+    "recomputed": {
+      "completed": 80,
+      "failures": [],
+      "mean_latency_ms": 1673.109,
+      "mean_ttft_ms": 137.34,
+      "p95_latency_ms": 1811.023,
+      "p95_ttft_ms": 232.412,
+      "requests": 80
+    },
+    "throughput": {
+      "reason": "the historical bundle does not contain an independent raw suite measurement duration; throughput remains sourced from request_summary.json",
+      "status": "not_raw_recomputable"
+    },
+    "valid": true
+  },
+  "realized_decision_mix": {
+    "partial_reuse": 60,
+    "recompute": 20
+  },
+  "request_count": 80,
+  "valid": true
+}

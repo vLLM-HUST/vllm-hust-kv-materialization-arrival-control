@@ -1,0 +1,65 @@
+{
+  "evidence_label": "real-online/m2-candidate-pilot",
+  "finished_at_s": 1785737509.3173158,
+  "promotion_gate": {
+    "controller_vs_best_fixed_e2e_pct_max": 5.0,
+    "controller_vs_best_fixed_throughput_pct_min": -5.0,
+    "controller_vs_best_fixed_ttft_pct_max": 2.0
+  },
+  "runs": [
+    {
+      "bundle_dir": "/tmp/kvmat_m2_candidate_pilot_20260803/shared_async_document_pipeline/controller/pilot_sequence_01",
+      "returncode": 0,
+      "sequence": 1,
+      "spec": {
+        "max_output_tokens": 96,
+        "policy_mode": "controller",
+        "request_rate": 18.0,
+        "workload": "shared_async_document_pipeline"
+      },
+      "validation_returncode": 2
+    }
+  ],
+  "schedule": [
+    {
+      "max_output_tokens": 96,
+      "policy_mode": "controller",
+      "request_rate": 18.0,
+      "workload": "shared_async_document_pipeline"
+    },
+    {
+      "max_output_tokens": 96,
+      "policy_mode": "always_full_reuse",
+      "request_rate": 18.0,
+      "workload": "shared_async_document_pipeline"
+    },
+    {
+      "max_output_tokens": 96,
+      "policy_mode": "always_recompute",
+      "request_rate": 18.0,
+      "workload": "shared_async_document_pipeline"
+    },
+    {
+      "max_output_tokens": 64,
+      "policy_mode": "always_recompute",
+      "request_rate": 24.0,
+      "workload": "shared_public_sharegpt_boundary"
+    },
+    {
+      "max_output_tokens": 64,
+      "policy_mode": "controller",
+      "request_rate": 24.0,
+      "workload": "shared_public_sharegpt_boundary"
+    },
+    {
+      "max_output_tokens": 64,
+      "policy_mode": "always_full_reuse",
+      "request_rate": 24.0,
+      "workload": "shared_public_sharegpt_boundary"
+    }
+  ],
+  "schema_version": 1,
+  "started_at_s": 1785737290.6248045,
+  "status": "failed",
+  "study": "M2 preregistered positive-candidate pilot"
+}
