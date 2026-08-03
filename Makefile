@@ -19,8 +19,10 @@ PAPER_DIR := paper/kv_materialization_control
 M2_SUITE_DIR ?= /tmp/kv_materialization_m2_online
 M2_REBUILD_INPUT_DIR ?= $(BENCH_DIR)/results/m2_online_boundary_20260803
 M2_RESULTS_DIR ?= $(M2_REBUILD_INPUT_DIR)/generated
+M2_PILOT_SUITE_DIR ?= /tmp/kv_materialization_m2_candidate_pilot
+M2_PILOT_RESULTS_DIR ?= $(M2_PILOT_SUITE_DIR)/generated
 
-.PHONY: help bootstrap-env install-dev smoke test shared-workloads-smoke shared-workloads-test lint format build bench paper offline-experiment experiment decision-study study-experiment shared-workloads-offline paper-experiment runtime-boundary-live live-benchmark shared-workloads-live optimization-live m1-online-rebuild m2-online-boundary m2-online-rebuild pdf paper-pdf evidence clean
+.PHONY: help bootstrap-env install-dev smoke test shared-workloads-smoke shared-workloads-test lint format build bench paper offline-experiment experiment decision-study study-experiment shared-workloads-offline paper-experiment runtime-boundary-live live-benchmark shared-workloads-live optimization-live m1-online-rebuild m2-online-boundary m2-online-rebuild m2-candidate-pilot m2-candidate-pilot-rebuild pdf paper-pdf evidence clean
 
 help:
 	@printf '%s\n' \
@@ -40,6 +42,8 @@ help:
 		'  make m1-online-rebuild  Rebuild M1 online CSV/TeX from committed raw bundles' \
 		'  make m2-online-boundary MODEL=<model> [M2_SUITE_DIR=/outside/worktree]  Run the preregistered M2 matrix' \
 		'  make m2-online-rebuild M2_SUITE_DIR=<validated-suite> [M2_RESULTS_DIR=<dir>]  Rebuild M2 artifacts' \
+		'  make m2-candidate-pilot MODEL=<model> [M2_PILOT_SUITE_DIR=/outside/worktree]  Run preregistered candidate pilot' \
+		'  make m2-candidate-pilot-rebuild M2_PILOT_SUITE_DIR=<suite>  Rebuild pilot verdict' \
 		'  make shared-workloads-live MODEL=<model> [WORKLOAD_CASE=<case>]  Compatibility alias of make runtime-boundary-live' \
 		'  make optimization-live MODEL=<model> [WORKLOAD_CASE=<case>]  Compatibility alias of make runtime-boundary-live' \
 		'  make pdf          Build the paper PDF after refreshing latest offline-study results' \
@@ -115,6 +119,16 @@ m2-online-rebuild:
 	PYTHONPATH=src $(PYTHON) $(BENCH_DIR)/aggregate_m2_boundary.py \
 		--input-dir '$(M2_REBUILD_INPUT_DIR)' \
 		--output-dir '$(M2_RESULTS_DIR)'
+
+m2-candidate-pilot:
+	PYTHONPATH=src $(PYTHON) $(BENCH_DIR)/run_m2_candidate_pilot.py \
+		--suite-dir '$(M2_PILOT_SUITE_DIR)' \
+		--model '$(MODEL)'
+
+m2-candidate-pilot-rebuild:
+	PYTHONPATH=src $(PYTHON) $(BENCH_DIR)/aggregate_m2_candidate_pilot.py \
+		--input-dir '$(M2_PILOT_SUITE_DIR)' \
+		--output-dir '$(M2_PILOT_RESULTS_DIR)'
 
 pdf: paper-pdf
 
