@@ -1,0 +1,22 @@
+{
+  "best_fixed_ttft_policy_by_round": [
+    "always_full_reuse",
+    "always_full_reuse",
+    "always_full_reuse",
+    "always_full_reuse",
+    "always_full_reuse"
+  ],
+  "controller_vs_best_fixed_e2e_pct_mean": 0.227367,
+  "controller_vs_best_fixed_throughput_pct_mean": -0.188592,
+  "controller_vs_best_fixed_ttft_pct_by_round": [
+    0.287455,
+    3.225093,
+    0.391324,
+    0.369321,
+    0.084067
+  ],
+  "controller_vs_best_fixed_ttft_pct_mean": 0.871452,
+  "controller_vs_best_fixed_ttft_pct_one_sided_95_upper": 2.131165,
+  "significant_meaningful_positive": false,
+  "workload": "shared_code_eval_judge"
+}

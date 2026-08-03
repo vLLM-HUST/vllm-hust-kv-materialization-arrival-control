@@ -1,0 +1,128 @@
+{
+  "candidate_set": "catalog-closure",
+  "evidence_label": "real-online/m2-catalog-closure-pilot",
+  "finished_at_s": 1785752055.8753743,
+  "num_shards": 5,
+  "promotion_gate": {
+    "controller_vs_best_fixed_e2e_pct_max": 5.0,
+    "controller_vs_best_fixed_throughput_pct_min": -5.0,
+    "controller_vs_best_fixed_ttft_pct_max": 2.0
+  },
+  "runs": [
+    {
+      "bundle_dir": "/tmp/kvmat_m2_catalog_closure_shard2_20260803/shared_rag_followup/controller/pilot_sequence_01",
+      "returncode": 0,
+      "sequence": 1,
+      "spec": {
+        "max_output_tokens": 48,
+        "policy_mode": "controller",
+        "request_rate": 18.0,
+        "workload": "shared_rag_followup"
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_catalog_closure_shard2_20260803/shared_rag_followup/always_full_reuse/pilot_sequence_02",
+      "returncode": 0,
+      "sequence": 2,
+      "spec": {
+        "max_output_tokens": 48,
+        "policy_mode": "always_full_reuse",
+        "request_rate": 18.0,
+        "workload": "shared_rag_followup"
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_catalog_closure_shard2_20260803/shared_rag_followup/always_recompute/pilot_sequence_03",
+      "returncode": 0,
+      "sequence": 3,
+      "spec": {
+        "max_output_tokens": 48,
+        "policy_mode": "always_recompute",
+        "request_rate": 18.0,
+        "workload": "shared_rag_followup"
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_catalog_closure_shard2_20260803/shared_realtime_voice_assistant/always_recompute/pilot_sequence_04",
+      "returncode": 0,
+      "sequence": 4,
+      "spec": {
+        "max_output_tokens": 72,
+        "policy_mode": "always_recompute",
+        "request_rate": 36.0,
+        "workload": "shared_realtime_voice_assistant"
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_catalog_closure_shard2_20260803/shared_realtime_voice_assistant/controller/pilot_sequence_05",
+      "returncode": 0,
+      "sequence": 5,
+      "spec": {
+        "max_output_tokens": 72,
+        "policy_mode": "controller",
+        "request_rate": 36.0,
+        "workload": "shared_realtime_voice_assistant"
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_catalog_closure_shard2_20260803/shared_realtime_voice_assistant/always_full_reuse/pilot_sequence_06",
+      "returncode": 0,
+      "sequence": 6,
+      "spec": {
+        "max_output_tokens": 72,
+        "policy_mode": "always_full_reuse",
+        "request_rate": 36.0,
+        "workload": "shared_realtime_voice_assistant"
+      },
+      "validation_returncode": 0
+    }
+  ],
+  "schedule": [
+    {
+      "max_output_tokens": 48,
+      "policy_mode": "controller",
+      "request_rate": 18.0,
+      "workload": "shared_rag_followup"
+    },
+    {
+      "max_output_tokens": 48,
+      "policy_mode": "always_full_reuse",
+      "request_rate": 18.0,
+      "workload": "shared_rag_followup"
+    },
+    {
+      "max_output_tokens": 48,
+      "policy_mode": "always_recompute",
+      "request_rate": 18.0,
+      "workload": "shared_rag_followup"
+    },
+    {
+      "max_output_tokens": 72,
+      "policy_mode": "always_recompute",
+      "request_rate": 36.0,
+      "workload": "shared_realtime_voice_assistant"
+    },
+    {
+      "max_output_tokens": 72,
+      "policy_mode": "controller",
+      "request_rate": 36.0,
+      "workload": "shared_realtime_voice_assistant"
+    },
+    {
+      "max_output_tokens": 72,
+      "policy_mode": "always_full_reuse",
+      "request_rate": 36.0,
+      "workload": "shared_realtime_voice_assistant"
+    }
+  ],
+  "schema_version": 1,
+  "shard_index": 2,
+  "started_at_s": 1785750944.216798,
+  "status": "completed",
+  "study": "M2 preregistered positive-candidate pilot"
+}

@@ -1,0 +1,128 @@
+{
+  "candidate_set": "catalog-closure",
+  "evidence_label": "real-online/m2-catalog-closure-pilot",
+  "finished_at_s": 1785752126.4324772,
+  "num_shards": 5,
+  "promotion_gate": {
+    "controller_vs_best_fixed_e2e_pct_max": 5.0,
+    "controller_vs_best_fixed_throughput_pct_min": -5.0,
+    "controller_vs_best_fixed_ttft_pct_max": 2.0
+  },
+  "runs": [
+    {
+      "bundle_dir": "/tmp/kvmat_m2_catalog_closure_shard1_20260803/shared_session_affine_bursty/controller/pilot_sequence_01",
+      "returncode": 0,
+      "sequence": 1,
+      "spec": {
+        "max_output_tokens": 128,
+        "policy_mode": "controller",
+        "request_rate": 30.0,
+        "workload": "shared_session_affine_bursty"
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_catalog_closure_shard1_20260803/shared_session_affine_bursty/always_full_reuse/pilot_sequence_02",
+      "returncode": 0,
+      "sequence": 2,
+      "spec": {
+        "max_output_tokens": 128,
+        "policy_mode": "always_full_reuse",
+        "request_rate": 30.0,
+        "workload": "shared_session_affine_bursty"
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_catalog_closure_shard1_20260803/shared_session_affine_bursty/always_recompute/pilot_sequence_03",
+      "returncode": 0,
+      "sequence": 3,
+      "spec": {
+        "max_output_tokens": 128,
+        "policy_mode": "always_recompute",
+        "request_rate": 30.0,
+        "workload": "shared_session_affine_bursty"
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_catalog_closure_shard1_20260803/shared_simulation_analysis_verification/always_recompute/pilot_sequence_04",
+      "returncode": 0,
+      "sequence": 4,
+      "spec": {
+        "max_output_tokens": 128,
+        "policy_mode": "always_recompute",
+        "request_rate": 14.0,
+        "workload": "shared_simulation_analysis_verification"
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_catalog_closure_shard1_20260803/shared_simulation_analysis_verification/controller/pilot_sequence_05",
+      "returncode": 0,
+      "sequence": 5,
+      "spec": {
+        "max_output_tokens": 128,
+        "policy_mode": "controller",
+        "request_rate": 14.0,
+        "workload": "shared_simulation_analysis_verification"
+      },
+      "validation_returncode": 0
+    },
+    {
+      "bundle_dir": "/tmp/kvmat_m2_catalog_closure_shard1_20260803/shared_simulation_analysis_verification/always_full_reuse/pilot_sequence_06",
+      "returncode": 0,
+      "sequence": 6,
+      "spec": {
+        "max_output_tokens": 128,
+        "policy_mode": "always_full_reuse",
+        "request_rate": 14.0,
+        "workload": "shared_simulation_analysis_verification"
+      },
+      "validation_returncode": 0
+    }
+  ],
+  "schedule": [
+    {
+      "max_output_tokens": 128,
+      "policy_mode": "controller",
+      "request_rate": 30.0,
+      "workload": "shared_session_affine_bursty"
+    },
+    {
+      "max_output_tokens": 128,
+      "policy_mode": "always_full_reuse",
+      "request_rate": 30.0,
+      "workload": "shared_session_affine_bursty"
+    },
+    {
+      "max_output_tokens": 128,
+      "policy_mode": "always_recompute",
+      "request_rate": 30.0,
+      "workload": "shared_session_affine_bursty"
+    },
+    {
+      "max_output_tokens": 128,
+      "policy_mode": "always_recompute",
+      "request_rate": 14.0,
+      "workload": "shared_simulation_analysis_verification"
+    },
+    {
+      "max_output_tokens": 128,
+      "policy_mode": "controller",
+      "request_rate": 14.0,
+      "workload": "shared_simulation_analysis_verification"
+    },
+    {
+      "max_output_tokens": 128,
+      "policy_mode": "always_full_reuse",
+      "request_rate": 14.0,
+      "workload": "shared_simulation_analysis_verification"
+    }
+  ],
+  "schema_version": 1,
+  "shard_index": 1,
+  "started_at_s": 1785750943.0238054,
+  "status": "completed",
+  "study": "M2 preregistered positive-candidate pilot"
+}

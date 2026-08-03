@@ -1,0 +1,5 @@
+workload,best_fixed_ttft_policy,controller_vs_best_fixed_ttft_pct,controller_vs_best_fixed_e2e_pct,controller_vs_best_fixed_throughput_pct,promotion
+shared_code_eval_judge,always_full_reuse,-1.210524,-0.232951,0.172191,True
+shared_memory_write_then_reuse,always_full_reuse,3.832031,0.67106,-0.692341,False
+shared_multi_turn_support_chat,always_full_reuse,110.726711,22.919086,-18.474946,False
+shared_structured_json_generation,always_full_reuse,0.913918,1.214646,-1.323655,True

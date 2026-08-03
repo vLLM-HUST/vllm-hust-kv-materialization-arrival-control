@@ -9,7 +9,13 @@
 | 论文机制表与继续投稿/停止判断 | derived-artifact | supported：成本/性能和 action/fallback 两个 panel 均由 raw bundle 重建；`stop_mechanism_direction`，不继续逐 workload 调参 | `m2_mechanism_table.tex`, `m2_action_table.tex`, `m2_verdict.json` |
 | M2 offline-ranked positive-candidate pilot | real-online | negative/exploratory：两个新增候选均未通过 promotion gate；不作为重复确认或论文正收益证据 | `experiments/results/m2_candidate_pilot_20260803/` |
 | M2 anchor-topology positive-candidate pilot | real-online | exploratory：multi-tenant candidate 以 TTFT -3.65% 通过 promotion gate；必须由排除 pilot 的三轮 matched confirmation 复验 | `experiments/results/m2_anchor_pilot_20260803/` |
-| M2 anchor-topology independent confirmation | real-online | nominal positive but below meaningful threshold：TTFT -0.90%、E2E -1.36%、throughput +1.35%；不满足预注册 5% TTFT boundary | `experiments/results/m2_anchor_confirmation_20260803/` |
+| M2 anchor-topology independent confirmation | real-online | not positive：TTFT -0.90%、E2E -1.36%、throughput +1.35%，但不满足预注册 5% TTFT boundary，且轮级方向为 2 胜 1 负 | `experiments/results/m2_anchor_confirmation_20260803/` |
+| M2 stateful-secondary 四 workload pilot | real-online | exploratory：4 个新 workload、12/12 lifecycle；2 个通过宽松晋级门槛，pilot 不作为正收益证据 | `experiments/results/m2_stateful_secondary_pilot_20260803/` |
+| M2 stateful-secondary 五轮确认 | real-online | negative：code-eval 与 structured-JSON 的 controller TTFT 均为 +0.87%，单侧 95% 上界分别 +2.13%/+2.95% | `experiments/results/m2_significance_code_eval_20260803/`, `experiments/results/m2_significance_structured_json_20260803/` |
+| M2 剩余 canonical catalog closure pilot | real-online | exploratory/negative：10 个 workload、30/30 lifecycle；2 个通过宽松晋级门槛，其余回退 +2.20% 至 +39.90% | `experiments/results/m2_catalog_closure_20260803/` |
+| M2 catalog closure 五轮确认 | real-online | negative：long-context TTFT +3.70%（95% 上界 +6.19%），bursty +2.29%（上界 +3.89%）；20/20 轮最佳固定策略均为 full reuse | `experiments/results/m2_significance_long_context_20260803/`, `experiments/results/m2_significance_bursty_20260803/` |
+| M2 扩展 workload 的 cost-model 排序 | simulation/model | supported at confirmation boundary：离线模型未预测任何 >=5% 收益，且 4 个晋级 workload 的五轮在线最佳固定策略均为 full reuse；不进行逐 workload 参数校准 | offline study → four confirmation verdicts |
+| M2 现有 catalog 显著正收益结论 | derived-artifact | negative/stop：14 个新 canonical workload 完成 pilot，4 个晋级者全部完成五轮确认；102/102 lifecycle、6192/6192 请求有效，未发现 >=5% 且单侧 95% 上界低于 0 的 workload；停止 post-hoc 搜索和调参 | `experiments/results/m2_catalog_closure_20260803/README.md`, `mechanism_breakdown.csv` |
 
 生成的 `claim_ledger.json` 是该轮结果的机器可读 ledger。requested action 仍不得写成
 realized reuse；例如 tool controller 的 lifecycle 中位 applied mix 是 8/8/16

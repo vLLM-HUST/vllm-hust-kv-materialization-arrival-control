@@ -1,0 +1,21 @@
+{
+  "promoted_workloads": [],
+  "workloads": [
+    {
+      "best_fixed_ttft_policy": "always_full_reuse",
+      "controller_vs_best_fixed_e2e_pct": 0.49154,
+      "controller_vs_best_fixed_throughput_pct": -0.41632,
+      "controller_vs_best_fixed_ttft_pct": 4.814395,
+      "promotion": false,
+      "workload": "shared_experiment_planning_assistant"
+    },
+    {
+      "best_fixed_ttft_policy": "always_full_reuse",
+      "controller_vs_best_fixed_e2e_pct": 1.676931,
+      "controller_vs_best_fixed_throughput_pct": -1.554404,
+      "controller_vs_best_fixed_ttft_pct": 12.440842,
+      "promotion": false,
+      "workload": "shared_session_affine_multi_turn"
+    }
+  ]
+}

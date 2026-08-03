@@ -1,0 +1,3 @@
+workload,best_fixed_ttft_policy,controller_vs_best_fixed_ttft_pct,controller_vs_best_fixed_e2e_pct,controller_vs_best_fixed_throughput_pct,promotion
+shared_preemption_resume_long_decode,always_full_reuse,19.95224,2.023289,-1.954121,False
+shared_repo_aware_coding_assistant,always_full_reuse,12.688469,1.480766,-1.495112,False

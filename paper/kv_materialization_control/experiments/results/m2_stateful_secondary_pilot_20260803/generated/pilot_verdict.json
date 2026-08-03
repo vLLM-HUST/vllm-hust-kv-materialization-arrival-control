@@ -1,0 +1,40 @@
+{
+  "promoted_workloads": [
+    "shared_code_eval_judge",
+    "shared_structured_json_generation"
+  ],
+  "workloads": [
+    {
+      "best_fixed_ttft_policy": "always_full_reuse",
+      "controller_vs_best_fixed_e2e_pct": -0.232951,
+      "controller_vs_best_fixed_throughput_pct": 0.172191,
+      "controller_vs_best_fixed_ttft_pct": -1.210524,
+      "promotion": true,
+      "workload": "shared_code_eval_judge"
+    },
+    {
+      "best_fixed_ttft_policy": "always_full_reuse",
+      "controller_vs_best_fixed_e2e_pct": 0.67106,
+      "controller_vs_best_fixed_throughput_pct": -0.692341,
+      "controller_vs_best_fixed_ttft_pct": 3.832031,
+      "promotion": false,
+      "workload": "shared_memory_write_then_reuse"
+    },
+    {
+      "best_fixed_ttft_policy": "always_full_reuse",
+      "controller_vs_best_fixed_e2e_pct": 22.919086,
+      "controller_vs_best_fixed_throughput_pct": -18.474946,
+      "controller_vs_best_fixed_ttft_pct": 110.726711,
+      "promotion": false,
+      "workload": "shared_multi_turn_support_chat"
+    },
+    {
+      "best_fixed_ttft_policy": "always_full_reuse",
+      "controller_vs_best_fixed_e2e_pct": 1.214646,
+      "controller_vs_best_fixed_throughput_pct": -1.323655,
+      "controller_vs_best_fixed_ttft_pct": 0.913918,
+      "promotion": true,
+      "workload": "shared_structured_json_generation"
+    }
+  ]
+}

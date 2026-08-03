@@ -22,9 +22,11 @@ This directory keeps three evidence layers separate.
 	`always_recompute` and `always_full_reuse`
 
 The manuscript should not blur those layers into a single end-to-end claim.
-The completed M2 result is negative: the controller loses to
-`always_full_reuse` in all six matched rounds, so the current mechanism
-direction stops without per-workload retuning.
+The completed M2 result is negative. After the original matrix, the existing
+catalog was closed with 14 additional canonical-workload pilots and four
+five-round confirmations. None confirmed a meaningful significant gain, and
+`always_full_reuse` won all 20 added confirmation rounds. The current mechanism
+direction stops without per-workload retuning or post-hoc workload search.
 
 ## Local Workflow
 

@@ -15,11 +15,10 @@ deltas are:
 - end-to-end latency: -1.36% (improvement);
 - request throughput: +1.35% (improvement).
 
-This is a nominal positive workload under the literal sign-based definition:
-all three primary metrics move in the favorable direction. It is not a
-meaningful positive boundary under the preregistered 5% TTFT rule. Controller
-won TTFT in rounds 1 and 2 but lost in round 3, so the result must not be
-reported as a stable 5% gain.
+All three primary metric signs are nominally favorable, but this is not a
+positive conclusion under the preregistered 5% TTFT rule. Controller won TTFT
+in rounds 1 and 2 but lost in round 3, so the result must not be reported as a
+stable or significant gain.
 
 Rebuild with:
 

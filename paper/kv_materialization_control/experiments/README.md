@@ -133,3 +133,27 @@ The completed suite is
 `always_full_reuse`; its mean matched TTFT regression versus the best fixed
 policy was 9.24% on tool scaffold and 6.60% on knowledge service. The emitted
 verdict is therefore `stop_mechanism_direction`.
+
+## M2 Existing-Catalog Closure
+
+The later catalog closure is preregistered in
+`M2_SIGNIFICANCE_EXPANSION_PROTOCOL.md` and
+`M2_CATALOG_CLOSURE_PROTOCOL.md`. Fourteen additional canonical workloads were
+screened without changing controller parameters. Four passed a permissive pilot
+gate and received five fresh matched rounds.
+
+All four confirmations were negative: controller TTFT means relative to the
+per-round best fixed policy were +0.87%, +0.87%, +3.70%, and +2.29%, and all
+one-sided 95% upper bounds were above zero. Full reuse was the best fixed TTFT
+policy in 20/20 confirmation rounds. The finite conclusion is therefore “no
+meaningful significant positive workload in the existing catalog under the
+matched model/runtime,” not a universal impossibility theorem.
+
+The auditable summary and mechanism CSV are under
+`results/m2_catalog_closure_20260803/`. Rebuild a five-round verdict with:
+
+```bash
+make m2-significance-confirmation-rebuild \
+  M2_SIGNIFICANCE_CONFIRMATION_DIR=/outside/worktree/confirmation_suite \
+  M2_SIGNIFICANCE_CONFIRMATION_RESULTS_DIR=/tmp/rebuilt
+```
