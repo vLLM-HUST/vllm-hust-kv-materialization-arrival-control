@@ -24,6 +24,8 @@ M2_PILOT_RESULTS_DIR ?= $(M2_PILOT_SUITE_DIR)/generated
 M2_ANCHOR_CONFIRMATION_DIR ?= /tmp/kv_materialization_m2_anchor_confirmation
 M2_ANCHOR_CONFIRMATION_RESULTS_DIR ?= $(M2_ANCHOR_CONFIRMATION_DIR)/generated
 M2_PILOT_CANDIDATE_SET ?= offline-ranked
+M2_PILOT_SHARD_INDEX ?= 0
+M2_PILOT_NUM_SHARDS ?= 1
 M2_SIGNIFICANCE_CONFIRMATION_DIR ?= /tmp/kv_materialization_m2_significance_confirmation
 M2_SIGNIFICANCE_CONFIRMATION_RESULTS_DIR ?= $(M2_SIGNIFICANCE_CONFIRMATION_DIR)/generated
 
@@ -132,7 +134,9 @@ m2-candidate-pilot:
 	PYTHONPATH=src $(PYTHON) $(BENCH_DIR)/run_m2_candidate_pilot.py \
 		--suite-dir '$(M2_PILOT_SUITE_DIR)' \
 		--model '$(MODEL)' \
-		--candidate-set '$(M2_PILOT_CANDIDATE_SET)'
+		--candidate-set '$(M2_PILOT_CANDIDATE_SET)' \
+		--shard-index '$(M2_PILOT_SHARD_INDEX)' \
+		--num-shards '$(M2_PILOT_NUM_SHARDS)'
 
 m2-candidate-pilot-rebuild:
 	PYTHONPATH=src $(PYTHON) $(BENCH_DIR)/aggregate_m2_candidate_pilot.py \

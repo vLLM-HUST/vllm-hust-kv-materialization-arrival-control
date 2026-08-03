@@ -22,6 +22,7 @@ M2_ANCHOR_PILOT_LABEL = "real-online/m2-anchor-candidate-pilot"
 M2_ANCHOR_CONFIRMATION_LABEL = "real-online/m2-anchor-confirmation"
 M2_STATEFUL_SECONDARY_PILOT_LABEL = "real-online/m2-stateful-secondary-pilot"
 M2_SIGNIFICANCE_CONFIRMATION_LABEL = "real-online/m2-significance-confirmation"
+M2_CATALOG_CLOSURE_PILOT_LABEL = "real-online/m2-catalog-closure-pilot"
 M2_EVIDENCE_LABELS = {
     M2_LABEL,
     M2_PILOT_LABEL,
@@ -29,6 +30,7 @@ M2_EVIDENCE_LABELS = {
     M2_ANCHOR_CONFIRMATION_LABEL,
     M2_STATEFUL_SECONDARY_PILOT_LABEL,
     M2_SIGNIFICANCE_CONFIRMATION_LABEL,
+    M2_CATALOG_CLOSURE_PILOT_LABEL,
 }
 RAW_RECOMPUTABLE_SUMMARY_FIELDS = (
     "requests",
@@ -416,6 +418,7 @@ def main() -> int:
             M2_ANCHOR_CONFIRMATION_LABEL,
             M2_STATEFUL_SECONDARY_PILOT_LABEL,
             M2_SIGNIFICANCE_CONFIRMATION_LABEL,
+            M2_CATALOG_CLOSURE_PILOT_LABEL,
         ),
     )
     parser.add_argument("--require-realized-partial", action="store_true")

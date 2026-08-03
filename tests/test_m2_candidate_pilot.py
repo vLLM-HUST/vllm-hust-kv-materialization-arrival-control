@@ -10,9 +10,11 @@ from paper.kv_materialization_control.experiments.run_m2_anchor_confirmation imp
 from paper.kv_materialization_control.experiments.run_m2_candidate_pilot import (
     ANCHOR_TOPOLOGY_CANDIDATES,
     CANDIDATES,
+    CATALOG_CLOSURE_CANDIDATES,
     POLICIES,
     STATEFUL_SECONDARY_CANDIDATES,
     build_schedule,
+    select_shard,
 )
 from paper.kv_materialization_control.experiments.run_m2_significance_confirmation import (
     build_schedule as build_significance_schedule,
@@ -45,12 +47,30 @@ def test_candidate_pilot_schedule_is_complete_and_independent() -> None:
         for policy in POLICIES
     }
 
+    closure_schedule = build_schedule(CATALOG_CLOSURE_CANDIDATES)
+    assert len(closure_schedule) == 30
+    assert {(spec.workload, spec.policy_mode) for spec in closure_schedule} == {
+        (candidate[0], policy)
+        for candidate in CATALOG_CLOSURE_CANDIDATES
+        for policy in POLICIES
+    }
+
 
 def test_candidate_pilot_promotion_gate_is_fail_closed() -> None:
     assert passes_promotion_gate(2.0, 5.0, -5.0)
     assert not passes_promotion_gate(2.01, 0.0, 0.0)
     assert not passes_promotion_gate(0.0, 5.01, 0.0)
     assert not passes_promotion_gate(0.0, 0.0, -5.01)
+
+
+def test_catalog_closure_shards_are_disjoint_and_complete() -> None:
+    shards = [
+        select_shard(CATALOG_CLOSURE_CANDIDATES, shard_index=index, num_shards=5)
+        for index in range(5)
+    ]
+    flattened = [candidate for shard in shards for candidate in shard]
+    assert len(flattened) == len(set(flattened))
+    assert set(flattened) == set(CATALOG_CLOSURE_CANDIDATES)
 
 
 def test_anchor_confirmation_schedule_has_three_balanced_rounds() -> None:

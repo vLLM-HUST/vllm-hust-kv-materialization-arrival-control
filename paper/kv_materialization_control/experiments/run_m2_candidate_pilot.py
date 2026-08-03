@@ -13,6 +13,7 @@ EVIDENCE_LABELS = {
     "offline-ranked": "real-online/m2-candidate-pilot",
     "anchor-topology": "real-online/m2-anchor-candidate-pilot",
     "stateful-secondary": "real-online/m2-stateful-secondary-pilot",
+    "catalog-closure": "real-online/m2-catalog-closure-pilot",
 }
 POLICIES = ("always_recompute", "always_full_reuse", "controller")
 OFFLINE_RANKED_CANDIDATES = (
@@ -28,6 +29,18 @@ STATEFUL_SECONDARY_CANDIDATES = (
     ("shared_structured_json_generation", 18.0, 96),
     ("shared_multi_turn_support_chat", 20.0, 96),
     ("shared_memory_write_then_reuse", 16.0, 96),
+)
+CATALOG_CLOSURE_CANDIDATES = (
+    ("shared_session_affine_multi_turn", 24.0, 96),
+    ("shared_session_affine_bursty", 30.0, 128),
+    ("shared_rag_followup", 18.0, 48),
+    ("shared_long_context_doc_analysis", 12.0, 64),
+    ("shared_repo_aware_coding_assistant", 20.0, 128),
+    ("shared_experiment_planning_assistant", 16.0, 192),
+    ("shared_simulation_analysis_verification", 14.0, 128),
+    ("shared_realtime_voice_assistant", 36.0, 72),
+    ("shared_dynamic_rag_corpus_update", 18.0, 72),
+    ("shared_preemption_resume_long_decode", 10.0, 192),
 )
 CANDIDATES = OFFLINE_RANKED_CANDIDATES
 
@@ -62,6 +75,17 @@ def build_schedule(
     ]
 
 
+def select_shard(
+    candidates: tuple[tuple[str, float, int], ...],
+    *,
+    shard_index: int,
+    num_shards: int,
+) -> tuple[tuple[str, float, int], ...]:
+    if num_shards < 1 or not 0 <= shard_index < num_shards:
+        raise ValueError("shard-index must be in [0, num-shards)")
+    return candidates[shard_index::num_shards]
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run the preregistered M2 pilot.")
     parser.add_argument("--suite-dir", required=True)
@@ -69,6 +93,8 @@ def main() -> int:
     parser.add_argument("--carrier-root", default="vendor/vllm")
     parser.add_argument("--device", type=int, default=7)
     parser.add_argument("--port", type=int, default=8011)
+    parser.add_argument("--shard-index", type=int, default=0)
+    parser.add_argument("--num-shards", type=int, default=1)
     parser.add_argument(
         "--candidate-set",
         choices=tuple(EVIDENCE_LABELS),
@@ -84,11 +110,19 @@ def main() -> int:
         raise SystemExit(f"refusing to overwrite suite directory: {suite_dir}")
     suite_dir.mkdir(parents=True)
 
-    candidates = {
+    all_candidates = {
         "offline-ranked": OFFLINE_RANKED_CANDIDATES,
         "anchor-topology": ANCHOR_TOPOLOGY_CANDIDATES,
         "stateful-secondary": STATEFUL_SECONDARY_CANDIDATES,
+        "catalog-closure": CATALOG_CLOSURE_CANDIDATES,
     }[args.candidate_set]
+    candidates = select_shard(
+        all_candidates,
+        shard_index=args.shard_index,
+        num_shards=args.num_shards,
+    )
+    if not candidates:
+        raise SystemExit("selected candidate shard is empty")
     evidence_label = EVIDENCE_LABELS[args.candidate_set]
     schedule = build_schedule(candidates)
     suite: dict[str, object] = {
@@ -96,6 +130,8 @@ def main() -> int:
         "study": "M2 preregistered positive-candidate pilot",
         "evidence_label": evidence_label,
         "candidate_set": args.candidate_set,
+        "shard_index": args.shard_index,
+        "num_shards": args.num_shards,
         "started_at_s": time.time(),
         "promotion_gate": {
             "controller_vs_best_fixed_ttft_pct_max": 2.0,

@@ -8,10 +8,13 @@ import re
 import statistics
 from pathlib import Path
 
-from paper.kv_materialization_control.experiments.run_m2_significance_confirmation import (
-    EVIDENCE_LABEL,
-    POLICIES,
-)
+try:
+    from paper.kv_materialization_control.experiments.run_m2_significance_confirmation import (
+        EVIDENCE_LABEL,
+        POLICIES,
+    )
+except ModuleNotFoundError:  # Direct script execution with PYTHONPATH=src.
+    from run_m2_significance_confirmation import EVIDENCE_LABEL, POLICIES
 
 ONE_SIDED_T_CRITICAL_95_DF4 = 2.131847
 

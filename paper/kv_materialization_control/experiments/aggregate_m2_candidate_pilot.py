@@ -9,6 +9,7 @@ POLICIES = ("always_recompute", "always_full_reuse", "controller")
 EVIDENCE_LABEL = "real-online/m2-candidate-pilot"
 ANCHOR_EVIDENCE_LABEL = "real-online/m2-anchor-candidate-pilot"
 STATEFUL_SECONDARY_EVIDENCE_LABEL = "real-online/m2-stateful-secondary-pilot"
+CATALOG_CLOSURE_EVIDENCE_LABEL = "real-online/m2-catalog-closure-pilot"
 
 
 def read_json(path: Path) -> dict:
@@ -37,6 +38,7 @@ def main() -> None:
             EVIDENCE_LABEL,
             ANCHOR_EVIDENCE_LABEL,
             STATEFUL_SECONDARY_EVIDENCE_LABEL,
+            CATALOG_CLOSURE_EVIDENCE_LABEL,
         ),
         default=EVIDENCE_LABEL,
     )
