@@ -9,6 +9,7 @@
 | 论文机制表与继续投稿/停止判断 | derived-artifact | supported：成本/性能和 action/fallback 两个 panel 均由 raw bundle 重建；`stop_mechanism_direction`，不继续逐 workload 调参 | `m2_mechanism_table.tex`, `m2_action_table.tex`, `m2_verdict.json` |
 | M2 offline-ranked positive-candidate pilot | real-online | negative/exploratory：两个新增候选均未通过 promotion gate；不作为重复确认或论文正收益证据 | `experiments/results/m2_candidate_pilot_20260803/` |
 | M2 anchor-topology positive-candidate pilot | real-online | exploratory：multi-tenant candidate 以 TTFT -3.65% 通过 promotion gate；必须由排除 pilot 的三轮 matched confirmation 复验 | `experiments/results/m2_anchor_pilot_20260803/` |
+| M2 anchor-topology independent confirmation | real-online | nominal positive but below meaningful threshold：TTFT -0.90%、E2E -1.36%、throughput +1.35%；不满足预注册 5% TTFT boundary | `experiments/results/m2_anchor_confirmation_20260803/` |
 
 生成的 `claim_ledger.json` 是该轮结果的机器可读 ledger。requested action 仍不得写成
 realized reuse；例如 tool controller 的 lifecycle 中位 applied mix 是 8/8/16

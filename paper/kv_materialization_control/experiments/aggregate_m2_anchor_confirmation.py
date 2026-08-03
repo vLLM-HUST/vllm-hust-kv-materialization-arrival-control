@@ -130,13 +130,19 @@ def main() -> None:
         and mean_deltas["e2e"] <= 5.0
         and mean_deltas["rps"] >= -5.0
     )
+    nominal_positive = (
+        mean_deltas["ttft"] < 0.0
+        and mean_deltas["e2e"] <= 0.0
+        and mean_deltas["rps"] >= 0.0
+    )
     verdict = {
         "workload": WORKLOAD,
         "controller_vs_best_fixed_ttft_pct_mean": round(mean_deltas["ttft"], 6),
         "controller_vs_best_fixed_e2e_pct_mean": round(mean_deltas["e2e"], 6),
         "controller_vs_best_fixed_throughput_pct_mean": round(mean_deltas["rps"], 6),
         "best_fixed_ttft_wins": dict(winners),
-        "positive_boundary": positive,
+        "nominal_positive": nominal_positive,
+        "meaningful_positive_5pct": positive,
     }
     with (output_dir / "confirmation_runs.csv").open(
         "w", newline="", encoding="utf-8"

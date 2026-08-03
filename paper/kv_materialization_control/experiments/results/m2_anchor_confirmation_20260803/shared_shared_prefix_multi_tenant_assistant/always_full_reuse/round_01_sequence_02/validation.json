@@ -1,0 +1,540 @@
+{
+  "applied_decision_mix": {
+    "full_reuse": 72,
+    "partial_reuse": 0,
+    "recompute": 0
+  },
+  "completed": 72,
+  "engine_accounting": [
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 1477,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-0",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 1477,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-1",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 1474,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-10",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 1474,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-11",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 1474,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-12",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 1474,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-13",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 1474,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-14",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 1474,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-15",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 1474,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-16",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 1474,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-17",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 581,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-18",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 581,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-19",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 1477,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-2",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 581,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-20",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 581,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-21",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 581,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-22",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 581,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-23",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 581,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-24",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 581,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-25",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 581,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-26",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 581,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-27",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 578,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-28",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 578,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-29",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 1477,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-3",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 578,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-30",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 578,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-31",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 578,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-32",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 578,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-33",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 578,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-34",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 578,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-35",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 581,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-36",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 581,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-37",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 581,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-38",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 581,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-39",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 1477,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-4",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 581,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-40",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 581,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-41",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 581,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-42",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 581,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-43",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 581,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-44",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 581,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-45",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 578,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-46",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 578,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-47",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 578,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-48",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 578,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-49",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 1477,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-5",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 578,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-50",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 578,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-51",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 578,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-52",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 578,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-53",
+      "reused_tokens": 896
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 197,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-54",
+      "reused_tokens": 1280
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 197,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-55",
+      "reused_tokens": 1280
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 197,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-56",
+      "reused_tokens": 1280
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 197,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-57",
+      "reused_tokens": 1280
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 197,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-58",
+      "reused_tokens": 1280
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 197,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-59",
+      "reused_tokens": 1280
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 1477,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-6",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 197,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-60",
+      "reused_tokens": 1280
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 197,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-61",
+      "reused_tokens": 1280
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 197,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-62",
+      "reused_tokens": 1280
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 197,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-63",
+      "reused_tokens": 1280
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 194,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-64",
+      "reused_tokens": 1280
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 194,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-65",
+      "reused_tokens": 1280
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 194,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-66",
+      "reused_tokens": 1280
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 194,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-67",
+      "reused_tokens": 1280
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 194,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-68",
+      "reused_tokens": 1280
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 194,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-69",
+      "reused_tokens": 1280
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 1477,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-7",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 194,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-70",
+      "reused_tokens": 1280
+    },
+    {
+      "prompt_tokens": 1474,
+      "realized_decision": "partial_reuse",
+      "recomputed_tokens": 194,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-71",
+      "reused_tokens": 1280
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 1477,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-8",
+      "reused_tokens": 0
+    },
+    {
+      "prompt_tokens": 1477,
+      "realized_decision": "recompute",
+      "recomputed_tokens": 1477,
+      "request_id": "shared_shared_prefix_multi_tenant_assistant-9",
+      "reused_tokens": 0
+    }
+  ],
+  "engine_event_count": 15436,
+  "errors": [],
+  "failed": 0,
+  "observation_count": 72,
+  "raw_summary_verification": {
+    "recomputed": {
+      "completed": 72,
+      "failures": [],
+      "mean_latency_ms": 1987.638,
+      "mean_ttft_ms": 143.512,
+      "p95_latency_ms": 2562.449,
+      "p95_ttft_ms": 321.186,
+      "requests": 72
+    },
+    "throughput": {
+      "reason": "the historical bundle does not contain an independent raw suite measurement duration; throughput remains sourced from request_summary.json",
+      "status": "not_raw_recomputable"
+    },
+    "valid": true
+  },
+  "realized_decision_mix": {
+    "partial_reuse": 54,
+    "recompute": 18
+  },
+  "request_count": 72,
+  "valid": true
+}

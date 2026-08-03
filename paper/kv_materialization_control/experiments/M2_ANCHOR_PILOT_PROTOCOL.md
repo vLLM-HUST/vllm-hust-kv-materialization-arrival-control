@@ -33,3 +33,11 @@ over the per-round best fixed policy without more than 5% E2E or throughput
 regression. If neither candidate is promoted, this anchor-topology hypothesis
 is recorded as negative and no further catalog cases are added post hoc.
 
+## Completed result
+
+`shared_shared_prefix_multi_tenant_assistant` passed the pilot gate and was
+confirmed in three new matched rounds. Its mean controller deltas relative to
+the per-round best fixed policy were TTFT -0.90%, E2E -1.36%, and throughput
++1.35%. This establishes a nominal positive workload, but not the preregistered
+5% meaningful-positive boundary; round-level TTFT direction was 2 wins and 1
+loss for the controller.
