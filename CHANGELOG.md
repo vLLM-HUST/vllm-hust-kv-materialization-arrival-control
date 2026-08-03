@@ -15,6 +15,13 @@
   regressed TTFT versus the best fixed policy by 9.24% and 6.60% on the two
   preregistered workloads, so the mechanism direction stops as a negative
   result rather than receiving workload-specific retuning.
+- Closed M2 issue #3 with a consolidated 20-workload benefit-boundary ledger
+  (`paper/kv_materialization_control/experiments/M2_ISSUE_CLOSURE.md`):
+  18 extension workloads were screened without retuning, all four promoted
+  workloads failed five-round confirmations (+0.87% to +3.70% TTFT, all
+  one-sided 95% upper bounds above zero), and the final verdict is
+  `stop_mechanism_direction` across 141 validated lifecycles and 8208/8208
+  requests.
 
 ## [Unreleased]
 
