@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+- Added the preregistered M2 matched online boundary study comparing
+  `always_recompute`, `always_full_reuse`, and the three-action controller over
+  independent service lifecycles.
+- Added explicit fixed-policy runtime modes and scheduler-owned timing for
+  lookup, cache commit, block-boundary alignment, and segmented-tail isolation;
+  recompute now bypasses cache lookup and commit as a native action.
+- Added fail-closed M2 bundle validation, action/fallback/work decomposition,
+  cost-model ordering checks, a paper-facing TeX table, a typed claim ledger,
+  and a deterministic continue/stop verdict.
+
 ## [Unreleased]
 
 ### Added

@@ -16,6 +16,7 @@ REQUIRED_OBSERVATION_FIELDS = {
 }
 FORMAL_LABEL = "real-online/formal-matrix"
 DRY_RUN_LABEL = "real-online/carrier-validation-dry-run"
+M2_LABEL = "real-online/m2-benefit-boundary"
 RAW_RECOMPUTABLE_SUMMARY_FIELDS = (
     "requests",
     "completed",
@@ -122,6 +123,10 @@ def validate_bundle(
     requests = read_jsonl(bundle_dir / "request_results.jsonl")
     observations = read_jsonl(bundle_dir / "runtime_observations.jsonl")
     engine_events = read_jsonl(bundle_dir / "runtime_events.jsonl")
+    is_m2 = expected_evidence_label == M2_LABEL or (
+        environment.get("evidence_label") == M2_LABEL
+        and manifest.get("evidence_label") == M2_LABEL
+    )
 
     recomputed_summary, summary_errors = verify_request_summary(summary, requests)
     errors.extend(summary_errors)
@@ -152,6 +157,15 @@ def validate_bundle(
             errors.append(
                 f"observation {index} contains deprecated planner-derived runtime counters"
             )
+        if is_m2:
+            for field in (
+                "policy_mode",
+                "decision_latency_ms",
+                "boundary_alignment_latency_ms",
+                "controller_latency_ms",
+            ):
+                if field not in observation:
+                    errors.append(f"M2 observation {index} missing field: {field}")
     for index, request in enumerate(requests):
         if request.get("ok") and request.get("ttft_s") is None:
             errors.append(f"successful request {index} missing TTFT")
@@ -226,16 +240,52 @@ def validate_bundle(
         )
         if realized != expected_realized:
             errors.append(f"request {request_id} realized decision is inconsistent")
+        if is_m2:
+            for field in (
+                "lookup_latency_ms",
+                "tail_isolation_latency_ms",
+                "cache_usage",
+            ):
+                if not isinstance(lookup.get(field), (int, float)):
+                    errors.append(
+                        f"request {request_id} lookup missing numeric {field}"
+                    )
+            for commit in commits:
+                for field in ("commit_latency_ms", "cache_usage"):
+                    if not isinstance(commit.get(field), (int, float)):
+                        errors.append(
+                            f"request {request_id} commit missing numeric {field}"
+                        )
         realized_mix[str(realized)] += 1
-        accounting_rows.append(
-            {
-                "request_id": request_id,
-                "prompt_tokens": prompt,
-                "reused_tokens": reused,
-                "recomputed_tokens": recomputed,
-                "realized_decision": realized,
-            }
-        )
+        accounting_row = {
+            "request_id": request_id,
+            "prompt_tokens": prompt,
+            "reused_tokens": reused,
+            "recomputed_tokens": recomputed,
+            "realized_decision": realized,
+        }
+        if is_m2:
+            commit_latency_ms = sum(
+                float(row.get("commit_latency_ms", 0.0)) for row in commits
+            )
+            cached_blocks = sum(int(row.get("cached_blocks", 0)) for row in commits)
+            cache_usages = [
+                float(row["cache_usage"])
+                for row in (lookup, *commits)
+                if isinstance(row.get("cache_usage"), (int, float))
+            ]
+            accounting_row.update(
+                {
+                    "lookup_latency_ms": lookup.get("lookup_latency_ms"),
+                    "commit_latency_ms": round(commit_latency_ms, 9),
+                    "tail_isolation_latency_ms": lookup.get(
+                        "tail_isolation_latency_ms"
+                    ),
+                    "cached_blocks": cached_blocks,
+                    "peak_cache_usage": max(cache_usages, default=None),
+                }
+            )
+        accounting_rows.append(accounting_row)
 
     labels = {environment.get("evidence_label"), manifest.get("evidence_label")}
     expected_label = expected_evidence_label
@@ -262,6 +312,54 @@ def validate_bundle(
         errors.append("server log did not prove graph-mode configuration")
     if require_realized_partial and realized_mix["partial_reuse"] == 0:
         errors.append("dry run did not produce a nonzero realized partial reuse")
+    if is_m2:
+        policy_mode = manifest.get("policy_mode")
+        observation_modes = {row.get("policy_mode") for row in observations}
+        if policy_mode not in {
+            "controller",
+            "always_recompute",
+            "always_full_reuse",
+        }:
+            errors.append(f"invalid or missing M2 policy mode: {policy_mode!r}")
+        if observation_modes != {policy_mode}:
+            errors.append(
+                "M2 policy mode mismatch between run and observations: "
+                f"{policy_mode!r} vs {sorted(map(str, observation_modes))}"
+            )
+        duration_s = summary.get("measurement_duration_s")
+        output_tokens = summary.get("completed_output_tokens")
+        if not isinstance(duration_s, (int, float)) or duration_s <= 0:
+            errors.append("M2 summary missing positive measurement_duration_s")
+        elif summary.get("request_throughput_rps") != round(
+            int(summary.get("completed", 0)) / duration_s, 3
+        ):
+            errors.append("M2 request throughput does not close from raw duration")
+        if not isinstance(output_tokens, int) or output_tokens < 0:
+            errors.append("M2 summary missing nonnegative completed_output_tokens")
+        elif (
+            isinstance(duration_s, (int, float))
+            and duration_s > 0
+            and summary.get("output_throughput_toks")
+            != round(output_tokens / duration_s, 3)
+        ):
+            errors.append("M2 output throughput does not close from raw duration")
+
+    throughput_verification = {
+        "status": "not_raw_recomputable",
+        "reason": (
+            "the historical bundle does not contain an independent raw suite "
+            "measurement duration; throughput remains sourced from "
+            "request_summary.json"
+        ),
+    }
+    if is_m2:
+        throughput_verification = {
+            "status": "raw_recomputed",
+            "measurement_duration_s": summary.get("measurement_duration_s"),
+            "completed_output_tokens": summary.get("completed_output_tokens"),
+            "request_throughput_rps": summary.get("request_throughput_rps"),
+            "output_throughput_toks": summary.get("output_throughput_toks"),
+        }
 
     return {
         "valid": not errors,
@@ -272,14 +370,7 @@ def validate_bundle(
         "raw_summary_verification": {
             "valid": not summary_errors,
             "recomputed": recomputed_summary,
-            "throughput": {
-                "status": "not_raw_recomputable",
-                "reason": (
-                    "the historical bundle does not contain an independent raw "
-                    "suite measurement duration; throughput remains sourced from "
-                    "request_summary.json"
-                ),
-            },
+            "throughput": throughput_verification,
         },
         "observation_count": len(observations),
         "engine_event_count": len(engine_events),
@@ -302,7 +393,7 @@ def main() -> int:
     parser.add_argument("bundle_dir")
     parser.add_argument("--output")
     parser.add_argument(
-        "--expected-evidence-label", choices=(FORMAL_LABEL, DRY_RUN_LABEL)
+        "--expected-evidence-label", choices=(FORMAL_LABEL, DRY_RUN_LABEL, M2_LABEL)
     )
     parser.add_argument("--require-realized-partial", action="store_true")
     args = parser.parse_args()

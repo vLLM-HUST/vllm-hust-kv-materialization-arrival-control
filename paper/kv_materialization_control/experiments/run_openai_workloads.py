@@ -276,6 +276,8 @@ def summarize(
         else 0.0,
         "mean_ttft_ms": round(mean(ttfts_ms), 3) if ttfts_ms else 0.0,
         "p95_ttft_ms": round(percentile(ttfts_ms, 95), 3) if ttfts_ms else 0.0,
+        "measurement_duration_s": duration_s,
+        "completed_output_tokens": output_tokens,
         "request_throughput_rps": round(len(ok) / duration_s, 3),
         "output_throughput_toks": round(output_tokens / duration_s, 3),
         "failures": [asdict(result) for result in results if not result.ok],

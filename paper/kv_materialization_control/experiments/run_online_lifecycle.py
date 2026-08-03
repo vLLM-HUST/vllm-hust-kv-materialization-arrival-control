@@ -30,9 +30,17 @@ def utc_timestamp(timestamp_s: float | None = None) -> str:
 
 
 def run_capture(command: list[str], cwd: Path) -> dict[str, object]:
-    result = subprocess.run(
-        command, cwd=cwd, text=True, capture_output=True, check=False
-    )
+    try:
+        result = subprocess.run(
+            command, cwd=cwd, text=True, capture_output=True, check=False
+        )
+    except FileNotFoundError as exc:
+        return {
+            "command": command,
+            "returncode": 127,
+            "stdout": "",
+            "stderr": str(exc),
+        }
     return {
         "command": command,
         "returncode": result.returncode,
@@ -140,6 +148,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--bundle-dir", required=True)
     parser.add_argument("--workload-case", required=True)
     parser.add_argument("--condition", choices=sorted(CONDITIONS), required=True)
+    parser.add_argument(
+        "--policy-mode",
+        choices=("controller", "always_recompute", "always_full_reuse"),
+        default="controller",
+    )
     parser.add_argument("--seam", choices=("old", "segmented"), required=True)
     parser.add_argument("--carrier-root", default="vendor/vllm")
     parser.add_argument("--model", required=True)
@@ -302,6 +315,7 @@ def main() -> int:
                 "VLLM_KV_RUNTIME_BLOCK_SIZE": str(args.block_size),
                 "VLLM_KV_RUNTIME_HASH_BLOCK_SIZE": str(args.block_size),
                 "VLLM_KV_RUNTIME_SEAM": args.seam,
+                "VLLM_KV_POLICY_MODE": args.policy_mode,
                 "VLLM_KV_MATERIALIZATION_LOG_PATH": str(runtime_observations_path),
                 "VLLM_KV_MATERIALIZATION_RUNTIME_EVENT_LOG_PATH": str(
                     runtime_events_path
@@ -348,6 +362,7 @@ def main() -> int:
             "workload_case": args.workload_case,
             "seam": args.seam,
             "condition": args.condition,
+            "policy_mode": args.policy_mode,
             "condition_knobs": condition,
             "server_command": server_command,
             "server_environment": {

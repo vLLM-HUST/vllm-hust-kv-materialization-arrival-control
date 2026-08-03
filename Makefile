@@ -16,7 +16,10 @@ PAPER_DIR := paper/kv_materialization_control
 
 .DEFAULT_GOAL := help
 
-.PHONY: help bootstrap-env install-dev smoke test shared-workloads-smoke shared-workloads-test lint format build bench paper offline-experiment experiment decision-study study-experiment shared-workloads-offline paper-experiment runtime-boundary-live live-benchmark shared-workloads-live optimization-live m1-online-rebuild pdf paper-pdf evidence clean
+M2_SUITE_DIR ?= /tmp/kv_materialization_m2_online
+M2_RESULTS_DIR ?= $(BENCH_DIR)/results/m2_online_boundary
+
+.PHONY: help bootstrap-env install-dev smoke test shared-workloads-smoke shared-workloads-test lint format build bench paper offline-experiment experiment decision-study study-experiment shared-workloads-offline paper-experiment runtime-boundary-live live-benchmark shared-workloads-live optimization-live m1-online-rebuild m2-online-boundary m2-online-rebuild pdf paper-pdf evidence clean
 
 help:
 	@printf '%s\n' \
@@ -34,6 +37,8 @@ help:
 		'  make shared-workloads-offline [WORKLOAD_CASES="..."]  Compatibility alias of make decision-study' \
 		'  make runtime-boundary-live MODEL=<model> [WORKLOAD_CASE=<case>]  Run the live runtime-boundary benchmark' \
 		'  make m1-online-rebuild  Rebuild M1 online CSV/TeX from committed raw bundles' \
+		'  make m2-online-boundary MODEL=<model> [M2_SUITE_DIR=/outside/worktree]  Run the preregistered M2 matrix' \
+		'  make m2-online-rebuild M2_SUITE_DIR=<validated-suite> [M2_RESULTS_DIR=<dir>]  Rebuild M2 artifacts' \
 		'  make shared-workloads-live MODEL=<model> [WORKLOAD_CASE=<case>]  Compatibility alias of make runtime-boundary-live' \
 		'  make optimization-live MODEL=<model> [WORKLOAD_CASE=<case>]  Compatibility alias of make runtime-boundary-live' \
 		'  make pdf          Build the paper PDF after refreshing latest offline-study results' \
@@ -99,6 +104,16 @@ m1-online-rebuild:
 	PYTHONPATH=src $(PYTHON) $(BENCH_DIR)/aggregate_online_results.py \
 		--input-dir $(BENCH_DIR)/results/m1_formal_approved_complete_20260801 \
 		--output-dir $(BENCH_DIR)/results/m1_formal_approved_complete_20260801/generated
+
+m2-online-boundary:
+	PYTHONPATH=src $(PYTHON) $(BENCH_DIR)/run_m2_online_boundary.py \
+		--suite-dir '$(M2_SUITE_DIR)' \
+		--model '$(MODEL)'
+
+m2-online-rebuild:
+	PYTHONPATH=src $(PYTHON) $(BENCH_DIR)/aggregate_m2_boundary.py \
+		--input-dir '$(M2_SUITE_DIR)' \
+		--output-dir '$(M2_RESULTS_DIR)'
 
 pdf: paper-pdf
 

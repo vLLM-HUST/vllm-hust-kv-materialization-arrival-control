@@ -1,6 +1,12 @@
 # Experiment Notes
 
-This artifact has two experiment paths, and they mean different things.
+This artifact has three experiment paths, and they mean different things.
+
+The preregistered M2 fixed-policy benefit-boundary study is specified in
+[`M2_PROTOCOL.md`](M2_PROTOCOL.md). Its evidence must not
+be inferred from the M1 seam matrix: matched `always_recompute`,
+`always_full_reuse`, and `controller` lifecycles with scheduler-owned physical
+cost counters.
 
 ## Decision Study
 
@@ -104,3 +110,19 @@ Current truthful interpretation:
 - materialization latency
 - KV bytes loaded or transferred
 - p95 end-to-end latency
+
+## M2 Online Benefit Boundary
+
+Canonical execution and rebuild entries:
+
+```bash
+make m2-online-boundary MODEL=/path/to/model \
+  M2_SUITE_DIR=/outside/the/worktree/m2_suite
+make m2-online-rebuild \
+  M2_SUITE_DIR=/outside/the/worktree/m2_suite \
+  M2_RESULTS_DIR=paper/kv_materialization_control/experiments/results/m2_online_boundary
+```
+
+The runner stops after three temporally blocked rounds. The aggregator rejects
+incomplete, unmatched, dirty, non-independent, or unvalidated evidence and
+emits both the paper-facing mechanism table and the submission/stop verdict.

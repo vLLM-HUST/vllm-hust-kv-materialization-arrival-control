@@ -92,6 +92,49 @@ def test_compute_runtime_control_uses_unique_salt_for_recompute(monkeypatch) -> 
     assert "req-c" in plan.cache_salt
 
 
+def test_fixed_recompute_policy_forces_native_recompute(monkeypatch) -> None:
+    monkeypatch.setenv("VLLM_KV_POLICY_MODE", "always_recompute")
+    monkeypatch.setenv("VLLM_KV_RUNTIME_BLOCK_SIZE", "128")
+    token = bind_request_headers(
+        {
+            HEADER_PRIMARY_ANCHOR: "anchor-fixed-recompute",
+            HEADER_SHARED_PREFIX_TOKENS: "1024",
+            HEADER_REUSE_CONFIDENCE: "0.99",
+        }
+    )
+    try:
+        observation, plan = compute_runtime_control("req-fixed-recompute", 1400, 64)
+    finally:
+        reset_request_headers(token)
+
+    assert observation.policy_mode == "always_recompute"
+    assert observation.decision == "recompute"
+    assert observation.rationale == "fixed_policy_always_recompute"
+    assert plan.effective_decision == "recompute"
+    assert plan.target_reuse_tokens == 0
+
+
+def test_fixed_full_reuse_policy_forces_native_full_reuse(monkeypatch) -> None:
+    monkeypatch.setenv("VLLM_KV_POLICY_MODE", "always_full_reuse")
+    token = bind_request_headers(
+        {
+            HEADER_PRIMARY_ANCHOR: "anchor-fixed-full",
+            HEADER_SHARED_PREFIX_TOKENS: "1024",
+            HEADER_REUSE_CONFIDENCE: "0.01",
+        }
+    )
+    try:
+        observation, plan = compute_runtime_control("req-fixed-full", 1400, 64)
+    finally:
+        reset_request_headers(token)
+
+    assert observation.policy_mode == "always_full_reuse"
+    assert observation.decision == "full_reuse"
+    assert observation.rationale == "fixed_policy_always_full_reuse"
+    assert plan.effective_decision == "full_reuse"
+    assert plan.target_reuse_tokens == 1024
+
+
 def test_compute_runtime_control_marks_partial_as_degraded_full_reuse(
     monkeypatch,
 ) -> None:
