@@ -1,0 +1,3 @@
+workload,best_fixed_ttft_policy,controller_vs_best_fixed_ttft_pct,controller_vs_best_fixed_e2e_pct,controller_vs_best_fixed_throughput_pct,promotion
+shared_session_continuation_maintenance,always_full_reuse,69.572063,6.083791,-5.667001,False
+shared_shared_prefix_multi_tenant_assistant,always_full_reuse,-3.65352,0.312389,-0.253036,True

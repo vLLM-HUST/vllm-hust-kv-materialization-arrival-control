@@ -1,0 +1,23 @@
+{
+  "completed": 72,
+  "completed_output_tokens": 7680,
+  "concurrency": 4,
+  "dataset_name": "shared-prefix-multi-tenant-assistant",
+  "failures": [],
+  "finished_at_utc": "2026-08-03T07:01:49.196817Z",
+  "mean_latency_ms": 1955.892,
+  "mean_ttft_ms": 151.443,
+  "measurement_duration_s": 36.4452338218689,
+  "output_throughput_toks": 210.727,
+  "p95_latency_ms": 2517.766,
+  "p95_ttft_ms": 302.467,
+  "request_rate": 18.0,
+  "request_throughput_rps": 1.976,
+  "requests": 72,
+  "requests_output": "/tmp/kvmat_m2_anchor_pilot_20260803/shared_shared_prefix_multi_tenant_assistant/always_full_reuse/pilot_sequence_06/request_results.jsonl",
+  "seed": 7,
+  "started_at_utc": "2026-08-03T07:01:12.751584Z",
+  "workload_case": "shared_shared_prefix_multi_tenant_assistant",
+  "workload_family": "shared-prefix-multi-tenant-assistant",
+  "workload_label": "Shared workload: shared-prefix multi-tenant assistant"
+}
