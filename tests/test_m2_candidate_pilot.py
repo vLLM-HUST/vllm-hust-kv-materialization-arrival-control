@@ -6,6 +6,9 @@ from paper.kv_materialization_control.experiments.run_m2_candidate_pilot import 
     POLICIES,
     build_schedule,
 )
+from paper.kv_materialization_control.experiments.validate_online_bundle import (
+    M2_PILOT_LABEL,
+)
 
 
 def test_candidate_pilot_schedule_is_complete_and_independent() -> None:
@@ -15,6 +18,7 @@ def test_candidate_pilot_schedule_is_complete_and_independent() -> None:
     assert {(spec.workload, spec.policy_mode) for spec in schedule} == {
         (candidate[0], policy) for candidate in CANDIDATES for policy in POLICIES
     }
+    assert M2_PILOT_LABEL == "real-online/m2-candidate-pilot"
 
 
 def test_candidate_pilot_promotion_gate_is_fail_closed() -> None:
