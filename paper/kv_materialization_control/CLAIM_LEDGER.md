@@ -15,8 +15,8 @@
 | M2 剩余 canonical catalog closure pilot | real-online | exploratory/negative：10 个 workload、30/30 lifecycle；2 个通过宽松晋级门槛，其余回退 +2.20% 至 +39.90% | `experiments/results/m2_catalog_closure_20260803/` |
 | M2 catalog closure 五轮确认 | real-online | negative：long-context TTFT +3.70%（95% 上界 +6.19%），bursty +2.29%（上界 +3.89%）；20/20 轮最佳固定策略均为 full reuse | `experiments/results/m2_significance_long_context_20260803/`, `experiments/results/m2_significance_bursty_20260803/` |
 | M2 扩展 workload 的 cost-model 排序 | simulation/model | supported at confirmation boundary：离线模型未预测任何 >=5% 收益，且 4 个晋级 workload 的五轮在线最佳固定策略均为 full reuse；不进行逐 workload 参数校准 | offline study → four confirmation verdicts |
-| M2 现有 catalog 显著正收益结论 | derived-artifact | negative/stop：14 个新 canonical workload 完成 pilot，4 个晋级者全部完成五轮确认；102/102 lifecycle、6192/6192 请求有效，未发现 >=5% 且单侧 95% 上界低于 0 的 workload；停止 post-hoc 搜索和调参 | `experiments/results/m2_catalog_closure_20260803/README.md`, `mechanism_breakdown.csv` |
-| M2 issue #3 完整闭合：20 个 workload 的收益边界总账与继续/停止判断 | derived-artifact | negative/stop：2 个主矩阵 workload 均 fallback_or_no_gain；18 个扩展 workload 中晋级者五轮确认全部为负；141/141 lifecycle、8208/8208 请求；verdict 为 `stop_mechanism_direction` | `experiments/M2_ISSUE_CLOSURE.md` + 各 `results/m2_*/` 生成物 |
+| M2 现有 catalog 显著正收益结论 | derived-artifact | negative/stop：14 个新 canonical workload 完成 pilot，4 个晋级者全部完成五轮确认；102/102 lifecycle、6192/6192 请求有效，未发现 >=5% 且单侧 95% 上界低于 0 的 workload；停止 post-hoc 搜索和调参。证据边界：该 102/102 lifecycle 为 aggregate-only supporting evidence（逐 run 聚合 + verdict，raw bundle 原存执行机 /tmp、现已不可取回），不参与 fresh-clone 逐请求复核声明 | `experiments/results/m2_catalog_closure_20260803/README.md`, `mechanism_breakdown.csv` |
+| M2 issue #3 完整闭合：20 个 workload 的收益边界总账与继续/停止判断 | derived-artifact | negative/stop：2 个主矩阵 workload 均 fallback_or_no_gain；18 个扩展 workload 中晋级者五轮确认全部为负；141/141 lifecycle、8208/8208 请求；verdict 为 `stop_mechanism_direction`。证据边界：39/141 lifecycle 仓内 raw 可逐请求复核，102/141 为 aggregate-only supporting evidence | `experiments/M2_ISSUE_CLOSURE.md` + 各 `results/m2_*/` 生成物 |
 
 生成的 `claim_ledger.json` 是该轮结果的机器可读 ledger。requested action 仍不得写成
 realized reuse；例如 tool controller 的 lifecycle 中位 applied mix 是 8/8/16
