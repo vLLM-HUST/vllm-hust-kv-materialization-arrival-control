@@ -150,7 +150,12 @@ meaningful significant positive workload in the existing catalog under the
 matched model/runtime,” not a universal impossibility theorem.
 
 The auditable summary and mechanism CSV are under
-`results/m2_catalog_closure_20260803/`. Rebuild a five-round verdict with:
+`results/m2_catalog_closure_20260803/`. Evidence boundary: the extension's 102
+lifecycles (stateful/catalog pilots plus four five-round confirmations) are
+aggregate-only supporting evidence; their raw bundles lived in `/tmp` on the
+execution machine and are no longer retrievable, so per-request raw review from
+a fresh clone covers only the 39 in-repo lifecycles (main matrix 18, candidate
+and anchor pilots 12, anchor confirmation 9). Rebuild a five-round verdict with:
 
 ```bash
 make m2-significance-confirmation-rebuild \

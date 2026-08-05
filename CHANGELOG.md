@@ -21,7 +21,10 @@
   workloads failed five-round confirmations (+0.87% to +3.70% TTFT, all
   one-sided 95% upper bounds above zero), and the final verdict is
   `stop_mechanism_direction` across 141 validated lifecycles and 8208/8208
-  requests.
+  requests. Evidence boundary: raw bundles for only 39 of the 141 lifecycles
+  are in the repository (per-request review); the remaining 102 lifecycles are
+  aggregate-only supporting evidence whose raw bundles lived in `/tmp` on the
+  execution machine and are no longer retrievable.
 
 ## [Unreleased]
 

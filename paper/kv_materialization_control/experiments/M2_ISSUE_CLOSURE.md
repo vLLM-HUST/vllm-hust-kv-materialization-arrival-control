@@ -2,7 +2,11 @@
 
 本文件是 issue #3 的最终闭合记录。它把预注册的 2-workload 收益边界矩阵与
 后续扩展的 18 个 workload 筛选结果合并为一份可审计的总账，并给出继续/停止
-判断。所有数字均可从 `results/` 下的原始 bundle 或聚合 CSV 直接复核。
+判断。可复核性边界：141 个 lifecycle 中，39 个（主矩阵 18 + candidate/anchor
+pilot 12 + anchor confirmation 9）在仓内保留 raw bundle，可从 `results/`
+逐请求独立复核；其余 102 个（stateful/catalog pilot 42 + 五轮 significance
+confirmation 60）仅保留逐 run 聚合与 verdict，标记为 aggregate-only
+supporting evidence，不表述为 fresh clone 可逐请求复核。
 
 ## 研究问题
 
@@ -97,9 +101,11 @@ reasons）见 `results/m2_catalog_closure_20260803/mechanism_breakdown.csv`。
 
 - matched 配置与重复服务生命周期：全 M2 141 个完成 lifecycle
   （18 主矩阵 + 123 扩展）全部独立、validated，8208/8208 请求成功；
-- 核心结论可从原始 action counters 与性能记录复核：主矩阵 raw bundle 在
-  仓库内；扩展 workload 以逐 run 聚合 CSV + verdict 保留，raw bundle 在
-  执行机 /tmp 目录（见下）；
+- 核心结论可从原始 action counters 与性能记录复核：仓内 39 个 lifecycle
+  （主矩阵 18 + candidate/anchor pilot 12 + anchor confirmation 9）保留
+  raw bundle，可逐请求独立复核；其余 102 个 lifecycle 仅保留逐 run 聚合
+  CSV + verdict，为 aggregate-only supporting evidence（raw bundle 原存
+  执行机 /tmp，现已不可取回，见"数据保留程度"）；
 - requested partial_reuse 不计为 realized reuse：所有机制分解均以 engine
   计数为准；
 - 论文机制分解表与重建脚本：`m2_mechanism_table.tex` /
@@ -126,5 +132,10 @@ index、semantic candidate 与验证协议仍属于 vLLM-HUST #198 的范围。
   `m2_anchor_pilot`（6）、`m2_anchor_confirmation`（9），共 39 个 lifecycle；
 - 仓库内保留逐 run 聚合与 verdict（无 raw bundle）：
   `m2_stateful_secondary_pilot`、`m2_catalog_closure_20260803`（5 shards）、
-  4 个 `m2_significance_*` 确认目录；如需逐请求复核需从执行机
-  （`/tmp` suite 目录）取回原始 bundle。
+  4 个 `m2_significance_*` 确认目录，共 102 个 lifecycle；
+- 执行机 `/tmp` 中的原始 suite 已被清理，102 个 lifecycle 的 raw bundle
+  无法再取回；这些结果一律作为 aggregate-only supporting evidence，不参与
+  "fresh clone 可逐请求独立复核" 的声明；
+- 若后续把 102 个 lifecycle 的 raw bundle 归档到持久、内容寻址的 artifact
+  （release asset 或对象存储），可再把复核范围扩回 141 个 lifecycle；归档
+  完成前，论文与 issue 中的可复现性表述以上述 39/102 边界为准。
