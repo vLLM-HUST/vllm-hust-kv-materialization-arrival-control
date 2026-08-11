@@ -37,8 +37,11 @@ effective, and realized actions. In a preregistered 18-lifecycle online matrix,
 the controller improves over recompute but fails to beat the best fixed policy:
 mean matched TTFT regresses by 9.24\% and 6.60\% on the two workloads, and
 \texttt{always\_full\_reuse} wins all six matched rounds. We therefore report a
-negative result and stop this mechanism direction instead of tuning per
-workload.
+negative result and fix the preregistered verdict as
+\texttt{stop\_mechanism\_direction}: the mechanism direction is closed without
+per-workload tuning or post-hoc workload search. Raw-bundle evidence covers 39
+of the 141 completed lifecycles; the remaining 102 are aggregate-only
+supporting evidence, and this paper keeps that 39/102 reproducibility boundary.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -546,6 +549,17 @@ materialization is beneficial. We also do not reframe this repository as a
 general admission or memory-evolution artifact simply because some workloads
 contain broader state semantics.
 
+\subsection{Reproducibility Boundary}
+The M2 raw bundles cover 39 of the 141 completed lifecycles and are archived
+both in the repository and in release
+\texttt{m2-issue3-closure-evidence-20260811}
+(\texttt{m2\_raw\_bundles\_39\_lifecycles.tar.gz}), so those 39 lifecycles can
+be reviewed request-by-request. The remaining 102 lifecycles are
+aggregate-only supporting evidence: their raw bundles originally lived in
+/\texttt{tmp} on the execution machine and are no longer retrievable.
+Per-request review claims therefore stay at the 39/102 boundary until those
+bundles are archived to a persistent, content-addressed location.
+
 \section{Current Contributions}
 \begin{enumerate}[leftmargin=1.5em]
 \item A precise systems formulation of request-arrival KV materialization as a
@@ -576,10 +590,13 @@ separate project boundary.
 Nevertheless, the result is sufficient for the decision registered here. Both
 online workloads lose to the same fixed policy, the model agrees with that
 ordering, and the controller's additional realized work explains the gap. We
-therefore stop the current arrival-time three-action mechanism direction and do
-not continue submission-oriented tuning of this controller. Reopening the
-question would require a materially different mechanism or workload semantics,
-not another sweep of the present cost knobs.
+therefore fix the verdict as \texttt{stop\_mechanism\_direction} in the final
+summary and this paper boundary: the current arrival-time three-action
+mechanism direction is closed as a negative result, and we do not continue
+submission-oriented tuning of this controller. The conclusion is bounded to
+the matched model/runtime/catalog tested here, not a universal impossibility
+theorem. Reopening the question would require a materially different mechanism
+or workload semantics, not another sweep of the present cost knobs.
 
 \bibliographystyle{IEEEtran}
 \bibliography{kv_materialization_control}

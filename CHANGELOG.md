@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Fixed the M2 issue #3 closure wording per the final review: the verdict
+  `stop_mechanism_direction` is now the fixed final-summary and paper-boundary
+  statement, and the 39 in-repo raw-bundle lifecycles are archived in release
+  `m2-issue3-closure-evidence-20260811` (asset
+  `m2_raw_bundles_39_lifecycles.tar.gz`). The 39/102 evidence boundary is
+  retained: the 102 aggregate-only lifecycles remain outside the
+  per-request-review claim until their raw bundles are archived to a
+  persistent, content-addressed location.
 - Added the preregistered M2 matched online boundary study comparing
   `always_recompute`, `always_full_reuse`, and the three-action controller over
   independent service lifecycles.

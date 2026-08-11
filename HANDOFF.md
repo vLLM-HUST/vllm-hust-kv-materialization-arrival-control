@@ -28,6 +28,10 @@ M0、M1 和 M2 已闭合。M2 在 parent `2e99ce1`、carrier `475ea49` 上完成
 重复，也不把 M1 的 seam/runtime-realization 结果写成固定策略收益。原始 bundle、机制
 表和机器可读 claim ledger 位于
 `paper/kv_materialization_control/experiments/results/m2_online_boundary_20260803/`。
+该 verdict 已固定写入最终摘要与论文边界；39 个仓内 raw-bundle lifecycle 同时归档于
+release `m2-issue3-closure-evidence-20260811`
+（asset `m2_raw_bundles_39_lifecycles.tar.gz`），其余 102 个 lifecycle 保持
+aggregate-only 口径（39/102），不恢复 141 个 lifecycle 的逐请求复核声明。
 
 下文保留的是 M2 之前的研究路线背景；其中“继续做强 partial reuse / deeper seam”不再是
 当前执行计划，除非未来提出 materially different mechanism 后重新预注册。

@@ -155,7 +155,12 @@ lifecycles (stateful/catalog pilots plus four five-round confirmations) are
 aggregate-only supporting evidence; their raw bundles lived in `/tmp` on the
 execution machine and are no longer retrievable, so per-request raw review from
 a fresh clone covers only the 39 in-repo lifecycles (main matrix 18, candidate
-and anchor pilots 12, anchor confirmation 9). Rebuild a five-round verdict with:
+and anchor pilots 12, anchor confirmation 9). Those 39 lifecycles are also
+archived in release `m2-issue3-closure-evidence-20260811`
+(<https://github.com/intellistream/kv-materialization-arrival-control/releases/tag/m2-issue3-closure-evidence-20260811>,
+asset `m2_raw_bundles_39_lifecycles.tar.gz`); the 102 aggregate-only lifecycles
+are not part of that archive, so the 39/102 boundary is retained. Rebuild a
+five-round verdict with:
 
 ```bash
 make m2-significance-confirmation-rebuild \

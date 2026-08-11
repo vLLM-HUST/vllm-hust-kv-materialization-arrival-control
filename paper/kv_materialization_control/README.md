@@ -26,7 +26,17 @@ The completed M2 result is negative. After the original matrix, the existing
 catalog was closed with 14 additional canonical-workload pilots and four
 five-round confirmations. None confirmed a meaningful significant gain, and
 `always_full_reuse` won all 20 added confirmation rounds. The current mechanism
-direction stops without per-workload retuning or post-hoc workload search.
+direction stops without per-workload retuning or post-hoc workload search; the
+final verdict is fixed as `stop_mechanism_direction` in the issue closure
+summary and this paper's boundary.
+
+The 39 in-repo raw-bundle lifecycles are archived in release
+`m2-issue3-closure-evidence-20260811`
+(<https://github.com/intellistream/kv-materialization-arrival-control/releases/tag/m2-issue3-closure-evidence-20260811>,
+asset `m2_raw_bundles_39_lifecycles.tar.gz`). The remaining 102 lifecycles are
+aggregate-only supporting evidence, so the 39/102 reproducibility boundary is
+retained until those raw bundles are archived to a persistent,
+content-addressed location.
 
 ## Local Workflow
 

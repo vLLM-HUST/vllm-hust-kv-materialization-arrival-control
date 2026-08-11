@@ -8,6 +8,19 @@ pilot 12 + anchor confirmation 9）在仓内保留 raw bundle，可从 `results/
 confirmation 60）仅保留逐 run 聚合与 verdict，标记为 aggregate-only
 supporting evidence，不表述为 fresh clone 可逐请求复核。
 
+## 最终摘要（Final Summary）
+
+**verdict 固定：`stop_mechanism_direction`。** 本 issue 以负结果闭合，不再
+继续调参或扩展搜索：
+
+- 主矩阵 18/18 lifecycle、576/576 请求有效；controller 相对每轮最佳固定策略
+  的 TTFT 在两个 workload 上分别回退 9.24% 与 6.60%，6/6 matched rounds 的
+  最佳固定策略均为 `always_full_reuse`；
+- 18 个扩展 workload 中，4 个晋级者的五轮确认全部为负（+0.87% ~ +3.70%，
+  单侧 95% 上界均 >0），20/20 确认轮最佳固定策略均为 `always_full_reuse`；
+- 该判定固定写入本最终摘要与论文边界（`kv_materialization_control.tex`），
+  作为当前三动作控制器方向的收口记录，不因后续证据归档而改写。
+
 ## 研究问题
 
 计入边界对齐、lookup、cache commit 和 recomputed tail 成本后，三动作控制器
@@ -121,21 +134,31 @@ Qwen2.5-7B-Instruct/Ascend 配置下，未发现 controller 相对最佳固定�
 `always_full_reuse` 的有意义且统计显著的正收益 workload；最佳结果
 （multi-tenant assistant）在独立确认中只有 -0.90% TTFT，低于 5% 门槛。
 结果按负结果记录，不继续 post-hoc workload 搜索或逐 workload 调参。
+该 verdict 固定写入最终摘要与论文边界，作为本方向的标准闭合表述。
 
 这是有限 catalog 结论，不是"任何配置下都不存在正收益"的普适定理；chunk
 index、semantic candidate 与验证协议仍属于 vLLM-HUST #198 的范围。
 
-## 数据保留程度
+## 数据保留程度与 Release 归档
 
 - 仓库内保留 raw bundle（validation.json、runtime observations）：
   `m2_online_boundary_20260803`（18 lifecycle）、`m2_candidate_pilot`（6）、
   `m2_anchor_pilot`（6）、`m2_anchor_confirmation`（9），共 39 个 lifecycle；
+- 已创建公开可引用的 raw-bundle release 归档（对应上述 39 个 lifecycle）：
+  release tag `m2-issue3-closure-evidence-20260811`，
+  <https://github.com/intellistream/kv-materialization-arrival-control/releases/tag/m2-issue3-closure-evidence-20260811>，
+  asset `m2_raw_bundles_39_lifecycles.tar.gz`（SHA-256
+  `56803f152b19e7f30aba6195bacba25eb2adb1de9db9e42369752ccb9fae37c4`）；
 - 仓库内保留逐 run 聚合与 verdict（无 raw bundle）：
   `m2_stateful_secondary_pilot`、`m2_catalog_closure_20260803`（5 shards）、
   4 个 `m2_significance_*` 确认目录，共 102 个 lifecycle；
 - 执行机 `/tmp` 中的原始 suite 已被清理，102 个 lifecycle 的 raw bundle
   无法再取回；这些结果一律作为 aggregate-only supporting evidence，不参与
   "fresh clone 可逐请求独立复核" 的声明；
+- 上述 release 只归档 39 个 lifecycle 的 raw bundle，不包含 102 个
+  aggregate-only lifecycle，也不恢复 141 个 lifecycle 的强声明；在 102 个
+  raw bundle 被归档到持久、内容寻址的位置之前，论文与 issue 保持 39/102
+  口径；
 - 若后续把 102 个 lifecycle 的 raw bundle 归档到持久、内容寻址的 artifact
   （release asset 或对象存储），可再把复核范围扩回 141 个 lifecycle；归档
   完成前，论文与 issue 中的可复现性表述以上述 39/102 边界为准。
