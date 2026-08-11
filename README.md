@@ -154,6 +154,15 @@ all six matched rounds. Cost-model and online winners agreed in `6/6` rounds.
 The preregistered verdict is therefore `stop_mechanism_direction`; the project
 does not continue per-workload controller tuning.
 
+The verdict is fixed in the M2 issue #3 closure summary and the paper boundary.
+The 39 in-repo raw-bundle lifecycles are also archived in release
+`m2-issue3-closure-evidence-20260811`
+(<https://github.com/intellistream/kv-materialization-arrival-control/releases/tag/m2-issue3-closure-evidence-20260811>,
+asset `m2_raw_bundles_39_lifecycles.tar.gz`); the other 102 M2 lifecycles
+remain aggregate-only supporting evidence, and the 39/102 reproducibility
+boundary is kept until those raw bundles are archived to a persistent,
+content-addressed location.
+
 The action accounting remains a useful systems result. For example, the tool
 controller's median lifecycle applied mix was `8/8/16`
 recompute/partial/full, while engine realization was `16/16/0`. Requested or
