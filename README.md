@@ -302,7 +302,7 @@ submodule (not a symlink) with:
 
 - URL: `https://github.com/vLLM-HUST/vllm-hust.git`
 - branch: `feature/kv-materialization-runtime-integration`
-- pinned carrier commit: `f8efeebe900e638f178e3b460f50cc750054fa17`
+- pinned carrier commit: `68b8be04493d39d5706f3d0d18f465f5eab947c4`
 - base: vLLM-HUST `main` at `e4ce33646f2ef1781289e6dc651fad0d00177c55`
 
 Fresh-checkout CPU validation:
