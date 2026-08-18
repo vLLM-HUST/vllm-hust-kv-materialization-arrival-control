@@ -76,6 +76,22 @@ graph-induced gap.
 - [ ] Do not promote host fixture, simulation, dry-run, or projected numbers to
       end-to-end performance evidence.
 
+## Runtime progress
+
+The pinned NPU environment can run vLLM-Ascend graph mode and AscendStore
+memcache layerwise:
+
+- Graph-mode readiness smoke passed on Qwen2.5-3B-Instruct with
+  `FULL_AND_PIECEWISE`.
+- AscendStore `kv_both` + `backend=memcache` + `use_layerwise=true` +
+  `layerwise_prefetch_layers=1` passed on 8x 910B2 with
+  `DeepSeek-V4-Flash-W8A8` in eager mode.
+
+Both artifacts are recorded under `docs/wavemat/results/`. These are runtime
+readiness/layerwise smokes, not M0 gap evidence. The next unresolved step is
+the graph-mode AscendStore layerwise trace (prefetch 1/2/4), which still needs
+to be run and analyzed before the seam gate can return go/no-go.
+
 ## Host-side failure injection
 
 The first PR includes a deterministic, stdlib-only fixture:
