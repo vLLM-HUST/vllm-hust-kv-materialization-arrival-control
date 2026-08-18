@@ -1,0 +1,408 @@
+{
+  "all_static_checks_pass": true,
+  "artifact": "m3-wavemat-seam-gate-carrier-audit",
+  "ascend_checks": [
+    {
+      "case": "ascend_store_connector",
+      "found": true,
+      "matched": [
+        {
+          "found": true,
+          "lines": [
+            76
+          ],
+          "needle": "class AscendStoreConnector(KVConnectorBase_V1, SupportsHMA):"
+        },
+        {
+          "found": true,
+          "lines": [
+            78
+          ],
+          "needle": "def requires_piecewise_for_cudagraph(cls, extra_config: dict[str, Any]) -> bool:"
+        },
+        {
+          "found": true,
+          "lines": [
+            83
+          ],
+          "needle": "return extra_config.get(\"use_layerwise\", False)"
+        },
+        {
+          "found": true,
+          "lines": [
+            229
+          ],
+          "needle": "def wait_for_layer_load(self, layer_name: str) -> None:"
+        },
+        {
+          "found": true,
+          "lines": [
+            234
+          ],
+          "needle": "def save_kv_layer("
+        }
+      ],
+      "path": "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/ascend_store_connector.py"
+    },
+    {
+      "case": "ascend_attention_consume",
+      "found": true,
+      "matched": [
+        {
+          "found": true,
+          "lines": [
+            431
+          ],
+          "needle": "def wait_for_kv_layer_from_connector(layer_name: str):"
+        },
+        {
+          "found": true,
+          "lines": [
+            445
+          ],
+          "needle": "def maybe_save_kv_layer_to_connector("
+        },
+        {
+          "found": true,
+          "lines": [
+            442
+          ],
+          "needle": "connector.wait_for_layer_load(layer_name)"
+        },
+        {
+          "found": true,
+          "lines": [
+            459
+          ],
+          "needle": "connector.save_kv_layer(layer_name, kv_cache_layer, attn_metadata)"
+        }
+      ],
+      "path": "vllm_ascend/attention/utils.py"
+    },
+    {
+      "case": "ascend_pool_worker_prefetch",
+      "found": true,
+      "matched": [
+        {
+          "found": true,
+          "lines": [
+            428
+          ],
+          "needle": "self.num_prefetch_layers = int(self._extra_config.get(\"layerwise_prefetch_layers\", 1))"
+        },
+        {
+          "found": true,
+          "lines": [
+            1701
+          ],
+          "needle": "def wait_for_layer_load(self) -> None:"
+        },
+        {
+          "found": true,
+          "lines": [
+            1724
+          ],
+          "needle": "def save_kv_layer(self, connector_metadata: AscendConnectorMetadata) -> None:"
+        },
+        {
+          "found": true,
+          "lines": [
+            405,
+            462,
+            520,
+            539,
+            1704,
+            1711,
+            1713,
+            1716
+          ],
+          "needle": "layer_load_finished_events"
+        },
+        {
+          "found": true,
+          "lines": [
+            406,
+            463,
+            481,
+            501,
+            521,
+            540,
+            1728,
+            1739,
+            1741,
+            1748,
+            1749
+          ],
+          "needle": "layer_save_finished_events"
+        }
+      ],
+      "path": "vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py"
+    },
+    {
+      "case": "ascend_acl_graph",
+      "found": true,
+      "matched": [
+        {
+          "found": true,
+          "lines": [
+            60
+          ],
+          "needle": "class ACLGraphWrapper:"
+        },
+        {
+          "found": true,
+          "lines": [
+            165
+          ],
+          "needle": "torch.npu.NPUGraph()"
+        },
+        {
+          "found": true,
+          "lines": [
+            133
+          ],
+          "needle": "def __call__(self, *args, **kwargs):"
+        },
+        {
+          "found": true,
+          "lines": [
+            266
+          ],
+          "needle": "entry.aclgraph.replay()"
+        }
+      ],
+      "path": "vllm_ascend/compilation/acl_graph.py"
+    }
+  ],
+  "carrier_checks": [
+    {
+      "case": "kv_connector_v1_base",
+      "found": true,
+      "matched": [
+        {
+          "found": true,
+          "lines": [
+            171
+          ],
+          "needle": "class KVConnectorBase_V1(ABC):"
+        },
+        {
+          "found": true,
+          "lines": [
+            311
+          ],
+          "needle": "def wait_for_layer_load(self, layer_name: str) -> None:"
+        },
+        {
+          "found": true,
+          "lines": [
+            325
+          ],
+          "needle": "def save_kv_layer("
+        },
+        {
+          "found": true,
+          "lines": [
+            608
+          ],
+          "needle": "def requires_piecewise_for_cudagraph(cls, extra_config: dict[str, Any]) -> bool:"
+        }
+      ],
+      "path": "vllm/distributed/kv_transfer/kv_connector/v1/base.py"
+    },
+    {
+      "case": "attention_layerwise_decorator",
+      "found": true,
+      "matched": [
+        {
+          "found": true,
+          "lines": [
+            15
+          ],
+          "needle": "def maybe_transfer_kv_layer(func: Callable) -> Callable:"
+        }
+      ],
+      "path": "vllm/model_executor/layers/attention/kv_transfer_utils.py"
+    },
+    {
+      "case": "attention_consume_non_mla",
+      "found": true,
+      "matched": [
+        {
+          "found": true,
+          "lines": [
+            761
+          ],
+          "needle": "@eager_break_during_capture"
+        },
+        {
+          "found": true,
+          "lines": [
+            762
+          ],
+          "needle": "@maybe_transfer_kv_layer"
+        },
+        {
+          "found": true,
+          "lines": [
+            763
+          ],
+          "needle": "def unified_attention_with_output("
+        }
+      ],
+      "path": "vllm/model_executor/layers/attention/attention.py"
+    },
+    {
+      "case": "attention_consume_mla",
+      "found": true,
+      "matched": [
+        {
+          "found": true,
+          "lines": [
+            1080
+          ],
+          "needle": "@eager_break_during_capture"
+        },
+        {
+          "found": true,
+          "lines": [
+            1081
+          ],
+          "needle": "@maybe_transfer_kv_layer"
+        },
+        {
+          "found": true,
+          "lines": [
+            1082
+          ],
+          "needle": "def unified_mla_attention_with_output("
+        }
+      ],
+      "path": "vllm/model_executor/layers/attention/mla_attention.py"
+    },
+    {
+      "case": "lmcache_layerwise_connector",
+      "found": true,
+      "matched": [
+        {
+          "found": true,
+          "lines": [
+            72
+          ],
+          "needle": "class LMCacheConnectorV1(KVConnectorBase_V1):"
+        },
+        {
+          "found": true,
+          "lines": [
+            81
+          ],
+          "needle": "return extra_config.get(\"use_layerwise\", False)"
+        },
+        {
+          "found": true,
+          "lines": [
+            153
+          ],
+          "needle": "def wait_for_layer_load(self, layer_name: str) -> None:"
+        },
+        {
+          "found": true,
+          "lines": [
+            166
+          ],
+          "needle": "def save_kv_layer("
+        }
+      ],
+      "path": "vllm/distributed/kv_transfer/kv_connector/v1/lmcache_connector.py"
+    },
+    {
+      "case": "graph_mode_override",
+      "found": true,
+      "matched": [
+        {
+          "found": true,
+          "lines": [
+            1309
+          ],
+          "needle": "KV connector %s requires PIECEWISE CUDA graph mode"
+        },
+        {
+          "found": true,
+          "lines": [
+            786,
+            1276,
+            1316
+          ],
+          "needle": "self.compilation_config.cudagraph_mode = CUDAGraphMode.PIECEWISE"
+        }
+      ],
+      "path": "vllm/config/vllm.py"
+    },
+    {
+      "case": "breakable_graph_capture",
+      "found": true,
+      "matched": [
+        {
+          "found": true,
+          "lines": [
+            59
+          ],
+          "needle": "def eager_break_during_capture(fn: F) -> F:"
+        },
+        {
+          "found": true,
+          "lines": [
+            125
+          ],
+          "needle": "class BreakableCUDAGraphCapture:"
+        },
+        {
+          "found": true,
+          "lines": [
+            78
+          ],
+          "needle": "wait_for_layer_load"
+        }
+      ],
+      "path": "vllm/compilation/breakable_cudagraph.py"
+    },
+    {
+      "case": "worker_connector_lifecycle",
+      "found": true,
+      "matched": [
+        {
+          "found": true,
+          "lines": [
+            34
+          ],
+          "needle": "class KVConnectorModelRunnerMixin:"
+        },
+        {
+          "found": true,
+          "lines": [
+            95
+          ],
+          "needle": "kv_connector.start_load_kv(get_forward_context())"
+        },
+        {
+          "found": true,
+          "lines": [
+            71,
+            100
+          ],
+          "needle": "kv_connector.wait_for_save()"
+        }
+      ],
+      "path": "vllm/v1/worker/kv_connector_model_runner_mixin.py"
+    }
+  ],
+  "carrier_expected_commit": "68b8be04493d39d5706f3d0d18f465f5eab947c4",
+  "carrier_vendor_vllm_commit": "68b8be04493d39d5706f3d0d18f465f5eab947c4",
+  "claim": "Static source audit confirms the pinned vendor/vllm carrier exposes KVConnector V1 layerwise load/consume seams and forces layerwise connectors to PIECEWISE graph mode; upstream vllm-ascend exposes AscendStoreConnector layerwise wait/save/prefetch and ACLGraph. This is not a 910B2 runtime trace and does not establish a graph induced gap or its absence.",
+  "evidence_class": "carrier_audit_static",
+  "generated_at_utc": "2026-08-18T10:09:11Z",
+  "is_end_to_end_performance_evidence": false,
+  "is_wavemat_mechanism_enabled": false,
+  "vllm_ascend_commit": "61a16bbd2565fbd86645011aa849c2bfcc5ace71",
+  "vllm_ascend_is_vendored": false
+}
