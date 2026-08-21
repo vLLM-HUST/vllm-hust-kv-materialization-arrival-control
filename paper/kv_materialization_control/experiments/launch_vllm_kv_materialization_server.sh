@@ -14,7 +14,6 @@ BLOCK_SIZE="${BLOCK_SIZE:-16}"
 SERVED_MODEL_NAME="${SERVED_MODEL_NAME:-$(basename "$MODEL")}"
 ENABLE_PLUGIN="${ENABLE_PLUGIN:-1}"
 CARRIER_VLLM_HUST_ROOT="${CARRIER_VLLM_HUST_ROOT:-$REPO_ROOT/vendor/vllm}"
-VLLM_ASCEND_HUST_ROOT="${VLLM_ASCEND_HUST_ROOT:-$REPO_ROOT/vendor/vllm-ascend-hust}"
 XDG_CACHE_HOME="${VLLM_KV_MATERIALIZATION_XDG_CACHE_HOME:-$REPO_ROOT/.cache/vllm}"
 HF_HOME="${VLLM_KV_MATERIALIZATION_HF_HOME:-$REPO_ROOT/.cache/huggingface}"
 VLLM_CACHE_ROOT="${VLLM_CACHE_ROOT:-$XDG_CACHE_HOME/vllm}"
@@ -50,17 +49,13 @@ if [[ ! -f "$CARRIER_VLLM_HUST_ROOT/vllm/__init__.py" ]]; then
   echo "missing runtime carrier; run: git submodule update --init" >&2
   exit 2
 fi
-if [[ ! -f "$VLLM_ASCEND_HUST_ROOT/vllm_ascend/__init__.py" ]]; then
-  echo "missing vllm-ascend-hust plugin; run: git submodule update --init" >&2
-  exit 2
-fi
 conda activate "$ENV_NAME"
 export LD_LIBRARY_PATH="$CONDA_PREFIX/lib:${LD_LIBRARY_PATH:-}"
 export XDG_CACHE_HOME
 export HF_HOME
 export VLLM_CACHE_ROOT
 export PYTHONNOUSERSITE="${PYTHONNOUSERSITE:-1}"
-export PYTHONPATH="$VLLM_ASCEND_HUST_ROOT:$CARRIER_VLLM_HUST_ROOT:$REPO_ROOT/src${PYTHONPATH:+:$PYTHONPATH}"
+export PYTHONPATH="$CARRIER_VLLM_HUST_ROOT:$REPO_ROOT/src${PYTHONPATH:+:$PYTHONPATH}"
 export VLLM_KV_RUNTIME_BLOCK_SIZE="${VLLM_KV_RUNTIME_BLOCK_SIZE:-$BLOCK_SIZE}"
 mkdir -p "$XDG_CACHE_HOME" "$HF_HOME" "$VLLM_CACHE_ROOT"
 if [[ -z "$MAX_MODEL_LEN" ]]; then
