@@ -124,6 +124,31 @@ no per-stage transfer/wait/compute separation, and the layerwise-vs-non-layerwis
 comparison is confounded. The next measurement should add an eager-mode layerwise
 reference to isolate the graph-induced portion, and per-stage timing.
 
+## Graph-induced gap: eager vs graph reference
+
+Same workload (8 prompts x 64 tokens, max_num_seqs=4, prefetch 1 and 4), with
+`enforce_eager=True`:
+
+| config | mode | wall_clock_s |
+|---|---|---|
+| layerwise prefetch 1 | eager | 16.828 |
+| layerwise prefetch 4 | eager | 16.645 |
+| layerwise prefetch 1 | graph (PIECEWISE) | 8.649 / 8.658 |
+| layerwise prefetch 4 | graph (PIECEWISE) | 8.192 / 8.118 |
+
+Raw results: `docs/wavemat/results/m0_timing_eager_p{1,4}.json`.
+
+Conclusion for the graph-induced question: **no graph-induced overlap loss or
+sync bubble is observed.** Graph mode (PIECEWISE) is ~2x faster than eager
+(8.65 s vs 16.83 s at prefetch 1); the graph-piece boundary does not add
+measurable host-wait. The reproducible prefetch 1->4 bubble (~5.8%) persists in
+both eager (16.83->16.65 s) and graph (8.65->8.16 s) modes, so it is an
+eager-agnostic fixed-prefetch scheduling bubble, not a graph-safety seam.
+
+This is a candidate M0 no-graph-gap result, pending (a) runtime replay
+correctness failure-injection (stale/ABA/duplicate/load-failure) and (b)
+per-stage transfer/wait/compute timing on a longer workload.
+
 ## AscendStore memcache backend prerequisites
 
 - A standalone MMC meta service must be listening on `127.0.0.1:5000` (meta),

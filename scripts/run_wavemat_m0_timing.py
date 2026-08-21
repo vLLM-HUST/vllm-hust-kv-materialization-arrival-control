@@ -60,13 +60,14 @@ def run(
     max_num_seqs: int,
     max_tokens: int,
     gpu_memory_utilization: float,
+    enforce_eager: bool,
 ) -> dict[str, Any]:
     from vllm import LLM, SamplingParams
 
     llm = LLM(
         model=model,
         trust_remote_code=True,
-        enforce_eager=False,
+        enforce_eager=enforce_eager,
         tensor_parallel_size=8,
         max_model_len=256,
         max_num_seqs=max_num_seqs,
@@ -116,6 +117,7 @@ def main() -> None:
     parser.add_argument("--max-num-seqs", type=int, default=8)
     parser.add_argument("--max-tokens", type=int, default=64)
     parser.add_argument("--gpu-memory-utilization", type=float, default=0.6)
+    parser.add_argument("--enforce-eager", action=argparse.BooleanOptionalAction, default=False)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
 
@@ -129,6 +131,7 @@ def main() -> None:
         args.max_num_seqs,
         args.max_tokens,
         args.gpu_memory_utilization,
+        args.enforce_eager,
     )
     result["artifact"] = "m0-wavemat-layerwise-timing"
     result["is_end_to_end_performance_evidence"] = False
