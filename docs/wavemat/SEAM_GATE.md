@@ -24,6 +24,39 @@ The parent gitlink is now initialized and checked out at
 `68b8be04493d39d5706f3d0d18f465f5eab947c4`. The M2 historical carrier
 `475ea49` is preserved as historical evidence and is not rewritten.
 
+## M2 historical carrier/plugin recheck
+
+M2 result manifests (`m2_online_boundary_20260803` and
+`m2_anchor_confirmation_20260803`) record:
+
+- carrier: `vendor/vllm` commit
+  `475ea49295b8c19907d2bd3c0af94beb9c99c441`
+- model: `/root/models/Qwen2.5-7B-Instruct` (`Qwen2ForCausalLM`,
+  `model_type=qwen2`, 28 hidden layers, 4 KV heads)
+- paired plugin: `vllm-ascend-hust 0.19.1.post1.dev414+g03a12f9b`
+- graph mode: `FULL_AND_PIECEWISE`, `enforce_eager=False`
+
+The historical `vllm-hust` commit is a separate core checkout, while the
+per-layer Ascend attention hook lives in the paired `vllm-ascend-hust` plugin.
+Recheck of `vLLM-HUST/vllm-ascend-hust` at `03a12f9b` shows the layerwise
+call sites only in `mla_v1.py` and `sfa_v1.py`:
+
+- `wait_for_kv_layer_from_connector` / `maybe_save_kv_layer_to_connector`
+  are imported and called in `mla_v1.py` and `sfa_v1.py`.
+- `attention_v1.py` has only `is_kv_producer` / `kv_transfer_config` branches;
+  it contains no `wait_for_kv_layer_from_connector`,
+  `maybe_save_kv_layer_to_connector`, `wait_for_layer_load`, or
+  `save_kv_layer`.
+
+`Qwen2.5-7B-Instruct` is `qwen2` GQA, not an MLA/SFA/DSA model, so it follows
+the generic `ASCEND` / `attention_v1.py` attention path. Therefore the M2 model
+path did not have an Ascend per-layer load/save consume seam.
+
+This is a first-fact negative, not M0 go/no-go by itself: if M0 stays on M2's
+`Qwen2.5-7B-Instruct` and its paired plugin, the upstream layerwise KV baseline
+is not active in `attention_v1`; the seam-gate result must be evaluated on that
+observed absence rather than assuming the layerwise path was exercised.
+
 This checkout confirms the pinned carrier contains the upstream
 `KVConnectorBase_V1` layerwise interface and the LMCache layerwise
 implementation. It does not vendor `vllm-ascend`; that code was audited from a
