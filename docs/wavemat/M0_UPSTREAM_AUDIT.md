@@ -63,16 +63,42 @@ References are relative to the installed upstream pair, not the vendored
 These are static-audit candidates, not measured overlap loss. Runtime proof is
 still required for go/no-go.
 
-## Runtime blocker (as of 2026-08-21 ~06:30 UTC)
+## Runtime baseline (resolved and run)
 
-The 8x 910B2 devices are occupied by processes in another namespace: `npu-smi`
-reports one process per device at ~59-62 GB, and `torch.npu.mem_get_info`
-reports ~2.3 GB free per device (NPU0 ~23 MB). This is below the ~4 GB/device
-weight footprint of `DeepSeek-V2-Lite`, so the graph-mode AscendStore layerwise
-baseline (prefetch 1/2/4) cannot run until a free device is available.
+The 8x 910B2 devices became free. The graph-mode AscendStore layerwise baseline
+was then run with `use_layerwise=True` + `backend=memcache` +
+`cudagraph_mode=FULL_AND_PIECEWISE`, `enforce_eager=False`, `tensor_parallel_size=8`,
+`max_model_len=256`, one request, 32 output tokens:
 
-Per the issue, this maps to the stop condition "M0 没有空闲 910B2 graph-mode
-环境" unless a free device becomes available.
+| layerwise_prefetch_layers | generate_elapsed_s | generated_text (prefix) |
+|---|---|---|
+| 1 | 2.506 | `\n\n\nA: You can use the following code to get the current date...` |
+| 2 | 2.511 | `\n\n\nA: You can use the following code to get the value...` |
+| 4 | 2.529 | `\n\n\nA: You can use the following code to get the current date...` |
+
+Raw results: `docs/wavemat/results/m0_layerwise_baseline_p{1,2,4}.json`.
+
+Observations:
+
+- Runtime confirms the static-audit finding: with `use_layerwise=True`, only
+  PIECEWISE graphs are captured (`mixed prefill-decode, PIECEWISE`); no FULL
+  decode graph is captured. The FULL mode is overridden to PIECEWISE.
+- At this scale (one short request, 32 tokens), prefetch 1/2/4 produces
+  essentially identical generation time (2.506 / 2.511 / 2.529 s), so no
+  prefetch-induced bubble is yet measurable. This is a first-order signal, not
+  a gap/no-gap conclusion; longer sequences and concurrent requests are needed
+  to stress the transfer/compute overlap.
+- Per-stage timing (transfer / layer-ready wait / attention compute /
+  graph-piece transition) and TTFT p50/p95 are not yet instrumented; the next
+  step is to enable KV events / iteration-stats tracing and a longer workload.
+
+## AscendStore memcache backend prerequisites
+
+- A standalone MMC meta service must be listening on `127.0.0.1:5000` (meta),
+  `127.0.0.1:6000` (config store), `127.0.0.1:8000` (HTTP):
+  `setsid python3 scripts/start_mmc_meta_service.py`.
+- `MMC_LOCAL_CONFIG_PATH` must point at
+  `docs/wavemat/configs/mmc-local.conf`.
 
 ## Environment notes
 

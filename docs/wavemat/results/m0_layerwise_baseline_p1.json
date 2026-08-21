@@ -1,0 +1,14 @@
+{
+  "artifact": "m0-wavemat-layerwise-baseline",
+  "cudagraph_mode": "FULL_AND_PIECEWISE",
+  "generate_elapsed_s": 2.506,
+  "generated_at_utc": "2026-08-21T07:36:04Z",
+  "generated_text": "\n\n\nA: You can use the following code to get the current date and time in the format you want:\nimport java.time.LocalDateTime",
+  "is_end_to_end_performance_evidence": false,
+  "is_wavemat_mechanism_enabled": false,
+  "layerwise_prefetch_layers": 1,
+  "max_tokens": 32,
+  "model": "/root/models/DeepSeek-V2-Lite",
+  "prompt": "Hello, world!",
+  "ttft_ms": null
+}
