@@ -3,3 +3,7 @@
 	url = https://github.com/vLLM-HUST/vllm-hust.git
 	branch = feature/kv-materialization-runtime-integration
 	shallow = true
+[submodule "vendor/vllm-ascend-hust"]
+	path = vendor/vllm-ascend-hust
+	url = https://github.com/vLLM-HUST/vllm-ascend-hust.git
+	shallow = true
