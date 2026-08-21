@@ -92,6 +92,38 @@ Observations:
   graph-piece transition) and TTFT p50/p95 are not yet instrumented; the next
   step is to enable KV events / iteration-stats tracing and a longer workload.
 
+## Concurrent timing sweep (8 prompts x 64 tokens, max_num_seqs=4)
+
+Measured wall-clock for 8 concurrent identical prompts (64 output tokens) with
+`gpu_memory_utilization=0.22`:
+
+| config | use_layerwise | prefetch | wall_clock_s |
+|---|---|---|---|
+| non-layerwise | False | 1 | 2.999 |
+| layerwise | True | 1 | 8.649 / 8.658 |
+| layerwise | True | 2 | 8.245 |
+| layerwise | True | 4 | 8.192 / 8.118 |
+
+Raw results: `docs/wavemat/results/m0_timing_*.json`.
+
+Findings (first-order, reproducible at endpoints):
+
+1. **Layerwise overhead**: the layerwise path is ~2.7-2.9x slower than
+   non-layerwise (8.1-8.7 s vs 3.0 s). This is confounded: layerwise forces
+   PIECEWISE (non-layerwise uses FULL+PIECEWISE) and does per-layer rather than
+   whole-request transfer, so it is not yet attributable to graph-mode alone.
+2. **Fixed-prefetch bubble is reproducible**: prefetch 1 -> 4 improves
+   wall-clock by ~5.8% (8.65 s -> 8.16 s), monotonic through prefetch 2
+   (8.245 s), with endpoint repeats agreeing within ~1%. This maps to the
+   issue's gap candidate "固定 layerwise_prefetch_layers 形成 bubble" and to
+   the code seam `pool_worker.py:1309`
+   (`submit_count = num_prefetch_layers if current_layer == 0 else 1`).
+
+Caveats: single/config (two repeats only at prefetch 1 and 4), short workload,
+no per-stage transfer/wait/compute separation, and the layerwise-vs-non-layerwise
+comparison is confounded. The next measurement should add an eager-mode layerwise
+reference to isolate the graph-induced portion, and per-stage timing.
+
 ## AscendStore memcache backend prerequisites
 
 - A standalone MMC meta service must be listening on `127.0.0.1:5000` (meta),

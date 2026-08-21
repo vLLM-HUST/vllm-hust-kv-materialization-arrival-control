@@ -59,6 +59,7 @@ def run(
     num_prompts: int,
     max_num_seqs: int,
     max_tokens: int,
+    gpu_memory_utilization: float,
 ) -> dict[str, Any]:
     from vllm import LLM, SamplingParams
 
@@ -69,8 +70,7 @@ def run(
         tensor_parallel_size=8,
         max_model_len=256,
         max_num_seqs=max_num_seqs,
-        gpu_memory_utilization=0.6,
-        disable_log_stats=True,
+        gpu_memory_utilization=gpu_memory_utilization,
         compilation_config={"cudagraph_mode": cudagraph_mode},
         kv_transfer_config={
             "kv_connector": "AscendStoreConnector",
@@ -115,6 +115,7 @@ def main() -> None:
     parser.add_argument("--num-prompts", type=int, default=8)
     parser.add_argument("--max-num-seqs", type=int, default=8)
     parser.add_argument("--max-tokens", type=int, default=64)
+    parser.add_argument("--gpu-memory-utilization", type=float, default=0.6)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
 
@@ -127,6 +128,7 @@ def main() -> None:
         args.num_prompts,
         args.max_num_seqs,
         args.max_tokens,
+        args.gpu_memory_utilization,
     )
     result["artifact"] = "m0-wavemat-layerwise-timing"
     result["is_end_to_end_performance_evidence"] = False
