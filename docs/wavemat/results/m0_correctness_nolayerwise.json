@@ -1,0 +1,44 @@
+{
+  "artifact": "m0-wavemat-correctness",
+  "cudagraph_mode": "FULL_AND_PIECEWISE",
+  "enforce_eager": false,
+  "generated_at_utc": "2026-08-22T11:09:51Z",
+  "is_wavemat_mechanism_enabled": false,
+  "layerwise_prefetch_layers": 1,
+  "max_tokens": 96,
+  "model": "/root/models/DeepSeek-V2-Lite",
+  "outputs": [
+    {
+      "finish_reason": "length",
+      "prompt": "Write a Python function to compute the nth Fibonacci number.",
+      "text": "\n\nThe Fibonacci numbers are the numbers in the following integer sequence.\n\n0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, \u2026\u2026..\n\nExample:\n\nIf n = 6, then the Fibonacci number is 8.\n\ndef fibonacci(n):\n   "
+    },
+    {
+      "finish_reason": "length",
+      "prompt": "Explain what a binary search tree is in one paragraph.",
+      "text": "\n\nA binary search tree is a data structure that stores data in a tree-like structure. Each node in the tree has a value, and the values in the left subtree are less than the value of the node, and the values in the right subtree are greater than the value of the node. The tree is balanced, meaning that the height of the left and right subtrees are approximately the same.\n\n## What is the time complexity of a binary search tree?"
+    },
+    {
+      "finish_reason": "length",
+      "prompt": "Write a function that reverses a singly linked list.",
+      "text": "\n\nExample:\n\nInput: 1->2->3->4->5->NULL\nOutput: 5->4->3->2->1->NULL\n\nFollow up:\nA linked list can be reversed either iteratively or recursively. Could you implement both?\n\n\n\n/**\n * Definition for singly-linked list.\n * public class ListNode {\n *     int val;\n *     ListNode next;\n *     ListNode"
+    },
+    {
+      "finish_reason": "length",
+      "prompt": "What is the capital of France? Answer in one short sentence.",
+      "text": "\n\nWhat is the capital of France? Answer in one short sentence.\n\nWhat is the capital of France? Answer in one short sentence.\n\nWhat is the capital of France? Answer in one short sentence.\n\nWhat is the capital of France? Answer in one short sentence.\n\nWhat is the capital of France? Answer in one short sentence.\n\nWhat is the capital of France? Answer in one short sentence.\n\nWhat is the capital"
+    },
+    {
+      "finish_reason": "length",
+      "prompt": "Write a function to check whether a string is a palindrome.",
+      "text": "\n\nA palindrome is a word, phrase, number, or other sequence of characters which reads the same backward or forward.\n\nExample:\n\nInput: \"abba\"\nOutput: true\n\nInput: \"abba\"\nOutput: true\n\nInput: \"abba\"\nOutput: true\n\nInput: \"abba\"\nOutput: true\n\nInput: \"abba\"\nOutput: true\n\nInput: \""
+    },
+    {
+      "finish_reason": "length",
+      "prompt": "Describe the difference between TCP and UDP in two sentences.",
+      "text": "\n\nTCP is a connection-oriented protocol, which means that it establishes a connection between the sender and the receiver before sending data. It provides reliable data transfer by ensuring that the data is delivered in the correct order and without any loss or corruption.\n\nUDP is a connectionless protocol, which means that it does not establish a connection between the sender and the receiver before sending data. It provides fast and efficient data transfer, but it does not guarantee that the data will be"
+    }
+  ],
+  "use_layerwise": false,
+  "wall_clock_s": 3.556
+}

@@ -149,6 +149,36 @@ This is a candidate M0 no-graph-gap result, pending (a) runtime replay
 correctness failure-injection (stale/ABA/duplicate/load-failure) and (b)
 per-stage transfer/wait/compute timing on a longer workload.
 
+## Correctness oracle (greedy output, 6 distinct prompts)
+
+Six distinct prompts, `max_tokens=96`, `temperature=0`. Wall-clock and
+exact-output comparison across three configs:
+
+| config | wall_clock_s | greedy matches eager (of 6) |
+|---|---|---|
+| eager | 27.941 | 6/6 (reference) |
+| non-layerwise graph (FULL+PIECEWISE) | 3.556 | 3/6 |
+| layerwise graph prefetch 1 (PIECEWISE) | 11.696 | 3/6 |
+
+Raw results: `docs/wavemat/results/m0_correctness_{eager,nonlayerwise,layerwise}.json`.
+
+Observations:
+
+- Graph mode (both non-layerwise and layerwise) diverges from eager on 3/6
+  prompts. This is the dominant effect and is consistent with floating-point /
+  MoE non-determinism between graph and eager kernel execution, not KV
+  corruption.
+- Layerwise graph diverges from non-layerwise graph on 2/6 prompts. This is a
+  separate, smaller signal that the per-layer save/load or eager-break path
+  changes numerics slightly. It warrants a block/layer digest-level check (the
+  issue's `block/layer digest` oracle) rather than a token-level conclusion.
+- On the 3 divergent prompts the outputs differ by a few tokens (lengths differ
+  by ~1), not by gross corruption.
+
+Open correctness items: (a) replay determinism of the same layerwise config
+across two runs, and (b) a block/layer digest comparison between layerwise
+load and recompute, both of which need digest instrumentation.
+
 ## AscendStore memcache backend prerequisites
 
 - A standalone MMC meta service must be listening on `127.0.0.1:5000` (meta),
