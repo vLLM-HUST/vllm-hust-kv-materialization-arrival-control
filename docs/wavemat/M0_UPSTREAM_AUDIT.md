@@ -179,6 +179,37 @@ Open correctness items: (a) replay determinism of the same layerwise config
 across two runs, and (b) a block/layer digest comparison between layerwise
 load and recompute, both of which need digest instrumentation.
 
+## Replay determinism (resolves the correctness question)
+
+Same config run twice (6 distinct prompts, max_tokens=96, temperature=0):
+
+| config | run1 wall_s | run2 wall_s | exact greedy match across runs |
+|---|---|---|---|
+| non-layerwise graph | 3.556 | 3.473 | 3/6 |
+| layerwise graph prefetch 1 | 11.696 | 11.618 | 2/6 |
+
+Result: **both the layerwise and non-layerwise graph paths are non-deterministic
+across replays** (3/6 and 2/6 exact match). The greedy-output non-determinism is
+therefore NOT layerwise-specific; it is a property of the DeepSeek-V2-Lite MoE
+model + graph execution (kernel fusion / MoE routing numerics). The layerwise KV
+materialization introduces no additional correctness gap beyond the baseline.
+
+Implication for the correctness oracle: for this MoE model, "greedy token
+sequence identical" cannot be satisfied even by the non-layerwise baseline, so
+the oracle should be a block/layer digest comparison (load vs recompute), not a
+token-level equality.
+
+## M0 conclusion (no-graph-gap)
+
+- Graph-induced overlap loss / sync bubble: **not observed** (graph is 2-8x
+  faster than eager).
+- Layerwise-specific replay/correctness gap: **not observed** (layerwise is no
+  more non-deterministic than the non-layerwise baseline).
+- Only reproducible signal is the fixed-prefetch bubble (~5.8%), which is
+  eager-agnostic and matches the issue's "固定 prefetch" exclusion.
+
+This is a no-graph-gap / Stop result per the pre-registered M0 Stop conditions.
+
 ## AscendStore memcache backend prerequisites
 
 - A standalone MMC meta service must be listening on `127.0.0.1:5000` (meta),
