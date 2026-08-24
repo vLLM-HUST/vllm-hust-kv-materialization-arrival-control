@@ -379,8 +379,11 @@ python3 scripts/summarize_wavemat_m0_device_trace.py \
 Use the analogous `gate_trace_analyzer` command in the manifest for p=2 gate
 logs. The `trace` field retained in the early per-arm summary is the original
 capture path used by the analyzer, not the reviewer-facing artifact location.
-The recorded fresh-clone check verifies all eight assets and re-computes the
-matched p=2 graph/eager device summaries and graph gate summary.
+`scripts/verify_wavemat_m0_raw_provenance.py` is the executable custody check:
+it verifies all eight assets, then rebuilds all six device summaries and both
+gate summaries from those bytes. The recorded fresh-clone check is its earlier
+matched-p=2 review run; the executable check is the reproducible full-bundle
+verification contract.
 
 The completed paired sweep used the profiler's synchronous
 `AscendCL@aclrtMemcpyBatch` interval and intersected it with NPU `AI_*` / `MIX_*`

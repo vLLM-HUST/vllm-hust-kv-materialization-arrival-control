@@ -6,6 +6,13 @@
     "url": "https://github.com/intellistream/kv-materialization-arrival-control/releases/tag/wavemat-m0-raw-20260824-v1",
     "target_commit": "de3449d34b8c51736dbad05a44e83058fcc9702d"
   },
+  "custody": {
+    "artifact_authority": "GitHub Release assets in the private intellistream/kv-materialization-arrival-control repository",
+    "location_contract": "Each raw.url is a numeric GitHub Release Asset API endpoint. An uploaded asset cannot be replaced in place; its compressed and decompressed SHA-256 values are the content identities.",
+    "access_contract": "A reviewer uses a GitHub token with read access to this repository and the authenticated command in this manifest.",
+    "retention_contract": "The wavemat-m0-raw-20260824-v1 release and its eight asset IDs are retained for M0 review; deletion is the only operation that can make a location unavailable, and is prohibited while this PR or its audit record is active.",
+    "chain_of_custody": "Ascend profiler/gate logs on the declared device -> gzip -9 capture copy -> GitHub Release upload -> asset-ID URL and dual SHA-256 validation -> offline summary rebuild."
+  },
   "common_identity": {
     "host_device": "Ascend 910B2, ASCEND_RT_VISIBLE_DEVICES=2, TP=1",
     "npu_smi_version": "26.0.rc1",
@@ -33,6 +40,7 @@
       "id": "tp1_graph_p1",
       "mode": "graph",
       "prefetch_layers": 1,
+      "source_capture_path": "docs/wavemat/results/m0_overlap_tp1_graph_p1_profile/wavemat_m0_dp0_pp0_tp0_dcp0_ep0_rank0_246977_20260824054732383_ascend_pt/ASCEND_PROFILER_OUTPUT/trace_view.json",
       "summary": "docs/wavemat/results/m0_overlap_tp1_graph_p1_device_summary.json",
       "raw": {"url": "https://api.github.com/repos/intellistream/kv-materialization-arrival-control/releases/assets/527271237", "compression": "gzip", "compressed_bytes": 18696268, "compressed_sha256": "ac660ae6c73f1a76bf9f5be3ea7fffecc83d0c8cca19b831956695a8b41c7b6f", "uncompressed_bytes": 287659349, "uncompressed_sha256": "ad165e1a6eb9a1cdefc737d83bca97394a698221adc2ceff9b5426faa568baee"}
     },
@@ -40,6 +48,7 @@
       "id": "tp1_eager_p1",
       "mode": "eager",
       "prefetch_layers": 1,
+      "source_capture_path": "docs/wavemat/results/m0_overlap_tp1_eager_p1_profile/wavemat_m0_dp0_pp0_tp0_dcp0_ep0_rank0_249573_20260824054951719_ascend_pt/ASCEND_PROFILER_OUTPUT/trace_view.json",
       "summary": "docs/wavemat/results/m0_overlap_tp1_eager_p1_device_summary.json",
       "raw": {"url": "https://api.github.com/repos/intellistream/kv-materialization-arrival-control/releases/assets/527271427", "compression": "gzip", "compressed_bytes": 18699274, "compressed_sha256": "e3cb82f4d1385e93020cb92e6098461cdf1098865861a25502f99033a26fd47d", "uncompressed_bytes": 287960705, "uncompressed_sha256": "5622b4dcd938e3faa65ec7afa019a1b067e9b71196038b34010fd223a7a25aff"}
     },
@@ -47,6 +56,7 @@
       "id": "tp1_graph_p2",
       "mode": "graph",
       "prefetch_layers": 2,
+      "source_capture_path": "docs/wavemat/results/m0_overlap_tp1_graph_p2_profile/wavemat_m0_dp0_pp0_tp0_dcp0_ep0_rank0_242468_20260824054141194_ascend_pt/ASCEND_PROFILER_OUTPUT/trace_view.json",
       "summary": "docs/wavemat/results/m0_overlap_tp1_graph_p2_device_summary.json",
       "raw": {"url": "https://api.github.com/repos/intellistream/kv-materialization-arrival-control/releases/assets/527271682", "compression": "gzip", "compressed_bytes": 18714324, "compressed_sha256": "95ed6af3dcea3e48fe909e051e139d69a3f6aa2c541c05d59b5cc55d9e2c8868", "uncompressed_bytes": 287670549, "uncompressed_sha256": "2b967af3c2156e35e5dbed4fd7238e6f77309ba888346740298f8de70d6686f2"}
     },
@@ -54,6 +64,7 @@
       "id": "tp1_eager_p2",
       "mode": "eager",
       "prefetch_layers": 2,
+      "source_capture_path": "docs/wavemat/results/m0_overlap_tp1_eager_p2_profile/wavemat_m0_dp0_pp0_tp0_dcp0_ep0_rank0_255836_20260824060542854_ascend_pt/ASCEND_PROFILER_OUTPUT/trace_view.json",
       "summary": "docs/wavemat/results/m0_overlap_tp1_eager_p2_device_summary.json",
       "raw": {"url": "https://api.github.com/repos/intellistream/kv-materialization-arrival-control/releases/assets/527271836", "compression": "gzip", "compressed_bytes": 18677027, "compressed_sha256": "385f88b94704a2741669d40874ae70648e7d2ad97a5c8a9f2920ec2ec7573fdb", "uncompressed_bytes": 287941012, "uncompressed_sha256": "40fa64833f3db5be2d3b3780255e9625359c906f82cffae446b0615a70069092"}
     },
@@ -61,6 +72,7 @@
       "id": "tp1_graph_p4",
       "mode": "graph",
       "prefetch_layers": 4,
+      "source_capture_path": "docs/wavemat/results/m0_overlap_tp1_graph_p4_profile/wavemat_m0_dp0_pp0_tp0_dcp0_ep0_rank0_259620_20260824061012500_ascend_pt/ASCEND_PROFILER_OUTPUT/trace_view.json",
       "summary": "docs/wavemat/results/m0_overlap_tp1_graph_p4_device_summary.json",
       "raw": {"url": "https://api.github.com/repos/intellistream/kv-materialization-arrival-control/releases/assets/527272135", "compression": "gzip", "compressed_bytes": 18690755, "compressed_sha256": "436174983164b1208d75ac22eb97dcc620fdaa57d76581a9de9169cce57acbc5", "uncompressed_bytes": 287651961, "uncompressed_sha256": "da9f6d92db3d9df9076cd7a26b0e4ff8c8d4d6f81a986e66376b13ebcb33f312"}
     },
@@ -68,6 +80,7 @@
       "id": "tp1_eager_p4",
       "mode": "eager",
       "prefetch_layers": 4,
+      "source_capture_path": "docs/wavemat/results/m0_overlap_tp1_eager_p4_profile/wavemat_m0_dp0_pp0_tp0_dcp0_ep0_rank0_262549_20260824061255706_ascend_pt/ASCEND_PROFILER_OUTPUT/trace_view.json",
       "summary": "docs/wavemat/results/m0_overlap_tp1_eager_p4_device_summary.json",
       "raw": {"url": "https://api.github.com/repos/intellistream/kv-materialization-arrival-control/releases/assets/527272399", "compression": "gzip", "compressed_bytes": 18646197, "compressed_sha256": "6f80e2ea2caa518e3ae60f94907e8725f66bcc034fb2f4c0ac536f60ce5ee5eb", "uncompressed_bytes": 287922236, "uncompressed_sha256": "86fb26873a61a1dc4ca1970565a769a82581aca82552d6fcf148dd2c5cd604e4"}
     }
