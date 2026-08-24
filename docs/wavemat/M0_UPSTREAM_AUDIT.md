@@ -366,7 +366,8 @@ The raw files are gzip-compressed Release assets rather than local-only paths.
 Fresh-clone verification for an arm is:
 
 ```bash
-curl -fL -O <raw.url>
+curl -fL -H 'Accept: application/octet-stream' \
+  -H "Authorization: Bearer $GITHUB_TOKEN" <raw.url> -o asset.gz
 sha256sum <asset>.gz                 # compare raw.compressed_sha256
 gzip -dc <asset>.gz | sha256sum      # compare raw.uncompressed_sha256
 gzip -dc <asset>.gz > trace_view.json
