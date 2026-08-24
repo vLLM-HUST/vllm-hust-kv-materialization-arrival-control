@@ -10,6 +10,12 @@ audit-only metadata, not an experimental result.
 
 ## M0 runtime (upstream 0.23 pair)
 
+The active overlap experiment uses the locally available DeepSeek V4 Lite test
+target: `/data/shared_datasets/models/DeepSeek-V4-Flash-W8A8`. “V4 Lite” is
+the experiment label; the upstream local directory is named V4 Flash W8A8.
+The DeepSeek-V2-Lite pin recorded later in this document is historical M0
+baseline evidence, not the active overlap-test target.
+
 M0 uses the installed upstream pair, with no `PYTHONPATH` override:
 
 - vLLM: `vllm-project/vllm` `0.23.0` (editable at `/vllm-workspace/vllm`,

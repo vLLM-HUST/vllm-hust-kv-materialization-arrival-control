@@ -1,10 +1,12 @@
 # WaveMat M0 seam gate
 
-Status: `M0 overlap measurement pending`. The current upstream vLLM-Ascend
-0.23 + DeepSeek-V2-Lite results establish the call chain, graph-mode readiness,
-and absence of a layerwise-specific replay signal, but they do not yet measure
-per-layer transfer/compute overlap. See `M0_UPSTREAM_AUDIT.md`. This artifact
-does not enable WaveMat and is not an end-to-end performance result.
+Status: `M0 overlap measurement pending`. The active experiment target is
+DeepSeek V4 Lite (`/data/shared_datasets/models/DeepSeek-V4-Flash-W8A8`; local
+upstream name: V4 Flash W8A8). Historical V2-Lite results establish the call
+chain, graph-mode readiness, and absence of a layerwise-specific replay signal,
+but do not measure per-layer transfer/compute overlap. See
+`M0_UPSTREAM_AUDIT.md`. This artifact does not enable WaveMat and is not an
+end-to-end performance result.
 
 ## Scope
 

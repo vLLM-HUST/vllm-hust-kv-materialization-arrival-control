@@ -4,6 +4,12 @@ Status: `static_audit` + `graph_mode_smoke_verified` + `layerwise_runtime_partia
 This artifact does not enable WaveMat and is not an end-to-end performance
 result.
 
+**Active overlap-test target:** DeepSeek V4 Lite, using the local small V4
+checkpoint `/data/shared_datasets/models/DeepSeek-V4-Flash-W8A8`. The upstream
+directory calls this checkpoint “Flash”; this document uses “V4 Lite” only as
+the experiment label. The V2-Lite measurements below are historical evidence,
+not results for the active V4 target.
+
 ## Environment (verified working)
 
 - vLLM: `vllm-project/vllm` `0.23.0` (editable `/vllm-workspace/vllm`)
@@ -234,7 +240,8 @@ export MMC_LOCAL_CONFIG_PATH="$PWD/docs/wavemat/configs/mmc-local.conf"
 export OMP_NUM_THREADS=1
 for mode in graph eager; do
   for prefetch in 1 2 4; do
-    args=(--prefetch-layers "$prefetch" --max-tokens 64)
+    args=(--model /data/shared_datasets/models/DeepSeek-V4-Flash-W8A8 \
+      --prefetch-layers "$prefetch" --max-tokens 64)
     if [ "$mode" = eager ]; then args+=(--enforce-eager); fi
     python3 scripts/run_wavemat_m0_overlap.py "${args[@]}" \
       --output "docs/wavemat/results/m0_overlap_${mode}_p${prefetch}.json" \
