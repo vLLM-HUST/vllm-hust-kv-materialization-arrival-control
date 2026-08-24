@@ -290,6 +290,40 @@ only TP=1 and one paired run. It does **not** establish a transfer/compute
 overlap ratio or a final M0 Stop conclusion: that still requires device-event
 timestamps for transfer submit/ready and attention start/end.
 
+### What counts as “sufficient overlap”
+
+The next trace must emit one correlated record per `(request epoch,
+transfer_layer, gate_attention_layer)`.  A prefetch task for layer `L` carries
+the attention-start gate of the earlier layer whose compute it is intended to
+overlap; record that gate layer explicitly rather than inferring it from log
+order.
+
+| Timestamp | Real upstream seam | Meaning |
+|---|---|---|
+| `transfer_submit_ns` | immediately before `KVCacheStoreLayerRecvingThread._batch_copy_with_limits` | copy is submitted after its attention-start gate opens |
+| `transfer_ready_ns` | immediately before `layer_load_finished_events[layer].set()` | data is declared safe for the consumer |
+| `attention_start_ns` | the existing `record_attention_compute_start()` event | compute stream reaches the attention op |
+| `attention_end_ns` | an NPU event recorded immediately after the attention op | attention work has completed on the compute stream |
+
+Use NPU events to establish stream ordering and a trace worker to serialize
+them to host timestamps; do not call `synchronize()` on the model thread.
+For each correlated pair calculate:
+
+```text
+overlap_ns = max(0, min(transfer_ready_ns, attention_end_ns)
+                    - max(transfer_submit_ns, attention_start_ns))
+transfer_overlap_ratio = overlap_ns / (transfer_ready_ns - transfer_submit_ns)
+exposed_bubble_ns = max(0, transfer_ready_ns - attention_end_ns)
+```
+
+The final M0 Stop condition is met only if, in matched TP=1 graph/eager runs
+at prefetch 1/2/4, (1) at least 95% of eligible prefetched loads have complete
+correlated records, (2) graph has no material increase in `exposed_bubble_ns`
+or decrease in `transfer_overlap_ratio` relative to eager, and (3) no
+layerwise-specific correctness failure appears. Missing events are a trace
+failure, not zero-overlap evidence. The existing p2/p4 observation (only two
+consumer waits) is a lead to validate with this timeline, not this condition.
+
 ### Single-NPU trace when the TP=8 group is occupied
 
 V2-Lite supports TP=1. A one-NPU trace on an otherwise idle device is valid
