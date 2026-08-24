@@ -11,15 +11,22 @@ in a detached process before launching vLLM:
 
 from __future__ import annotations
 
+import argparse
+
 import memcache_hybrid  # noqa: F401  (loads the native library and sys.path)
 from memcache_hybrid import MetaConfig, MetaService
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Start a local MMC meta service.")
+    parser.add_argument("--meta-port", type=int, default=5000)
+    parser.add_argument("--config-store-port", type=int, default=6000)
+    parser.add_argument("--metrics-port", type=int, default=8000)
+    args = parser.parse_args()
     cfg = MetaConfig()
-    cfg.config_store_url = "tcp://127.0.0.1:6000"
-    cfg.meta_service_url = "tcp://127.0.0.1:5000"
-    cfg.metrics_url = "http://127.0.0.1:8000"
+    cfg.config_store_url = f"tcp://127.0.0.1:{args.config_store_port}"
+    cfg.meta_service_url = f"tcp://127.0.0.1:{args.meta_port}"
+    cfg.metrics_url = f"http://127.0.0.1:{args.metrics_port}"
     cfg.log_level = "info"
 
     rc = MetaService.setup(cfg)

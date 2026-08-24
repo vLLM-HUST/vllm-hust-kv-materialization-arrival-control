@@ -43,6 +43,7 @@ def run(
     prefetch_layers: int,
     max_tokens: int,
     gpu_memory_utilization: float,
+    tensor_parallel_size: int,
 ) -> dict[str, Any]:
     from vllm import LLM, SamplingParams
 
@@ -51,7 +52,7 @@ def run(
         model=model,
         trust_remote_code=True,
         enforce_eager=False,
-        tensor_parallel_size=8,
+        tensor_parallel_size=tensor_parallel_size,
         max_model_len=512,
         max_num_seqs=6,
         gpu_memory_utilization=gpu_memory_utilization,
@@ -79,6 +80,7 @@ def run(
         "use_layerwise": use_layerwise,
         "layerwise_prefetch_layers": prefetch_layers,
         "max_tokens": max_tokens,
+        "tensor_parallel_size": tensor_parallel_size,
         "wall_clock_s": round(wall_s, 3),
         "num_prompts": len(prompts),
         "first_output": outputs[0].outputs[0].text[:160],
@@ -98,6 +100,13 @@ def main() -> None:
     parser.add_argument("--prefetch-layers", type=int, default=1)
     parser.add_argument("--max-tokens", type=int, default=64)
     parser.add_argument("--gpu-memory-utilization", type=float, default=0.22)
+    parser.add_argument(
+        "--tensor-parallel-size",
+        type=int,
+        default=8,
+        choices=[1, 2, 4, 8],
+        help="Use 4 with ASCEND_RT_VISIBLE_DEVICES=2,3,4,5 while TP=8 is busy.",
+    )
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
 
@@ -108,6 +117,7 @@ def main() -> None:
         args.prefetch_layers,
         args.max_tokens,
         args.gpu_memory_utilization,
+        args.tensor_parallel_size,
     )
     result["artifact"] = "m0-wavemat-overlap"
     result["is_wavemat_mechanism_enabled"] = False

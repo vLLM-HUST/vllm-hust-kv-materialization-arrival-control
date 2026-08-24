@@ -263,6 +263,29 @@ valid independent full-graph baseline. Repeat the paired sweep at least twice;
 do not declare Stop until the device-event timeline also supplies transfer
 submit/ready and attention start/end to calculate overlap ratio.
 
+### Single-NPU trace when the TP=8 group is occupied
+
+V2-Lite supports TP=1. A one-NPU trace on an otherwise idle device is valid
+for the M0 graph-safety and layer-ready-wait questions, but must be labelled
+TP=1 and must not be compared directly with TP=8 latency or throughput.
+
+MMC's local meta service is process-global: start the TP=1 service before any
+TP=8 MMC service, or stop only a service known to be dedicated to this
+experiment. A TP=1 client cannot safely reuse an occupied TP=8 local-service
+configuration. Do not restart a shared service merely to run this trace.
+
+```bash
+export ASCEND_RT_VISIBLE_DEVICES=2
+export MMC_LOCAL_CONFIG_PATH="$PWD/docs/wavemat/configs/mmc-local-tp1.conf"
+export OMP_NUM_THREADS=1
+setsid python3 scripts/start_mmc_meta_service.py \
+  --meta-port 5001 --config-store-port 6001 --metrics-port 8001 \
+  > /tmp/wavemat-mmc-tp1.log 2>&1 &
+python3 scripts/run_wavemat_m0_overlap.py \
+  --tensor-parallel-size 1 --prefetch-layers 1 --max-tokens 64 \
+  --output docs/wavemat/results/m0_overlap_tp1_graph_p1.json
+```
+
 ## AscendStore memcache backend prerequisites
 
 - A standalone MMC meta service must be listening on `127.0.0.1:5000` (meta),
