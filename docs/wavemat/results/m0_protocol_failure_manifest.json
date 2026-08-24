@@ -1,0 +1,69 @@
+{
+  "all_failure_injection_cases_pass": true,
+  "artifact": "m3-wavemat-seam-gate-pr1",
+  "claim": "Host-side fail-closed generation/digest contract fixture passes for partial/stale/duplicate/ABA/load-failure/digest-mismatch/reuse-before-ack and detects orphan slots after crash recovery. This does not prove a real Ascend per-layer consumer seam.",
+  "evidence_class": "host_fixture_correctness",
+  "failure_injection_cases": [
+    {
+      "case": "partial",
+      "detail": "partial_layer_range: cannot consume partial layer group ('req-1', 'cache-1', 0, 4) before ready",
+      "expected": "partial_layer_range",
+      "observed": "partial_layer_range",
+      "pass": true
+    },
+    {
+      "case": "stale",
+      "detail": "stale_generation: consume generation 1 while registered generation is 2",
+      "expected": "stale_generation",
+      "observed": "stale_generation",
+      "pass": true
+    },
+    {
+      "case": "duplicate",
+      "detail": "duplicate_consume: duplicate consume for layer group ('req-1', 'cache-1', 0, 4)",
+      "expected": "duplicate_consume",
+      "observed": "duplicate_consume",
+      "pass": true
+    },
+    {
+      "case": "aba",
+      "detail": "aba_generation_reuse: generation 1 cannot reuse identity ('req-1', 'cache-1', 0, 4) after generation 1",
+      "expected": "aba_generation_reuse",
+      "observed": "aba_generation_reuse",
+      "pass": true
+    },
+    {
+      "case": "load_failure",
+      "detail": "load_failure: cannot consume load-failed layer group ('req-1', 'cache-1', 0, 4)",
+      "expected": "load_failure",
+      "observed": "load_failure",
+      "pass": true
+    },
+    {
+      "case": "digest_mismatch",
+      "detail": "digest_mismatch: consume digest mismatch for ('req-1', 'cache-1', 0, 4)",
+      "expected": "digest_mismatch",
+      "observed": "digest_mismatch",
+      "pass": true
+    },
+    {
+      "case": "reuse_before_ack",
+      "detail": "reuse_before_ack: slot ('req-1', 'cache-1', 0, 4) generation 1 not acked before reuse",
+      "expected": "reuse_before_ack",
+      "observed": "reuse_before_ack",
+      "pass": true
+    },
+    {
+      "case": "crash_recovery_orphan_detection",
+      "detail": "orphan slot(s) detected",
+      "expected": "orphan_after_recovery",
+      "observed": "orphan_after_recovery",
+      "pass": true
+    }
+  ],
+  "generated_at_utc": "2026-08-24T06:32:45Z",
+  "is_end_to_end_performance_evidence": false,
+  "is_wavemat_mechanism_enabled": false,
+  "parent_commit": "375d3a8a10610e13d3ca1f46d0046f0a7282373e",
+  "vendor_vllm_gitlink_at_parent_head": "68b8be04493d39d5706f3d0d18f465f5eab947c4"
+}

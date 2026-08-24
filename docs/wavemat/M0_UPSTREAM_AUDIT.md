@@ -376,12 +376,37 @@ overlap in this TP=1 workload, even at prefetch 4. Crucially, it also does not
 show a repeatable graph-specific regression: graph and eager are within 0.3
 percentage points at p=2 and p=4, and equal at p=1.
 
-This does **not** authorize M1. WaveMat's scope is a graph-induced seam, while
-the observed low-overlap behavior is already present in eager and may be a
-generic synchronous-MemCache baseline limitation. To make an M0 final decision,
-the remaining narrow check is gate-correlated DMA completion tracing; it must
-either expose a graph-only loss/correctness risk (Go) or confirm this finding
-(Stop: generic upstream issue is out of scope for WaveMat).
+### Gate-correlated DMA completion and replay correctness (2026-08-24)
+
+The remaining M0 check is complete. For the 52 eligible p=2 prefetch loads
+(the two initial/current-layer loads have no prefetch gate), the trace records
+the upstream attention-start NPU gate, synchronous `aclrtMemcpyBatch` submit,
+and its return immediately before `layer_load_finished_events[layer].set()`.
+Both graph and eager have **52/52** complete gate correlations.
+
+| mode | mean synchronous DMA duration | mean gate → layer-ready | p95 gate → layer-ready |
+|---|---:|---:|---:|
+| PIECEWISE graph | 0.759 ms | 1.837 ms | 1.983 ms |
+| eager | 0.773 ms | 1.867 ms | 2.153 ms |
+
+Graph is 0.030 ms lower in mean gate-to-ready latency, not higher. Together
+with the p=1/2/4 device-time sweep above, this rules out a repeatable
+graph-only DMA completion or readiness loss in this workload.
+
+For replay correctness, the same DeepSeek-V2-Lite p=2 materialization workload
+was run twice in PIECEWISE graph mode and once in eager with greedy decoding.
+The four request outputs match exactly between graph replay 1/2 and between
+graph/eager. No load error or stale/duplicate consumption signal appeared.
+The pre-existing protocol fixture also passed all eight fail-closed cases
+(partial, stale, duplicate, ABA, load failure, digest mismatch, ACK, and
+recovery). That fixture specifies a candidate WaveMat contract; it is not
+misrepresented as an upstream generation-tag implementation.
+
+**M0 final decision: Stop.** Upstream's synchronous static baseline has low
+device-level overlap, but the behavior is present in eager and is outside this
+graph-safe mechanism's scope. The real gate-correlated and replay-correctness
+checks reveal neither a graph-only loss nor a correctness gap; M1/M2 must not
+start and no Layerwise KV Pool rewrite is warranted.
 
 ### Single-NPU trace when the TP=8 group is occupied
 

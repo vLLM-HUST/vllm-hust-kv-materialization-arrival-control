@@ -1,0 +1,19 @@
+{
+  "artifact": "m0-wavemat-replay-correctness",
+  "model": "/root/models/DeepSeek-V2-Lite",
+  "tensor_parallel_size": 1,
+  "layerwise_prefetch_layers": 2,
+  "vllm_prefix_caching_enabled": false,
+  "effective_graph_mode": "PIECEWISE",
+  "greedy_output_match": {
+    "graph_r1_vs_graph_r2": true,
+    "graph_r1_vs_eager": true,
+    "requests_compared": 4
+  },
+  "failure_injection_contract": {
+    "fixture": "m0_protocol_failure_injection.json",
+    "cases": 8,
+    "all_fail_closed": true,
+    "scope": "candidate WaveMat protocol contract; not an upstream generation-tag implementation"
+  }
+}
