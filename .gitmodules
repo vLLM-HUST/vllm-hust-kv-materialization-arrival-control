@@ -3,3 +3,7 @@
 	url = https://github.com/vLLM-HUST/vllm-hust.git
 	branch = feature/kv-materialization-runtime-integration
 	shallow = true
+
+[submodule "third_party/llm-serving-workloads"]
+	path = third_party/llm-serving-workloads
+	url = https://github.com/intellistream/llm-serving-workloads.git
