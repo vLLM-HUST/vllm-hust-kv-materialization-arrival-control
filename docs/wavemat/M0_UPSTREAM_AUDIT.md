@@ -355,6 +355,34 @@ single visual overlap in the trace is insufficient: export the matched interval
 table for prefetch 1/2/4 in both PIECEWISE graph and eager before making the
 M0 Go/Stop decision.
 
+### TP=1 device-timeline sweep (2026-08-24)
+
+The completed paired sweep used the profiler's synchronous
+`AscendCL@aclrtMemcpyBatch` interval and intersected it with NPU `AI_*` / `MIX_*`
+task intervals. `scripts/summarize_wavemat_m0_device_trace.py` produces the
+reviewable JSON summaries. This is a **device-compute overlap proxy**, rather
+than the final gate-correlated ratio, because the profiler does not associate a
+DMA task ID with each MemCache layer-load gate.
+
+| prefetch | graph mean | eager mean | graph − eager | graph batches with any overlap |
+|---:|---:|---:|---:|---:|
+| 1 | 0.000% | 0.000% | 0.000 pp | 0 / 54 |
+| 2 | 4.394% | 4.620% | -0.225 pp | 52 / 54 |
+| 4 | 4.305% | 4.040% | +0.265 pp | 49 / 54 |
+
+No copy batch was fully covered by compute in any run. Thus the static
+layerwise baseline does **not** show sufficient device-level transfer/compute
+overlap in this TP=1 workload, even at prefetch 4. Crucially, it also does not
+show a repeatable graph-specific regression: graph and eager are within 0.3
+percentage points at p=2 and p=4, and equal at p=1.
+
+This does **not** authorize M1. WaveMat's scope is a graph-induced seam, while
+the observed low-overlap behavior is already present in eager and may be a
+generic synchronous-MemCache baseline limitation. To make an M0 final decision,
+the remaining narrow check is gate-correlated DMA completion tracing; it must
+either expose a graph-only loss/correctness risk (Go) or confirm this finding
+(Stop: generic upstream issue is out of scope for WaveMat).
+
 ### Single-NPU trace when the TP=8 group is occupied
 
 V2-Lite supports TP=1. A one-NPU trace on an otherwise idle device is valid

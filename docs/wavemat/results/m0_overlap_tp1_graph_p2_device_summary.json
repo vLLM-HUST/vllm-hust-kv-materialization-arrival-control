@@ -1,0 +1,17 @@
+{
+  "batches_fully_covered_by_compute": 0,
+  "batches_with_any_compute_overlap": 52,
+  "copy_batches": 54,
+  "limitations": [
+    "The trace labels aclrtMemcpyBatch as a synchronous copy call; this measures its wall interval against NPU AI-task intervals.",
+    "It is a device-timeline proxy, not the final per-layer, gate-correlated WaveMat overlap ratio.",
+    "Do not use this profiler-enabled workload wall clock for performance comparison."
+  ],
+  "max_overlap_ratio": 0.358289,
+  "mean_overlap_ratio": 0.043944,
+  "median_overlap_ratio": 0.035583,
+  "metric": "synchronous_batch_copy_device_compute_overlap_proxy",
+  "min_overlap_ratio": 0.0,
+  "npu_compute_tasks": 52668,
+  "trace": "docs/wavemat/results/m0_overlap_tp1_graph_p2_profile/wavemat_m0_dp0_pp0_tp0_dcp0_ep0_rank0_242468_20260824054141194_ascend_pt/ASCEND_PROFILER_OUTPUT/trace_view.json"
+}
