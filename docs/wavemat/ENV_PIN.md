@@ -10,11 +10,11 @@ audit-only metadata, not an experimental result.
 
 ## M0 runtime (upstream 0.23 pair)
 
-The active overlap experiment uses the locally available DeepSeek V4 Lite test
-target: `/data/shared_datasets/models/DeepSeek-V4-Flash-W8A8`. “V4 Lite” is
-the experiment label; the upstream local directory is named V4 Flash W8A8.
-The DeepSeek-V2-Lite pin recorded later in this document is historical M0
-baseline evidence, not the active overlap-test target.
+The active overlap experiment uses the locally available
+`/root/models/DeepSeek-V2-Lite` (16B total parameters, 2.4B active; MLA+MoE).
+It is the official Layerwise KV Pool example and therefore the smallest local
+DeepSeek model that exercises this M0 seam. The pin recorded later in this
+document is both the active target and historical M0 baseline evidence.
 
 M0 uses the installed upstream pair, with no `PYTHONPATH` override:
 

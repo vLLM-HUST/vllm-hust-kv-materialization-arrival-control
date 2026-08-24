@@ -89,10 +89,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="WaveMat M0 overlap (shared-prefix reuse).")
     parser.add_argument(
         "--model",
-        default="/data/shared_datasets/models/DeepSeek-V4-Flash-W8A8",
+        default="/root/models/DeepSeek-V2-Lite",
         help=(
-            "DeepSeek V4 Lite test target available on this host "
-            "(the local upstream directory is named DeepSeek-V4-Flash-W8A8)."
+            "Supported small MLA+MoE layerwise baseline available on this host."
         ),
     )
     parser.add_argument("--use-layerwise", action=argparse.BooleanOptionalAction, default=True)

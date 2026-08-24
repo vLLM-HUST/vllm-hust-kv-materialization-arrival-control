@@ -4,11 +4,12 @@ Status: `static_audit` + `graph_mode_smoke_verified` + `layerwise_runtime_partia
 This artifact does not enable WaveMat and is not an end-to-end performance
 result.
 
-**Active overlap-test target:** DeepSeek V4 Lite, using the local small V4
-checkpoint `/data/shared_datasets/models/DeepSeek-V4-Flash-W8A8`. The upstream
-directory calls this checkpoint “Flash”; this document uses “V4 Lite” only as
-the experiment label. The V2-Lite measurements below are historical evidence,
-not results for the active V4 target.
+**Active overlap-test target:** `/root/models/DeepSeek-V2-Lite` (16B total,
+2.4B active; MLA+MoE). It is already present locally and is the model used by
+the official vLLM-Ascend Layerwise KV Pool example. This makes it the smallest
+available DeepSeek model that exercises the relevant MLA layerwise path. Do not
+substitute a smaller DeepSeek R1-distill checkpoint: those are Qwen/Llama dense
+models and would not validate this MLA-specific seam.
 
 ## Environment (verified working)
 
@@ -240,7 +241,7 @@ export MMC_LOCAL_CONFIG_PATH="$PWD/docs/wavemat/configs/mmc-local.conf"
 export OMP_NUM_THREADS=1
 for mode in graph eager; do
   for prefetch in 1 2 4; do
-    args=(--model /data/shared_datasets/models/DeepSeek-V4-Flash-W8A8 \
+    args=(--model /root/models/DeepSeek-V2-Lite \
       --prefetch-layers "$prefetch" --max-tokens 64)
     if [ "$mode" = eager ]; then args+=(--enforce-eager); fi
     python3 scripts/run_wavemat_m0_overlap.py "${args[@]}" \
