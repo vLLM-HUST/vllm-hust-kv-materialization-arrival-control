@@ -45,11 +45,12 @@ def run(
     gpu_memory_utilization: float,
     tensor_parallel_size: int,
     enforce_eager: bool,
+    torch_profile_dir: Path | None,
 ) -> dict[str, Any]:
     from vllm import LLM, SamplingParams
 
     prompts = [SHARED_PREFIX + s for s in SUFFIXES]
-    llm = LLM(
+    llm_kwargs: dict[str, Any] = dict(
         model=model,
         trust_remote_code=True,
         enforce_eager=enforce_eager,
@@ -72,14 +73,33 @@ def run(
             },
         },
     )
+    if torch_profile_dir is not None:
+        llm_kwargs["profiler_config"] = {
+            "profiler": "torch",
+            "torch_profiler_dir": str(torch_profile_dir),
+            "torch_profiler_with_stack": False,
+            "torch_profiler_with_memory": False,
+        }
+    llm = LLM(**llm_kwargs)
 
     params = SamplingParams(max_tokens=max_tokens, temperature=0)
     # Warmup: compute and store the shared prefix KV so the following requests
     # hit the prefix cache and exercise the per-layer LOAD path.
     llm.generate([SHARED_PREFIX], SamplingParams(max_tokens=1, temperature=0), use_tqdm=False)
-    started = time.time()
-    outputs = llm.generate(prompts, params, use_tqdm=False)
-    wall_s = time.time() - started
+    if torch_profile_dir is not None:
+        # Do not collect model load or cache population: M0 needs only the
+        # materialization/replay interval.  The profiler's device trace is the
+        # source of truth for transfer--compute overlap; its wall time is not a
+        # performance datapoint.
+        torch_profile_dir.mkdir(parents=True, exist_ok=True)
+        llm.start_profile(profile_prefix="wavemat_m0")
+    try:
+        started = time.time()
+        outputs = llm.generate(prompts, params, use_tqdm=False)
+        wall_s = time.time() - started
+    finally:
+        if torch_profile_dir is not None:
+            llm.stop_profile()
     return {
         "model": model,
         "use_layerwise": use_layerwise,
@@ -88,6 +108,7 @@ def run(
         "tensor_parallel_size": tensor_parallel_size,
         "enforce_eager": enforce_eager,
         "vllm_prefix_caching_enabled": False,
+        "torch_profile_dir": str(torch_profile_dir) if torch_profile_dir else None,
         "wall_clock_s": round(wall_s, 3),
         "num_prompts": len(prompts),
         "first_output": outputs[0].outputs[0].text[:160],
@@ -113,7 +134,12 @@ def main() -> None:
         type=int,
         default=8,
         choices=[1, 2, 4, 8],
-        help="Use 4 with ASCEND_RT_VISIBLE_DEVICES=2,3,4,5 while TP=8 is busy.",
+        help="Use TP=1 for the single-NPU M0 seam gate; larger values are optional.",
+    )
+    parser.add_argument(
+        "--torch-profile-dir",
+        type=Path,
+        help="Optional Ascend PyTorch Profiler output directory (measurement only).",
     )
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
@@ -127,6 +153,7 @@ def main() -> None:
         args.gpu_memory_utilization,
         args.tensor_parallel_size,
         args.enforce_eager,
+        args.torch_profile_dir,
     )
     result["artifact"] = "m0-wavemat-overlap"
     result["is_wavemat_mechanism_enabled"] = False

@@ -324,6 +324,37 @@ layerwise-specific correctness failure appears. Missing events are a trace
 failure, not zero-overlap evidence. The existing p2/p4 observation (only two
 consumer waits) is a lead to validate with this timeline, not this condition.
 
+### Device timeline collection (implemented; first TP=1 capture complete)
+
+`run_wavemat_m0_overlap.py` can now drive vLLM-Ascend's built-in Ascend
+PyTorch Profiler. It starts **after** the shared-prefix warmup and stops after
+the cache-load requests, so model load and cache population are excluded.
+
+```bash
+ASCEND_RT_VISIBLE_DEVICES=2 \
+MMC_LOCAL_CONFIG_PATH="$PWD/docs/wavemat/configs/mmc-local-tp1.conf" \
+OMP_NUM_THREADS=1 HCCL_NPU_SOCKET_PORT_RANGE=16700-16799 \
+python3 scripts/run_wavemat_m0_overlap.py \
+  --tensor-parallel-size 1 --prefetch-layers 2 --max-tokens 64 \
+  --gpu-memory-utilization 0.85 \
+  --torch-profile-dir "$PWD/docs/wavemat/results/m0_overlap_tp1_graph_p2_profile" \
+  --output docs/wavemat/results/m0_overlap_tp1_graph_p2_profile.json
+```
+
+The 2026-08-24 TP=1/prefetch=2 capture completed and produced a device trace
+with 54 `AscendCL@aclrtMemcpyBatch` calls plus NPU kernel/stream events. The
+raw `trace_view.json` is about 288 MB (829 MB including profiler intermediates)
+and is intentionally local-only; it is measurement evidence, not a git
+artifact. Its wall-clock (`12.794s`) is profiling overhead and must never be
+compared with the unprofiled table above.
+
+For review, use the trace's `AscendCL@aclrtMemcpyBatch` / `MEMCPY_ASYNC` lanes
+as the transfer interval and the attention graph/kernel lane as compute. Match
+them by the existing layer-load gate trace, then apply the formula above. A
+single visual overlap in the trace is insufficient: export the matched interval
+table for prefetch 1/2/4 in both PIECEWISE graph and eager before making the
+M0 Go/Stop decision.
+
 ### Single-NPU trace when the TP=8 group is occupied
 
 V2-Lite supports TP=1. A one-NPU trace on an otherwise idle device is valid
