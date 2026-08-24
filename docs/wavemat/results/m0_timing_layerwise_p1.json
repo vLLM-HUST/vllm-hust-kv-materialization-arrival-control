@@ -1,0 +1,23 @@
+{
+  "artifact": "m0-wavemat-layerwise-timing",
+  "cudagraph_mode": "FULL_AND_PIECEWISE",
+  "decode_s_mean": null,
+  "e2e_s_p50": null,
+  "e2e_s_p95": null,
+  "first_output_text": "\n\nThe function must be declared as follows:\n\ndef sum(a,b):\n\n# your code\n\nThe function must return the result.\n\nExample:\n",
+  "generated_at_utc": "2026-08-21T08:54:06Z",
+  "is_end_to_end_performance_evidence": false,
+  "is_wavemat_mechanism_enabled": false,
+  "layerwise_prefetch_layers": 1,
+  "max_num_seqs": 4,
+  "max_tokens": 64,
+  "model": "/root/models/DeepSeek-V2-Lite",
+  "num_finished": 0,
+  "num_prompts": 8,
+  "tpot_s_p50": null,
+  "tpot_s_p95": null,
+  "ttft_s_p50": null,
+  "ttft_s_p95": null,
+  "use_layerwise": true,
+  "wall_clock_s": 8.649
+}

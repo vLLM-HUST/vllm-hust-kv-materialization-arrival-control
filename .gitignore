@@ -17,6 +17,8 @@ dist/
 scratch/
 tmp/
 /.cache/
+/kernel_meta/
+/fusion_result.json
 
 # Generated proposal artifacts
 /proposal/*.pdf
