@@ -344,9 +344,10 @@ python3 scripts/run_wavemat_m0_overlap.py \
 The 2026-08-24 TP=1/prefetch=2 capture completed and produced a device trace
 with 54 `AscendCL@aclrtMemcpyBatch` calls plus NPU kernel/stream events. The
 raw `trace_view.json` is about 288 MB (829 MB including profiler intermediates)
-and is intentionally local-only; it is measurement evidence, not a git
-artifact. Its wall-clock (`12.794s`) is profiling overhead and must never be
-compared with the unprofiled table above.
+and is stored as a controlled, gzip-compressed Release asset rather than in
+Git; it is measurement evidence, not a git artifact. Its wall-clock (`12.794s`)
+is profiling overhead and must never be compared with the unprofiled table
+above.
 
 For review, use the trace's `AscendCL@aclrtMemcpyBatch` / `MEMCPY_ASYNC` lanes
 as the transfer interval and the attention graph/kernel lane as compute. Match
@@ -378,6 +379,8 @@ python3 scripts/summarize_wavemat_m0_device_trace.py \
 Use the analogous `gate_trace_analyzer` command in the manifest for p=2 gate
 logs. The `trace` field retained in the early per-arm summary is the original
 capture path used by the analyzer, not the reviewer-facing artifact location.
+The recorded fresh-clone check verifies all eight assets and re-computes the
+matched p=2 graph/eager device summaries and graph gate summary.
 
 The completed paired sweep used the profiler's synchronous
 `AscendCL@aclrtMemcpyBatch` interval and intersected it with NPU `AI_*` / `MIX_*`
