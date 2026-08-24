@@ -1,11 +1,13 @@
 # WaveMat M0 seam gate
 
-Status: `M0 overlap measurement pending`. The active experiment target is the
-locally present DeepSeek-V2-Lite, the supported small MLA+MoE Layerwise KV Pool
-baseline. Existing V2-Lite results establish the call chain, graph-mode
-readiness, and absence of a layerwise-specific replay signal, but do not measure
-per-layer transfer/compute overlap. See `M0_UPSTREAM_AUDIT.md`. This artifact
-does not enable WaveMat and is not an end-to-end performance result.
+Status: `M0 device sweep complete — no graph-only Go signal`. The active
+experiment target is the locally present DeepSeek-V2-Lite, the supported small
+MLA+MoE Layerwise KV Pool baseline. The TP=1 graph/eager sweep at static
+prefetch 1/2/4 measured very low device-compute overlap (0–4.62%) in both
+modes, with no repeatable graph-specific regression. This is a generic
+upstream-baseline finding, not authorization for WaveMat M1. See
+`M0_UPSTREAM_AUDIT.md`; this artifact does not enable WaveMat and is not an
+end-to-end performance result.
 
 ## Scope
 
@@ -107,16 +109,17 @@ graph-induced gap.
       consume at static-code level.
 - [x] Trace `FULL` / `FULL_AND_PIECEWISE` config and graph/eager break path;
       layerwise connectors are forced to PIECEWISE.
-- [ ] Measure graph-induced layer-ready wait / overlap loss at the real 910B2
-      consumer seam, paired with eager and 1/2/4 prefetch baselines. Existing
-      wall-clock results are not a substitute.
+- [x] Measure the real TP=1 910B2 consumer seam, paired graph/eager and
+      prefetch 1/2/4 baselines. Device-timeline proxy shows no graph-only
+      loss; see `M0_UPSTREAM_AUDIT.md`. A future Go claim would still require
+      gate-correlated DMA completion, not wall-clock timing.
 - [x] No layerwise-specific replay correctness signal was observed beyond the
       non-layerwise graph baseline; see `M0_UPSTREAM_AUDIT.md`.
 - [ ] Keep `VLLM_WAVEMAT_ENABLE=0` and native path default until M0 go.
 - [ ] Do not promote host fixture, simulation, dry-run, or projected numbers to
       end-to-end performance evidence.
 
-## Runtime progress
+## Runtime progress and current M0 reading
 
 The pinned NPU environment can run vLLM-Ascend graph mode and AscendStore
 memcache layerwise:
@@ -128,9 +131,16 @@ memcache layerwise:
   `DeepSeek-V4-Flash-W8A8` in eager mode.
 
 Both artifacts are recorded under `docs/wavemat/results/`. These are runtime
-readiness/layerwise smokes, not M0 gap evidence. The next unresolved step is
-the graph-mode AscendStore layerwise trace (prefetch 1/2/4), which still needs
-to be run and analyzed before the seam gate can return go/no-go.
+readiness/layerwise smokes, not M0 gap evidence.
+
+The subsequent DeepSeek-V2-Lite TP=1 device sweep did exercise 54 real
+`aclrtMemcpyBatch` loads per run, with vLLM prefix caching disabled. The
+graph/eager overlap proxy is 0/0% at prefetch 1, 4.394/4.620% at prefetch 2,
+and 4.305/4.040% at prefetch 4. It rules out a measurable graph-only overlap
+penalty in this workload, while showing that larger static prefetch does not
+make the synchronous baseline sufficiently overlap. That generic limitation is
+outside WaveMat's graph-safe-materialization scope; do not start M1 unless
+gate-correlated DMA tracing exposes a graph-only loss or correctness failure.
 
 ## Host-side failure injection
 
