@@ -1,9 +1,10 @@
 # WaveMat M0 seam gate
 
-Status: `M0 no-graph-gap`. The runtime gap experiment on upstream vLLM-Ascend
-0.23 + DeepSeek-V2-Lite is complete; see `M0_UPSTREAM_AUDIT.md` for the full
-evidence chain. This artifact does not enable WaveMat and is not an
-end-to-end performance result.
+Status: `M0 overlap measurement pending`. The current upstream vLLM-Ascend
+0.23 + DeepSeek-V2-Lite results establish the call chain, graph-mode readiness,
+and absence of a layerwise-specific replay signal, but they do not yet measure
+per-layer transfer/compute overlap. See `M0_UPSTREAM_AUDIT.md`. This artifact
+does not enable WaveMat and is not an end-to-end performance result.
 
 ## Scope
 
@@ -105,10 +106,11 @@ graph-induced gap.
       consume at static-code level.
 - [x] Trace `FULL` / `FULL_AND_PIECEWISE` config and graph/eager break path;
       layerwise connectors are forced to PIECEWISE.
-- [x] Disprove a reproducible graph-induced overlap loss, sync bubble, or
-      layerwise-specific replay correctness gap on 910B2 graph mode
-      (graph mode is 2-8x faster than eager; layerwise is no more
-      non-deterministic than non-layerwise; see M0_UPSTREAM_AUDIT.md).
+- [ ] Measure graph-induced layer-ready wait / overlap loss at the real 910B2
+      consumer seam, paired with eager and 1/2/4 prefetch baselines. Existing
+      wall-clock results are not a substitute.
+- [x] No layerwise-specific replay correctness signal was observed beyond the
+      non-layerwise graph baseline; see `M0_UPSTREAM_AUDIT.md`.
 - [ ] Keep `VLLM_WAVEMAT_ENABLE=0` and native path default until M0 go.
 - [ ] Do not promote host fixture, simulation, dry-run, or projected numbers to
       end-to-end performance evidence.

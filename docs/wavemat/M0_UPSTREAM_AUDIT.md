@@ -1,6 +1,6 @@
 # WaveMat M0 — upstream 0.23 layerwise audit + runtime status
 
-Status: `static_audit` + `graph_mode_smoke_verified` + `layerwise_runtime_blocked`.
+Status: `static_audit` + `graph_mode_smoke_verified` + `layerwise_runtime_partially_measured`.
 This artifact does not enable WaveMat and is not an end-to-end performance
 result.
 
@@ -199,16 +199,61 @@ sequence identical" cannot be satisfied even by the non-layerwise baseline, so
 the oracle should be a block/layer digest comparison (load vs recompute), not a
 token-level equality.
 
-## M0 conclusion (no-graph-gap)
+## Provisional M0 reading (not a no-gap conclusion)
 
-- Graph-induced overlap loss / sync bubble: **not observed** (graph is 2-8x
-  faster than eager).
+- Graph-induced overlap loss / sync bubble: **not established either way**.
+  Graph is 2-8x faster than eager at end-to-end wall-clock, but this does not
+  measure whether the per-layer ready event falls on a graph-piece critical
+  path.
 - Layerwise-specific replay/correctness gap: **not observed** (layerwise is no
   more non-deterministic than the non-layerwise baseline).
 - Only reproducible signal is the fixed-prefetch bubble (~5.8%), which is
   eager-agnostic and matches the issue's "固定 prefetch" exclusion.
 
-This is a no-graph-gap / Stop result per the pre-registered M0 Stop conditions.
+The prior no-graph-gap/Stop wording was too strong.  The required remaining M0
+experiment is a shared-prefix *load* workload (not only a save or no-hit run),
+with 1/2/4 static prefetch, paired eager and PIECEWISE runs, and per-layer
+records at the actual `KVPoolWorker.wait_for_layer_load` seam.  Summarize those
+records with `scripts/summarize_wavemat_m0_overlap.py`.  It fail-closes:
+missing records or wall-clock-only results cannot be used to claim that
+upstream sufficiently overlaps transfer and compute.  A device-event timeline
+for transfer submit/ready and attention start/end is still required to report
+an overlap ratio.
+
+### Reproducible layer-ready wait run
+
+Run the following paired sweep only when all eight devices are idle; do not
+evict another user's NPU job.  The disposable upstream Ascend checkout must
+emit `WAVEMAT_TIMING layer=<id> load_wait_s=<seconds>` immediately around the
+existing `layer_load_finished_events[current_layer].wait()` in
+`KVPoolWorker.wait_for_layer_load`.  This is observability only, not a WaveMat
+mechanism change.
+
+```bash
+export MMC_LOCAL_CONFIG_PATH="$PWD/docs/wavemat/configs/mmc-local.conf"
+export OMP_NUM_THREADS=1
+for mode in graph eager; do
+  for prefetch in 1 2 4; do
+    args=(--prefetch-layers "$prefetch" --max-tokens 64)
+    if [ "$mode" = eager ]; then args+=(--enforce-eager); fi
+    python3 scripts/run_wavemat_m0_overlap.py "${args[@]}" \
+      --output "docs/wavemat/results/m0_overlap_${mode}_p${prefetch}.json" \
+      2>&1 | tee "docs/wavemat/results/m0_overlap_${mode}_p${prefetch}.log"
+  done
+done
+python3 scripts/summarize_wavemat_m0_overlap.py \
+  --graph-log docs/wavemat/results/m0_overlap_graph_p1.log \
+  --eager-log docs/wavemat/results/m0_overlap_eager_p1.log \
+  --output docs/wavemat/results/m0_overlap_wait_p1_summary.json
+```
+
+The current workload first saves a long shared prefix, then requests suffixes
+under that prefix, so the second generation is a cache-load path. Record both
+requested and effective graph mode: current upstream forces layerwise
+connectors to PIECEWISE, so requested `FULL` / `FULL_AND_PIECEWISE` is not a
+valid independent full-graph baseline. Repeat the paired sweep at least twice;
+do not declare Stop until the device-event timeline also supplies transfer
+submit/ready and attention start/end to calculate overlap ratio.
 
 ## AscendStore memcache backend prerequisites
 
