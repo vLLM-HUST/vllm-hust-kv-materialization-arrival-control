@@ -256,12 +256,39 @@ python3 scripts/summarize_wavemat_m0_overlap.py \
 ```
 
 The current workload first saves a long shared prefix, then requests suffixes
-under that prefix, so the second generation is a cache-load path. Record both
+under that prefix, so the second generation is a cache-load path. vLLM's own
+prefix cache is disabled in the driver: otherwise it bypasses AscendStore with
+`need_to_load=0`, and no layerwise materialization takes place. Record both
 requested and effective graph mode: current upstream forces layerwise
 connectors to PIECEWISE, so requested `FULL` / `FULL_AND_PIECEWISE` is not a
 valid independent full-graph baseline. Repeat the paired sweep at least twice;
 do not declare Stop until the device-event timeline also supplies transfer
 submit/ready and attention start/end to calculate overlap ratio.
+
+### TP=1 real-load trace (2026-08-24)
+
+This run used NPU 2, DeepSeek-V2-Lite, `backend=memcache`,
+`use_layerwise=true`, and vLLM prefix caching disabled.  The latter is
+important: every measured consumer had `vllm_cached=0`, `kvpool_cached=128`,
+and `need_to_allocate=128`, so it was an actual AscendStore load rather than an
+in-engine prefix-cache hit.
+
+| mode | prefetch | wall-clock s | layer-ready wait samples | mean wait ms |
+|---|---:|---:|---:|---:|
+| PIECEWISE graph | 1 | 9.376 | 54 | 0.515 |
+| eager | 1 | 8.173 | 54 | 0.510 |
+| PIECEWISE graph | 2 | 9.540 | 2 | n/a (prefetched layers did not block at the consumer) |
+| PIECEWISE graph | 4 | 9.069 | 2 | n/a (prefetched layers did not block at the consumer) |
+
+Raw JSON: `results/m0_overlap_tp1_{graph_p1,graph_p2,graph_p4,eager_p1}.json`;
+the paired wait summary is `results/m0_overlap_tp1_wait_p1_summary.json`.
+
+Interpretation: the graph-minus-eager mean ready-wait delta is **+0.005ms**,
+which is below this host-clock trace's useful resolution and does not support a
+graph-induced host synchronization bubble.  This is a real-load result, but is
+only TP=1 and one paired run. It does **not** establish a transfer/compute
+overlap ratio or a final M0 Stop conclusion: that still requires device-event
+timestamps for transfer submit/ready and attention start/end.
 
 ### Single-NPU trace when the TP=8 group is occupied
 
@@ -278,9 +305,7 @@ configuration. Do not restart a shared service merely to run this trace.
 export ASCEND_RT_VISIBLE_DEVICES=2
 export MMC_LOCAL_CONFIG_PATH="$PWD/docs/wavemat/configs/mmc-local-tp1.conf"
 export OMP_NUM_THREADS=1
-setsid python3 scripts/start_mmc_meta_service.py \
-  --meta-port 5001 --config-store-port 6001 --metrics-port 8001 \
-  > /tmp/wavemat-mmc-tp1.log 2>&1 &
+setsid python3 scripts/start_mmc_meta_service.py > /tmp/wavemat-mmc-tp1.log 2>&1 &
 python3 scripts/run_wavemat_m0_overlap.py \
   --tensor-parallel-size 1 --prefetch-layers 1 --max-tokens 64 \
   --output docs/wavemat/results/m0_overlap_tp1_graph_p1.json

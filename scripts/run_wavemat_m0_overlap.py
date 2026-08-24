@@ -44,6 +44,7 @@ def run(
     max_tokens: int,
     gpu_memory_utilization: float,
     tensor_parallel_size: int,
+    enforce_eager: bool,
 ) -> dict[str, Any]:
     from vllm import LLM, SamplingParams
 
@@ -51,11 +52,15 @@ def run(
     llm = LLM(
         model=model,
         trust_remote_code=True,
-        enforce_eager=False,
+        enforce_eager=enforce_eager,
         tensor_parallel_size=tensor_parallel_size,
         max_model_len=512,
         max_num_seqs=6,
         gpu_memory_utilization=gpu_memory_utilization,
+        # The cache under test is AscendStore.  Keeping vLLM's in-engine
+        # prefix cache enabled makes the second request a local hit
+        # (need_to_load=0), which bypasses layerwise materialization entirely.
+        enable_prefix_caching=False,
         compilation_config={"cudagraph_mode": "FULL_AND_PIECEWISE"},
         kv_transfer_config={
             "kv_connector": "AscendStoreConnector",
@@ -81,6 +86,8 @@ def run(
         "layerwise_prefetch_layers": prefetch_layers,
         "max_tokens": max_tokens,
         "tensor_parallel_size": tensor_parallel_size,
+        "enforce_eager": enforce_eager,
+        "vllm_prefix_caching_enabled": False,
         "wall_clock_s": round(wall_s, 3),
         "num_prompts": len(prompts),
         "first_output": outputs[0].outputs[0].text[:160],
@@ -96,6 +103,7 @@ def main() -> None:
             "Supported small MLA+MoE layerwise baseline available on this host."
         ),
     )
+    parser.add_argument("--enforce-eager", action=argparse.BooleanOptionalAction, default=False)
     parser.add_argument("--use-layerwise", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--prefetch-layers", type=int, default=1)
     parser.add_argument("--max-tokens", type=int, default=64)
@@ -118,6 +126,7 @@ def main() -> None:
         args.max_tokens,
         args.gpu_memory_utilization,
         args.tensor_parallel_size,
+        args.enforce_eager,
     )
     result["artifact"] = "m0-wavemat-overlap"
     result["is_wavemat_mechanism_enabled"] = False

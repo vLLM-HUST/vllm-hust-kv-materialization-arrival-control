@@ -1,0 +1,357 @@
+{
+  "artifact": "m0-wavemat-layer-ready-wait-summary",
+  "eager": {
+    "bubble_samples": 54,
+    "bubble_threshold_s": 0.0001,
+    "layers": 27,
+    "load_wait_s_mean": 0.00051,
+    "load_wait_s_p50": 0.000509,
+    "load_wait_s_p95": 0.000808,
+    "load_wait_s_total": 0.027521,
+    "per_layer": {
+      "0": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000924,
+        "wait_s_p95": 0.000928
+      },
+      "1": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000748,
+        "wait_s_p95": 0.000837
+      },
+      "10": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000494,
+        "wait_s_p95": 0.000549
+      },
+      "11": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000453,
+        "wait_s_p95": 0.000485
+      },
+      "12": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000438,
+        "wait_s_p95": 0.000501
+      },
+      "13": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000452,
+        "wait_s_p95": 0.000515
+      },
+      "14": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000473,
+        "wait_s_p95": 0.000555
+      },
+      "15": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000452,
+        "wait_s_p95": 0.000511
+      },
+      "16": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000452,
+        "wait_s_p95": 0.000505
+      },
+      "17": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000449,
+        "wait_s_p95": 0.000517
+      },
+      "18": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000449,
+        "wait_s_p95": 0.000524
+      },
+      "19": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.00047,
+        "wait_s_p95": 0.000542
+      },
+      "2": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000715,
+        "wait_s_p95": 0.000759
+      },
+      "20": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000485,
+        "wait_s_p95": 0.000535
+      },
+      "21": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000448,
+        "wait_s_p95": 0.000493
+      },
+      "22": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000452,
+        "wait_s_p95": 0.000522
+      },
+      "23": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000444,
+        "wait_s_p95": 0.000497
+      },
+      "24": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000437,
+        "wait_s_p95": 0.000513
+      },
+      "25": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000456,
+        "wait_s_p95": 0.000509
+      },
+      "26": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000772,
+        "wait_s_p95": 0.000785
+      },
+      "3": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000475,
+        "wait_s_p95": 0.000525
+      },
+      "4": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.00048,
+        "wait_s_p95": 0.000548
+      },
+      "5": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000468,
+        "wait_s_p95": 0.00051
+      },
+      "6": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000459,
+        "wait_s_p95": 0.000508
+      },
+      "7": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000483,
+        "wait_s_p95": 0.000545
+      },
+      "8": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000467,
+        "wait_s_p95": 0.000527
+      },
+      "9": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000468,
+        "wait_s_p95": 0.00055
+      }
+    },
+    "samples": 54,
+    "trace": "docs/wavemat/results/m0_overlap_tp1_eager_p1.log"
+  },
+  "gate_interpretation": "Layer-ready wait is measured at the real Ascend consumer seam. This artifact alone does not establish transfer-compute overlap; a device-event timeline is required before claiming sufficient overlap.",
+  "graph": {
+    "bubble_samples": 54,
+    "bubble_threshold_s": 0.0001,
+    "layers": 27,
+    "load_wait_s_mean": 0.000515,
+    "load_wait_s_p50": 0.000517,
+    "load_wait_s_p95": 0.00082,
+    "load_wait_s_total": 0.027804,
+    "per_layer": {
+      "0": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.00096,
+        "wait_s_p95": 0.001012
+      },
+      "1": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000801,
+        "wait_s_p95": 0.000818
+      },
+      "10": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000463,
+        "wait_s_p95": 0.000532
+      },
+      "11": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000452,
+        "wait_s_p95": 0.000523
+      },
+      "12": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000496,
+        "wait_s_p95": 0.000567
+      },
+      "13": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000477,
+        "wait_s_p95": 0.00054
+      },
+      "14": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000476,
+        "wait_s_p95": 0.000551
+      },
+      "15": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000458,
+        "wait_s_p95": 0.000492
+      },
+      "16": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000438,
+        "wait_s_p95": 0.000523
+      },
+      "17": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000447,
+        "wait_s_p95": 0.000513
+      },
+      "18": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000472,
+        "wait_s_p95": 0.00051
+      },
+      "19": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000472,
+        "wait_s_p95": 0.000544
+      },
+      "2": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000692,
+        "wait_s_p95": 0.000741
+      },
+      "20": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000437,
+        "wait_s_p95": 0.000507
+      },
+      "21": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000469,
+        "wait_s_p95": 0.000523
+      },
+      "22": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000458,
+        "wait_s_p95": 0.000506
+      },
+      "23": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.00048,
+        "wait_s_p95": 0.000557
+      },
+      "24": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000462,
+        "wait_s_p95": 0.00053
+      },
+      "25": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000442,
+        "wait_s_p95": 0.00051
+      },
+      "26": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000775,
+        "wait_s_p95": 0.000816
+      },
+      "3": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000485,
+        "wait_s_p95": 0.000561
+      },
+      "4": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000445,
+        "wait_s_p95": 0.000512
+      },
+      "5": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000465,
+        "wait_s_p95": 0.000542
+      },
+      "6": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000452,
+        "wait_s_p95": 0.000532
+      },
+      "7": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000478,
+        "wait_s_p95": 0.000548
+      },
+      "8": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000478,
+        "wait_s_p95": 0.000546
+      },
+      "9": {
+        "bubble_samples": 2,
+        "samples": 2,
+        "wait_s_mean": 0.000469,
+        "wait_s_p95": 0.000522
+      }
+    },
+    "samples": 54,
+    "trace": "docs/wavemat/results/m0_overlap_tp1_graph_p1.log"
+  },
+  "graph_minus_eager_load_wait_s_mean": 5e-06,
+  "is_wavemat_mechanism_enabled": false,
+  "overlap_ratio": null
+}
