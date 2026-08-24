@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "purpose": "Portable raw provenance for the WaveMat M0 TP=1 matched device sweep; no run in this manifest was rerun after the original capture.",
+  "release": {
+    "tag": "wavemat-m0-raw-20260824-v1",
+    "url": "https://github.com/intellistream/kv-materialization-arrival-control/releases/tag/wavemat-m0-raw-20260824-v1",
+    "target_commit": "de3449d34b8c51736dbad05a44e83058fcc9702d"
+  },
+  "common_identity": {
+    "host_device": "Ascend 910B2, ASCEND_RT_VISIBLE_DEVICES=2, TP=1",
+    "npu_smi_version": "26.0.rc1",
+    "model": "/root/models/DeepSeek-V2-Lite",
+    "model_config_sha256": "f346286b0f1c8b044252fd54cb4fa78b9fab6472a6e8bebb9edfe03d414ea03d",
+    "vllm_commit": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+    "vllm_ascend_commit": "f4a08bddd0cc65a0bd8c3d377b158ae5ca7527db",
+    "vendor_vllm_gitlink": "68b8be04493d39d5706f3d0d18f465f5eab947c4",
+    "effective_graph_mode": "PIECEWISE for graph arms; AscendStore layerwise connector overrides requested FULL_AND_PIECEWISE",
+    "vllm_prefix_caching_enabled": false,
+    "kv_connector": "AscendStoreConnector backend=memcache use_layerwise=true"
+  },
+  "capture_revision": {
+    "committed_equivalent": "5b4a6aeb340ec11d257c7f23ef5be3d9c952baba",
+    "note": "The graph-p2 profile was captured from the identical profiler-driver worktree immediately before this commit; the remaining five profile arms were captured after it. This records the original uncommitted state rather than falsely assigning a later commit."
+  },
+  "device_trace_analyzer": {
+    "path": "scripts/summarize_wavemat_m0_device_trace.py",
+    "git_blob": "4687fe5776f37b3e9958b55e883dbaa60863da6f",
+    "sha256": "59e9fd16aae7844790dde9e78c68d522c75b38acdbf82ca5a483ae1c8d4c45ee",
+    "command_template": "gzip -dc <asset>.json.gz > trace_view.json && python3 scripts/summarize_wavemat_m0_device_trace.py --trace trace_view.json --output summary.json"
+  },
+  "arms": [
+    {
+      "id": "tp1_graph_p1",
+      "mode": "graph",
+      "prefetch_layers": 1,
+      "summary": "docs/wavemat/results/m0_overlap_tp1_graph_p1_device_summary.json",
+      "raw": {"url": "https://github.com/intellistream/kv-materialization-arrival-control/releases/download/wavemat-m0-raw-20260824-v1/m0_tp1_graph_p1_trace_view.json.gz", "compression": "gzip", "compressed_bytes": 18696268, "compressed_sha256": "ac660ae6c73f1a76bf9f5be3ea7fffecc83d0c8cca19b831956695a8b41c7b6f", "uncompressed_bytes": 287659349, "uncompressed_sha256": "ad165e1a6eb9a1cdefc737d83bca97394a698221adc2ceff9b5426faa568baee"}
+    },
+    {
+      "id": "tp1_eager_p1",
+      "mode": "eager",
+      "prefetch_layers": 1,
+      "summary": "docs/wavemat/results/m0_overlap_tp1_eager_p1_device_summary.json",
+      "raw": {"url": "https://github.com/intellistream/kv-materialization-arrival-control/releases/download/wavemat-m0-raw-20260824-v1/m0_tp1_eager_p1_trace_view.json.gz", "compression": "gzip", "compressed_bytes": 18699274, "compressed_sha256": "e3cb82f4d1385e93020cb92e6098461cdf1098865861a25502f99033a26fd47d", "uncompressed_bytes": 287960705, "uncompressed_sha256": "5622b4dcd938e3faa65ec7afa019a1b067e9b71196038b34010fd223a7a25aff"}
+    },
+    {
+      "id": "tp1_graph_p2",
+      "mode": "graph",
+      "prefetch_layers": 2,
+      "summary": "docs/wavemat/results/m0_overlap_tp1_graph_p2_device_summary.json",
+      "raw": {"url": "https://github.com/intellistream/kv-materialization-arrival-control/releases/download/wavemat-m0-raw-20260824-v1/m0_tp1_graph_p2_trace_view.json.gz", "compression": "gzip", "compressed_bytes": 18714324, "compressed_sha256": "95ed6af3dcea3e48fe909e051e139d69a3f6aa2c541c05d59b5cc55d9e2c8868", "uncompressed_bytes": 287670549, "uncompressed_sha256": "2b967af3c2156e35e5dbed4fd7238e6f77309ba888346740298f8de70d6686f2"}
+    },
+    {
+      "id": "tp1_eager_p2",
+      "mode": "eager",
+      "prefetch_layers": 2,
+      "summary": "docs/wavemat/results/m0_overlap_tp1_eager_p2_device_summary.json",
+      "raw": {"url": "https://github.com/intellistream/kv-materialization-arrival-control/releases/download/wavemat-m0-raw-20260824-v1/m0_tp1_eager_p2_trace_view.json.gz", "compression": "gzip", "compressed_bytes": 18677027, "compressed_sha256": "385f88b94704a2741669d40874ae70648e7d2ad97a5c8a9f2920ec2ec7573fdb", "uncompressed_bytes": 287941012, "uncompressed_sha256": "40fa64833f3db5be2d3b3780255e9625359c906f82cffae446b0615a70069092"}
+    },
+    {
+      "id": "tp1_graph_p4",
+      "mode": "graph",
+      "prefetch_layers": 4,
+      "summary": "docs/wavemat/results/m0_overlap_tp1_graph_p4_device_summary.json",
+      "raw": {"url": "https://github.com/intellistream/kv-materialization-arrival-control/releases/download/wavemat-m0-raw-20260824-v1/m0_tp1_graph_p4_trace_view.json.gz", "compression": "gzip", "compressed_bytes": 18690755, "compressed_sha256": "436174983164b1208d75ac22eb97dcc620fdaa57d76581a9de9169cce57acbc5", "uncompressed_bytes": 287651961, "uncompressed_sha256": "da9f6d92db3d9df9076cd7a26b0e4ff8c8d4d6f81a986e66376b13ebcb33f312"}
+    },
+    {
+      "id": "tp1_eager_p4",
+      "mode": "eager",
+      "prefetch_layers": 4,
+      "summary": "docs/wavemat/results/m0_overlap_tp1_eager_p4_device_summary.json",
+      "raw": {"url": "https://github.com/intellistream/kv-materialization-arrival-control/releases/download/wavemat-m0-raw-20260824-v1/m0_tp1_eager_p4_trace_view.json.gz", "compression": "gzip", "compressed_bytes": 18646197, "compressed_sha256": "6f80e2ea2caa518e3ae60f94907e8725f66bcc034fb2f4c0ac536f60ce5ee5eb", "uncompressed_bytes": 287922236, "uncompressed_sha256": "86fb26873a61a1dc4ca1970565a769a82581aca82552d6fcf148dd2c5cd604e4"}
+    }
+  ],
+  "gate_trace_analyzer": {
+    "path": "scripts/summarize_wavemat_m0_gate_trace.py",
+    "git_blob": "2a21ff96e36cce7ef0493319d184b2641373d3b2",
+    "sha256": "6bb67349edcbf6fce22f7f256058e349eeb6b3e9eea0c1b4e81af3f1612bd46f",
+    "command_template": "gzip -dc <asset>.log.gz > gate.log && python3 scripts/summarize_wavemat_m0_gate_trace.py --log gate.log --output gate-summary.json",
+    "assets": [
+      {"id": "tp1_graph_p2_gate", "url": "https://github.com/intellistream/kv-materialization-arrival-control/releases/download/wavemat-m0-raw-20260824-v1/m0_tp1_graph_p2_gate.log.gz", "compressed_bytes": 11832, "compressed_sha256": "b49a6a36d8b0f0809e0d1d3bb59a347eaf3a327aaddde63ec5971519f0d47bee", "uncompressed_bytes": 65548, "uncompressed_sha256": "561b3fd515ddc486df42c9e283077266a251af7dc3facb1cdf4e0d8777296fd6"},
+      {"id": "tp1_eager_p2_gate", "url": "https://github.com/intellistream/kv-materialization-arrival-control/releases/download/wavemat-m0-raw-20260824-v1/m0_tp1_eager_p2_gate.log.gz", "compressed_bytes": 10992, "compressed_sha256": "b35bf61e334eee813da6edc8c49272f5fd3290b512cec44acce6714a888d3fed", "uncompressed_bytes": 63542, "uncompressed_sha256": "dff59ea1f9e3858f4f15d8516754dfdf0de88a232b92d26eab6e37d4590b857e"}
+    ]
+  }
+}

@@ -357,6 +357,27 @@ M0 Go/Stop decision.
 
 ### TP=1 device-timeline sweep (2026-08-24)
 
+Raw provenance is carried outside git in the versioned Release bundle and is
+indexed by `results/m0_raw_provenance_20260824_v1.json`. It records a stable
+URL, compressed/uncompressed byte size and SHA-256 for every graph/eager p=1/2/4
+trace, plus the gate logs, device/model/runtime identity, and analyzer hashes.
+The raw files are gzip-compressed Release assets rather than local-only paths.
+
+Fresh-clone verification for an arm is:
+
+```bash
+curl -fL -O <raw.url>
+sha256sum <asset>.gz                 # compare raw.compressed_sha256
+gzip -dc <asset>.gz | sha256sum      # compare raw.uncompressed_sha256
+gzip -dc <asset>.gz > trace_view.json
+python3 scripts/summarize_wavemat_m0_device_trace.py \
+  --trace trace_view.json --output recomputed.json
+```
+
+Use the analogous `gate_trace_analyzer` command in the manifest for p=2 gate
+logs. The `trace` field retained in the early per-arm summary is the original
+capture path used by the analyzer, not the reviewer-facing artifact location.
+
 The completed paired sweep used the profiler's synchronous
 `AscendCL@aclrtMemcpyBatch` interval and intersected it with NPU `AI_*` / `MIX_*`
 task intervals. `scripts/summarize_wavemat_m0_device_trace.py` produces the
