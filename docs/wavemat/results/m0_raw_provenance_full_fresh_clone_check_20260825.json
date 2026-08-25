@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "purpose": "Latest-head full-bundle fresh-clone verification of the WaveMat M0 raw provenance. This is download, hash, decompression, and offline summary reconstruction only; it does not start an NPU workload.",
+  "fresh_clone": {
+    "branch": "m3-wavemat-device-overlap-m0",
+    "commit": "4e5256291c2a2ab4ca471bd68f71752a2042674c"
+  },
+  "manifest": {
+    "path": "docs/wavemat/results/m0_raw_provenance_20260824_v1.json",
+    "sha256": "f74e60669f30b8046dee9be3ffe0c9840ed397f42118539b88e765c86476eea8"
+  },
+  "verifier": {
+    "path": "scripts/verify_wavemat_m0_raw_provenance.py",
+    "sha256": "4b85c2af77e9285943da3cb0acc884a0419cf80f61196f3098aa4a8bdb153784"
+  },
+  "asset_validation": {
+    "checks": [
+      "authenticated retrieval from each numeric Release Asset API location",
+      "compressed byte size",
+      "compressed SHA-256",
+      "decompressed SHA-256"
+    ],
+    "artifacts": [
+      "tp1_graph_p1",
+      "tp1_eager_p1",
+      "tp1_graph_p2",
+      "tp1_eager_p2",
+      "tp1_graph_p4",
+      "tp1_eager_p4",
+      "tp1_graph_p2_gate",
+      "tp1_eager_p2_gate"
+    ],
+    "result": "pass"
+  },
+  "offline_reconstruction": {
+    "device_summaries_rebuilt_and_compared": [
+      "tp1_graph_p1",
+      "tp1_eager_p1",
+      "tp1_graph_p2",
+      "tp1_eager_p2",
+      "tp1_graph_p4",
+      "tp1_eager_p4"
+    ],
+    "gate_summaries_rebuilt_and_compared": [
+      "tp1_graph_p2_gate",
+      "tp1_eager_p2_gate"
+    ],
+    "comparison": "Canonical JSON equality after dropping the analyzer-local trace or log path.",
+    "result": "pass"
+  }
+}

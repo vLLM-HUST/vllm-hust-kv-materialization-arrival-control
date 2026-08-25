@@ -383,7 +383,8 @@ capture path used by the analyzer, not the reviewer-facing artifact location.
 it verifies all eight assets, then rebuilds all six device summaries and both
 gate summaries from those bytes. The recorded fresh-clone check is its earlier
 matched-p=2 review run; the executable check is the reproducible full-bundle
-verification contract.
+verification contract. The latest-head full-bundle fresh-clone result is
+`results/m0_raw_provenance_full_fresh_clone_check_20260825.json`.
 
 The completed paired sweep used the profiler's synchronous
 `AscendCL@aclrtMemcpyBatch` interval and intersected it with NPU `AI_*` / `MIX_*`
