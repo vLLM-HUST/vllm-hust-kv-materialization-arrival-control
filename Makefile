@@ -172,7 +172,7 @@ paper-pdf:
 	$(MAKE) -C $(PAPER_DIR) pdf TECTONIC='$(TECTONIC)' PYTHON='$(PYTHON)'
 
 evidence:
-	$(MAKE) -C $(PAPER_DIR) evidence
+	$(MAKE) -C $(PAPER_DIR) evidence-bundle
 
 lint:
 	$(RUFF) check .
