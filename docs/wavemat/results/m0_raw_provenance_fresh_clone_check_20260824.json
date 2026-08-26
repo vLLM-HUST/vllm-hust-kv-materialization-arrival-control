@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "purpose": "Independent fresh-clone verification of the controlled WaveMat M0 raw-artifact bundle; this performs downloads, hashes, and offline analysis only, and does not rerun a device workload.",
+  "fresh_clone": {
+    "branch": "m3-wavemat-device-overlap-m0",
+    "commit": "ac172fbf617b208819791438f512af09d4d4160e"
+  },
+  "manifest": "docs/wavemat/results/m0_raw_provenance_20260824_v1.json",
+  "release": "https://github.com/intellistream/kv-materialization-arrival-control/releases/tag/wavemat-m0-raw-20260824-v1",
+  "asset_validation": {
+    "assets_verified": 8,
+    "arms": ["tp1_graph_p1", "tp1_eager_p1", "tp1_graph_p2", "tp1_eager_p2", "tp1_graph_p4", "tp1_eager_p4"],
+    "gate_logs": ["tp1_graph_p2_gate", "tp1_eager_p2_gate"],
+    "checks": ["compressed byte size", "compressed SHA-256", "decompressed SHA-256"],
+    "result": "pass"
+  },
+  "offline_reanalysis": {
+    "device_trace_analyzer": ["tp1_graph_p2", "tp1_eager_p2"],
+    "gate_trace_analyzer": ["tp1_graph_p2_gate"],
+    "comparison": "canonical JSON after deleting the analyzer-local trace or log path",
+    "result": "all matched committed summaries"
+  },
+  "command_contract": "Use the authenticated curl and analyzer command templates in the manifest; GitHub Release Asset API endpoints require a token with repository read access."
+}

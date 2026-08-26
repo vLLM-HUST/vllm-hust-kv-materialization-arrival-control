@@ -10,6 +10,12 @@ audit-only metadata, not an experimental result.
 
 ## M0 runtime (upstream 0.23 pair)
 
+The active overlap experiment uses the locally available
+`/root/models/DeepSeek-V2-Lite` (16B total parameters, 2.4B active; MLA+MoE).
+It is the official Layerwise KV Pool example and therefore the smallest local
+DeepSeek model that exercises this M0 seam. The pin recorded later in this
+document is both the active target and historical M0 baseline evidence.
+
 M0 uses the installed upstream pair, with no `PYTHONPATH` override:
 
 - vLLM: `vllm-project/vllm` `0.23.0` (editable at `/vllm-workspace/vllm`,

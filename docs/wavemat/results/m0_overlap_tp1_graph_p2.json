@@ -1,0 +1,15 @@
+{
+  "artifact": "m0-wavemat-overlap",
+  "enforce_eager": false,
+  "first_output": "\n\n## 1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.",
+  "generated_at_utc": "2026-08-24T04:21:54Z",
+  "is_wavemat_mechanism_enabled": false,
+  "layerwise_prefetch_layers": 2,
+  "max_tokens": 64,
+  "model": "/root/models/DeepSeek-V2-Lite",
+  "num_prompts": 6,
+  "tensor_parallel_size": 1,
+  "use_layerwise": true,
+  "vllm_prefix_caching_enabled": false,
+  "wall_clock_s": 9.54
+}

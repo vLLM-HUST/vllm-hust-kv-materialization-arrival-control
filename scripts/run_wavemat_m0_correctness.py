@@ -8,13 +8,16 @@ from pathlib import Path
 from typing import Any
 
 
-PROMPTS: list[str] = [
-    "Write a Python function to compute the nth Fibonacci number.",
-    "Explain what a binary search tree is in one paragraph.",
-    "Write a function that reverses a singly linked list.",
-    "What is the capital of France? Answer in one short sentence.",
-    "Write a function to check whether a string is a palindrome.",
-    "Describe the difference between TCP and UDP in two sentences.",
+SHARED_PREFIX = (
+    "The history of computing spans many centuries and reflects the human desire "
+    "to automate calculation and process information. Early mechanical devices "
+    "such as the abacus preceded modern electronic computers. "
+)
+SUFFIXES = [
+    "Summarize this paragraph in one sentence.",
+    "Name an early computing device.",
+    "What is the main topic?",
+    "State one consequence of electronic computers.",
 ]
 
 
@@ -26,6 +29,7 @@ def run(
     max_tokens: int,
     enforce_eager: bool,
     gpu_memory_utilization: float,
+    tensor_parallel_size: int,
 ) -> dict[str, Any]:
     from vllm import LLM, SamplingParams
 
@@ -33,10 +37,13 @@ def run(
         model=model,
         trust_remote_code=True,
         enforce_eager=enforce_eager,
-        tensor_parallel_size=8,
+        tensor_parallel_size=tensor_parallel_size,
         max_model_len=512,
         max_num_seqs=4,
         gpu_memory_utilization=gpu_memory_utilization,
+        # Ensure the second generation uses AscendStore materialization, not an
+        # in-engine prefix-cache hit that would skip the layerwise path.
+        enable_prefix_caching=False,
         compilation_config={"cudagraph_mode": cudagraph_mode},
         kv_transfer_config={
             "kv_connector": "AscendStoreConnector",
@@ -50,8 +57,10 @@ def run(
     )
 
     params = SamplingParams(max_tokens=max_tokens, temperature=0)
+    llm.generate([SHARED_PREFIX], SamplingParams(max_tokens=1, temperature=0), use_tqdm=False)
+    prompts = [SHARED_PREFIX + suffix for suffix in SUFFIXES]
     started = time.time()
-    outputs = llm.generate(PROMPTS, params, use_tqdm=False)
+    outputs = llm.generate(prompts, params, use_tqdm=False)
     wall_s = time.time() - started
 
     results = [
@@ -68,6 +77,8 @@ def run(
         "layerwise_prefetch_layers": prefetch_layers,
         "cudagraph_mode": cudagraph_mode,
         "enforce_eager": enforce_eager,
+        "tensor_parallel_size": tensor_parallel_size,
+        "vllm_prefix_caching_enabled": False,
         "max_tokens": max_tokens,
         "wall_clock_s": round(wall_s, 3),
         "outputs": results,
@@ -83,6 +94,7 @@ def main() -> None:
     parser.add_argument("--max-tokens", type=int, default=96)
     parser.add_argument("--enforce-eager", action=argparse.BooleanOptionalAction, default=False)
     parser.add_argument("--gpu-memory-utilization", type=float, default=0.22)
+    parser.add_argument("--tensor-parallel-size", type=int, choices=[1, 2, 4, 8], default=1)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
 
@@ -95,6 +107,7 @@ def main() -> None:
         args.max_tokens,
         args.enforce_eager,
         args.gpu_memory_utilization,
+        args.tensor_parallel_size,
     )
     result["artifact"] = "m0-wavemat-correctness"
     result["is_wavemat_mechanism_enabled"] = False

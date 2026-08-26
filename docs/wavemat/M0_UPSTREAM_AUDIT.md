@@ -1,8 +1,15 @@
 # WaveMat M0 — upstream 0.23 layerwise audit + runtime status
 
-Status: `static_audit` + `graph_mode_smoke_verified` + `layerwise_runtime_blocked`.
+Status: `static_audit` + `graph_mode_smoke_verified` + `layerwise_runtime_partially_measured`.
 This artifact does not enable WaveMat and is not an end-to-end performance
 result.
+
+**Active overlap-test target:** `/root/models/DeepSeek-V2-Lite` (16B total,
+2.4B active; MLA+MoE). It is already present locally and is the model used by
+the official vLLM-Ascend Layerwise KV Pool example. This makes it the smallest
+available DeepSeek model that exercises the relevant MLA layerwise path. Do not
+substitute a smaller DeepSeek R1-distill checkpoint: those are Qwen/Llama dense
+models and would not validate this MLA-specific seam.
 
 ## Environment (verified working)
 
@@ -199,16 +206,257 @@ sequence identical" cannot be satisfied even by the non-layerwise baseline, so
 the oracle should be a block/layer digest comparison (load vs recompute), not a
 token-level equality.
 
-## M0 conclusion (no-graph-gap)
+## Provisional M0 reading (not a no-gap conclusion)
 
-- Graph-induced overlap loss / sync bubble: **not observed** (graph is 2-8x
-  faster than eager).
+- Graph-induced overlap loss / sync bubble: **not established either way**.
+  Graph is 2-8x faster than eager at end-to-end wall-clock, but this does not
+  measure whether the per-layer ready event falls on a graph-piece critical
+  path.
 - Layerwise-specific replay/correctness gap: **not observed** (layerwise is no
   more non-deterministic than the non-layerwise baseline).
 - Only reproducible signal is the fixed-prefetch bubble (~5.8%), which is
   eager-agnostic and matches the issue's "固定 prefetch" exclusion.
 
-This is a no-graph-gap / Stop result per the pre-registered M0 Stop conditions.
+The prior no-graph-gap/Stop wording was too strong.  The required remaining M0
+experiment is a shared-prefix *load* workload (not only a save or no-hit run),
+with 1/2/4 static prefetch, paired eager and PIECEWISE runs, and per-layer
+records at the actual `KVPoolWorker.wait_for_layer_load` seam.  Summarize those
+records with `scripts/summarize_wavemat_m0_overlap.py`.  It fail-closes:
+missing records or wall-clock-only results cannot be used to claim that
+upstream sufficiently overlaps transfer and compute.  A device-event timeline
+for transfer submit/ready and attention start/end is still required to report
+an overlap ratio.
+
+### Reproducible layer-ready wait run
+
+Run the following paired sweep only when all eight devices are idle; do not
+evict another user's NPU job.  The disposable upstream Ascend checkout must
+emit `WAVEMAT_TIMING layer=<id> load_wait_s=<seconds>` immediately around the
+existing `layer_load_finished_events[current_layer].wait()` in
+`KVPoolWorker.wait_for_layer_load`.  This is observability only, not a WaveMat
+mechanism change.
+
+```bash
+export MMC_LOCAL_CONFIG_PATH="$PWD/docs/wavemat/configs/mmc-local.conf"
+export OMP_NUM_THREADS=1
+for mode in graph eager; do
+  for prefetch in 1 2 4; do
+    args=(--model /root/models/DeepSeek-V2-Lite \
+      --prefetch-layers "$prefetch" --max-tokens 64)
+    if [ "$mode" = eager ]; then args+=(--enforce-eager); fi
+    python3 scripts/run_wavemat_m0_overlap.py "${args[@]}" \
+      --output "docs/wavemat/results/m0_overlap_${mode}_p${prefetch}.json" \
+      2>&1 | tee "docs/wavemat/results/m0_overlap_${mode}_p${prefetch}.log"
+  done
+done
+python3 scripts/summarize_wavemat_m0_overlap.py \
+  --graph-log docs/wavemat/results/m0_overlap_graph_p1.log \
+  --eager-log docs/wavemat/results/m0_overlap_eager_p1.log \
+  --output docs/wavemat/results/m0_overlap_wait_p1_summary.json
+```
+
+The current workload first saves a long shared prefix, then requests suffixes
+under that prefix, so the second generation is a cache-load path. vLLM's own
+prefix cache is disabled in the driver: otherwise it bypasses AscendStore with
+`need_to_load=0`, and no layerwise materialization takes place. Record both
+requested and effective graph mode: current upstream forces layerwise
+connectors to PIECEWISE, so requested `FULL` / `FULL_AND_PIECEWISE` is not a
+valid independent full-graph baseline. Repeat the paired sweep at least twice;
+do not declare Stop until the device-event timeline also supplies transfer
+submit/ready and attention start/end to calculate overlap ratio.
+
+### TP=1 real-load trace (2026-08-24)
+
+This run used NPU 2, DeepSeek-V2-Lite, `backend=memcache`,
+`use_layerwise=true`, and vLLM prefix caching disabled.  The latter is
+important: every measured consumer had `vllm_cached=0`, `kvpool_cached=128`,
+and `need_to_allocate=128`, so it was an actual AscendStore load rather than an
+in-engine prefix-cache hit.
+
+| mode | prefetch | wall-clock s | layer-ready wait samples | mean wait ms |
+|---|---:|---:|---:|---:|
+| PIECEWISE graph | 1 | 9.376 | 54 | 0.515 |
+| eager | 1 | 8.173 | 54 | 0.510 |
+| PIECEWISE graph | 2 | 9.540 | 2 | n/a (prefetched layers did not block at the consumer) |
+| PIECEWISE graph | 4 | 9.069 | 2 | n/a (prefetched layers did not block at the consumer) |
+
+Raw JSON: `results/m0_overlap_tp1_{graph_p1,graph_p2,graph_p4,eager_p1}.json`;
+the paired wait summary is `results/m0_overlap_tp1_wait_p1_summary.json`.
+
+Interpretation: the graph-minus-eager mean ready-wait delta is **+0.005ms**,
+which is below this host-clock trace's useful resolution and does not support a
+graph-induced host synchronization bubble.  This is a real-load result, but is
+only TP=1 and one paired run. It does **not** establish a transfer/compute
+overlap ratio or a final M0 Stop conclusion: that still requires device-event
+timestamps for transfer submit/ready and attention start/end.
+
+### What counts as “sufficient overlap”
+
+The next trace must emit one correlated record per `(request epoch,
+transfer_layer, gate_attention_layer)`.  A prefetch task for layer `L` carries
+the attention-start gate of the earlier layer whose compute it is intended to
+overlap; record that gate layer explicitly rather than inferring it from log
+order.
+
+| Timestamp | Real upstream seam | Meaning |
+|---|---|---|
+| `transfer_submit_ns` | immediately before `KVCacheStoreLayerRecvingThread._batch_copy_with_limits` | copy is submitted after its attention-start gate opens |
+| `transfer_ready_ns` | immediately before `layer_load_finished_events[layer].set()` | data is declared safe for the consumer |
+| `attention_start_ns` | the existing `record_attention_compute_start()` event | compute stream reaches the attention op |
+| `attention_end_ns` | an NPU event recorded immediately after the attention op | attention work has completed on the compute stream |
+
+Use NPU events to establish stream ordering and a trace worker to serialize
+them to host timestamps; do not call `synchronize()` on the model thread.
+For each correlated pair calculate:
+
+```text
+overlap_ns = max(0, min(transfer_ready_ns, attention_end_ns)
+                    - max(transfer_submit_ns, attention_start_ns))
+transfer_overlap_ratio = overlap_ns / (transfer_ready_ns - transfer_submit_ns)
+exposed_bubble_ns = max(0, transfer_ready_ns - attention_end_ns)
+```
+
+The final M0 Stop condition is met only if, in matched TP=1 graph/eager runs
+at prefetch 1/2/4, (1) at least 95% of eligible prefetched loads have complete
+correlated records, (2) graph has no material increase in `exposed_bubble_ns`
+or decrease in `transfer_overlap_ratio` relative to eager, and (3) no
+layerwise-specific correctness failure appears. Missing events are a trace
+failure, not zero-overlap evidence. The existing p2/p4 observation (only two
+consumer waits) is a lead to validate with this timeline, not this condition.
+
+### Device timeline collection (implemented; first TP=1 capture complete)
+
+`run_wavemat_m0_overlap.py` can now drive vLLM-Ascend's built-in Ascend
+PyTorch Profiler. It starts **after** the shared-prefix warmup and stops after
+the cache-load requests, so model load and cache population are excluded.
+
+```bash
+ASCEND_RT_VISIBLE_DEVICES=2 \
+MMC_LOCAL_CONFIG_PATH="$PWD/docs/wavemat/configs/mmc-local-tp1.conf" \
+OMP_NUM_THREADS=1 HCCL_NPU_SOCKET_PORT_RANGE=16700-16799 \
+python3 scripts/run_wavemat_m0_overlap.py \
+  --tensor-parallel-size 1 --prefetch-layers 2 --max-tokens 64 \
+  --gpu-memory-utilization 0.85 \
+  --torch-profile-dir "$PWD/docs/wavemat/results/m0_overlap_tp1_graph_p2_profile" \
+  --output docs/wavemat/results/m0_overlap_tp1_graph_p2_profile.json
+```
+
+The 2026-08-24 TP=1/prefetch=2 capture completed and produced a device trace
+with 54 `AscendCL@aclrtMemcpyBatch` calls plus NPU kernel/stream events. The
+raw `trace_view.json` is about 288 MB (829 MB including profiler intermediates)
+and is stored as a controlled, gzip-compressed Release asset rather than in
+Git; it is measurement evidence, not a git artifact. Its wall-clock (`12.794s`)
+is profiling overhead and must never be compared with the unprofiled table
+above.
+
+For review, use the trace's `AscendCL@aclrtMemcpyBatch` / `MEMCPY_ASYNC` lanes
+as the transfer interval and the attention graph/kernel lane as compute. Match
+them by the existing layer-load gate trace, then apply the formula above. A
+single visual overlap in the trace is insufficient: export the matched interval
+table for prefetch 1/2/4 in both PIECEWISE graph and eager before making the
+M0 Go/Stop decision.
+
+### TP=1 device-timeline sweep (2026-08-24)
+
+Raw provenance is carried outside git in the versioned Release bundle and is
+indexed by `results/m0_raw_provenance_20260824_v1.json`. It records a stable
+URL, compressed/uncompressed byte size and SHA-256 for every graph/eager p=1/2/4
+trace, plus the gate logs, device/model/runtime identity, and analyzer hashes.
+The raw files are gzip-compressed Release assets rather than local-only paths.
+
+Fresh-clone verification for an arm is:
+
+```bash
+curl -fL -H 'Accept: application/octet-stream' \
+  -H "Authorization: Bearer $GITHUB_TOKEN" <raw.url> -o asset.gz
+sha256sum <asset>.gz                 # compare raw.compressed_sha256
+gzip -dc <asset>.gz | sha256sum      # compare raw.uncompressed_sha256
+gzip -dc <asset>.gz > trace_view.json
+python3 scripts/summarize_wavemat_m0_device_trace.py \
+  --trace trace_view.json --output recomputed.json
+```
+
+Use the analogous `gate_trace_analyzer` command in the manifest for p=2 gate
+logs. The `trace` field retained in the early per-arm summary is the original
+capture path used by the analyzer, not the reviewer-facing artifact location.
+`scripts/verify_wavemat_m0_raw_provenance.py` is the executable custody check:
+it verifies all eight assets, then rebuilds all six device summaries and both
+gate summaries from those bytes. The recorded fresh-clone check is its earlier
+matched-p=2 review run; the executable check is the reproducible full-bundle
+verification contract. The latest-head full-bundle fresh-clone result is
+`results/m0_raw_provenance_full_fresh_clone_check_20260825.json`.
+
+The completed paired sweep used the profiler's synchronous
+`AscendCL@aclrtMemcpyBatch` interval and intersected it with NPU `AI_*` / `MIX_*`
+task intervals. `scripts/summarize_wavemat_m0_device_trace.py` produces the
+reviewable JSON summaries. This is a **device-compute overlap proxy**, rather
+than the final gate-correlated ratio, because the profiler does not associate a
+DMA task ID with each MemCache layer-load gate.
+
+| prefetch | graph mean | eager mean | graph − eager | graph batches with any overlap |
+|---:|---:|---:|---:|---:|
+| 1 | 0.000% | 0.000% | 0.000 pp | 0 / 54 |
+| 2 | 4.394% | 4.620% | -0.225 pp | 52 / 54 |
+| 4 | 4.305% | 4.040% | +0.265 pp | 49 / 54 |
+
+No copy batch was fully covered by compute in any run. Thus the static
+layerwise baseline does **not** show sufficient device-level transfer/compute
+overlap in this TP=1 workload, even at prefetch 4. Crucially, it also does not
+show a repeatable graph-specific regression: graph and eager are within 0.3
+percentage points at p=2 and p=4, and equal at p=1.
+
+### Gate-correlated DMA completion and replay correctness (2026-08-24)
+
+The remaining M0 check is complete. For the 52 eligible p=2 prefetch loads
+(the two initial/current-layer loads have no prefetch gate), the trace records
+the upstream attention-start NPU gate, synchronous `aclrtMemcpyBatch` submit,
+and its return immediately before `layer_load_finished_events[layer].set()`.
+Both graph and eager have **52/52** complete gate correlations.
+
+| mode | mean synchronous DMA duration | mean gate → layer-ready | p95 gate → layer-ready |
+|---|---:|---:|---:|
+| PIECEWISE graph | 0.759 ms | 1.837 ms | 1.983 ms |
+| eager | 0.773 ms | 1.867 ms | 2.153 ms |
+
+Graph is 0.030 ms lower in mean gate-to-ready latency, not higher. Together
+with the p=1/2/4 device-time sweep above, this rules out a repeatable
+graph-only DMA completion or readiness loss in this workload.
+
+For replay correctness, the same DeepSeek-V2-Lite p=2 materialization workload
+was run twice in PIECEWISE graph mode and once in eager with greedy decoding.
+The four request outputs match exactly between graph replay 1/2 and between
+graph/eager. No load error or stale/duplicate consumption signal appeared.
+The pre-existing protocol fixture also passed all eight fail-closed cases
+(partial, stale, duplicate, ABA, load failure, digest mismatch, ACK, and
+recovery). That fixture specifies a candidate WaveMat contract; it is not
+misrepresented as an upstream generation-tag implementation.
+
+**M0 final decision: Stop.** Upstream's synchronous static baseline has low
+device-level overlap, but the behavior is present in eager and is outside this
+graph-safe mechanism's scope. The real gate-correlated and replay-correctness
+checks reveal neither a graph-only loss nor a correctness gap; M1/M2 must not
+start and no Layerwise KV Pool rewrite is warranted.
+
+### Single-NPU trace when the TP=8 group is occupied
+
+V2-Lite supports TP=1. A one-NPU trace on an otherwise idle device is valid
+for the M0 graph-safety and layer-ready-wait questions, but must be labelled
+TP=1 and must not be compared directly with TP=8 latency or throughput.
+
+MMC's local meta service is process-global: start the TP=1 service before any
+TP=8 MMC service, or stop only a service known to be dedicated to this
+experiment. A TP=1 client cannot safely reuse an occupied TP=8 local-service
+configuration. Do not restart a shared service merely to run this trace.
+
+```bash
+export ASCEND_RT_VISIBLE_DEVICES=2
+export MMC_LOCAL_CONFIG_PATH="$PWD/docs/wavemat/configs/mmc-local-tp1.conf"
+export OMP_NUM_THREADS=1
+setsid python3 scripts/start_mmc_meta_service.py > /tmp/wavemat-mmc-tp1.log 2>&1 &
+python3 scripts/run_wavemat_m0_overlap.py \
+  --tensor-parallel-size 1 --prefetch-layers 1 --max-tokens 64 \
+  --output docs/wavemat/results/m0_overlap_tp1_graph_p1.json
+```
 
 ## AscendStore memcache backend prerequisites
 

@@ -1,0 +1,22 @@
+{
+  "copy_duration_ms": {
+    "mean": 0.772544,
+    "p50": 0.72849,
+    "p95": 0.981153
+  },
+  "correlation_ratio": 1.0,
+  "eligible_prefetch_records": 52,
+  "gate_to_ready_ms": {
+    "mean": 1.866844,
+    "p50": 1.632962,
+    "p95": 2.152838
+  },
+  "limitations": [
+    "The completion boundary is the return from synchronous aclrtMemcpyBatch, immediately before layer-ready is set.",
+    "This proves gate-to-DMA-completion ordering; device trace overlap remains the separate overlap metric."
+  ],
+  "log": "docs/wavemat/results/m0_gate_eager_p2.log",
+  "metric": "gate_correlated_synchronous_dma_completion",
+  "records_with_attention_gate": 52,
+  "transfer_records": 54
+}
