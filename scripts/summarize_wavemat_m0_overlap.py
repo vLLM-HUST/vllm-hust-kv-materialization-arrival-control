@@ -16,7 +16,6 @@ import re
 import statistics
 from pathlib import Path
 
-
 WAIT_RE = re.compile(r"WAVEMAT_TIMING\s+layer=(?P<layer>\d+)\s+load_wait_s=(?P<wait>[0-9.]+)")
 
 

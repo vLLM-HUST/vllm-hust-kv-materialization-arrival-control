@@ -2,22 +2,26 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import asdict
-from dataclasses import replace
+from dataclasses import asdict, replace
 from pathlib import Path
 from statistics import mean
 
-from vllm_kv_materialization.offline_traces import build_signals
-from vllm_kv_materialization.offline_traces import load_traces
-from vllm_kv_materialization.offline_traces import workload_case_to_traces
-from vllm_kv_materialization.policy import MaterializationDecision
-from vllm_kv_materialization.policy import estimate_materialization_ttft_ms
-from vllm_kv_materialization.policy import MaterializationPolicy
-from vllm_kv_materialization.policy import MaterializationSignals
-from vllm_kv_materialization.policy import optimize_partial_reuse_tokens
-from vllm_kv_materialization.shared_workloads import DECISION_SURFACE_CASE_IDS
-from vllm_kv_materialization.shared_workloads import DECISION_SURFACE_CASE_ROLES
-
+from vllm_kv_materialization.offline_traces import (
+    build_signals,
+    load_traces,
+    workload_case_to_traces,
+)
+from vllm_kv_materialization.policy import (
+    MaterializationDecision,
+    MaterializationPolicy,
+    MaterializationSignals,
+    estimate_materialization_ttft_ms,
+    optimize_partial_reuse_tokens,
+)
+from vllm_kv_materialization.shared_workloads import (
+    DECISION_SURFACE_CASE_IDS,
+    DECISION_SURFACE_CASE_ROLES,
+)
 
 CORE_POLICIES = (
     "always_recompute",
@@ -75,7 +79,7 @@ def parse_args() -> argparse.Namespace:
 def percentile(sorted_values: list[float], q: float) -> float:
     if not sorted_values:
         return 0.0
-    index = min(len(sorted_values) - 1, max(0, int(round(q * (len(sorted_values) - 1)))))
+    index = min(len(sorted_values) - 1, max(0, round(q * (len(sorted_values) - 1))))
     return sorted_values[index]
 def decide_baseline(name: str, signals: MaterializationSignals) -> tuple[MaterializationDecision, int]:
     if name == "always_recompute":

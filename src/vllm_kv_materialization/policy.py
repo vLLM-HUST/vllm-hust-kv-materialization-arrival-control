@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from dataclasses import replace
+from dataclasses import dataclass, replace
 from enum import Enum
 
 
@@ -50,7 +49,7 @@ def estimate_confident_reuse_tokens(
         confident_ratio += 0.05
     confident_ratio -= 0.06 * max(signals.queue_pressure - 0.5, 0.0)
     confident_ratio = max(floor_ratio, min(confident_ratio, 0.92))
-    return min(total_tokens, max(partial_reuse_floor_tokens, int(round(total_tokens * confident_ratio))))
+    return min(total_tokens, max(partial_reuse_floor_tokens, round(total_tokens * confident_ratio)))
 
 
 def estimate_materialization_ttft_ms(
