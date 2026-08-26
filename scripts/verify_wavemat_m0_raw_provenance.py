@@ -24,7 +24,6 @@ from typing import Any
 from summarize_wavemat_m0_device_trace import summarize as summarize_device
 from summarize_wavemat_m0_gate_trace import parse as summarize_gate
 
-
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MANIFEST = ROOT / "docs/wavemat/results/m0_raw_provenance_20260824_v1.json"
 

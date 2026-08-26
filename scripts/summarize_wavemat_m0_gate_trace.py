@@ -8,7 +8,6 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
-
 EVENT = re.compile(
     r"WAVEMAT_EVENT event=(?P<event>\w+) gate=(?P<gate>-?\d+) "
     r"ts_ns=(?P<ts>\d+)(?: (?P<fields>.*))?$"

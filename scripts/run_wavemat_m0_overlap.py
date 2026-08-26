@@ -7,7 +7,6 @@ import time
 from pathlib import Path
 from typing import Any
 
-
 # A long shared prefix (roughly 250+ tokens) so prefix caching triggers a
 # per-layer KV load on subsequent requests.
 SHARED_PREFIX = (
@@ -50,20 +49,20 @@ def run(
     from vllm import LLM, SamplingParams
 
     prompts = [SHARED_PREFIX + s for s in SUFFIXES]
-    llm_kwargs: dict[str, Any] = dict(
-        model=model,
-        trust_remote_code=True,
-        enforce_eager=enforce_eager,
-        tensor_parallel_size=tensor_parallel_size,
-        max_model_len=512,
-        max_num_seqs=6,
-        gpu_memory_utilization=gpu_memory_utilization,
+    llm_kwargs: dict[str, Any] = {
+        "model": model,
+        "trust_remote_code": True,
+        "enforce_eager": enforce_eager,
+        "tensor_parallel_size": tensor_parallel_size,
+        "max_model_len": 512,
+        "max_num_seqs": 6,
+        "gpu_memory_utilization": gpu_memory_utilization,
         # The cache under test is AscendStore.  Keeping vLLM's in-engine
         # prefix cache enabled makes the second request a local hit
         # (need_to_load=0), which bypasses layerwise materialization entirely.
-        enable_prefix_caching=False,
-        compilation_config={"cudagraph_mode": "FULL_AND_PIECEWISE"},
-        kv_transfer_config={
+        "enable_prefix_caching": False,
+        "compilation_config": {"cudagraph_mode": "FULL_AND_PIECEWISE"},
+        "kv_transfer_config": {
             "kv_connector": "AscendStoreConnector",
             "kv_role": "kv_both",
             "kv_connector_extra_config": {
@@ -72,7 +71,7 @@ def run(
                 "layerwise_prefetch_layers": prefetch_layers,
             },
         },
-    )
+    }
     if torch_profile_dir is not None:
         llm_kwargs["profiler_config"] = {
             "profiler": "torch",

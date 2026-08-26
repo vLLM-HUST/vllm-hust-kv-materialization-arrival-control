@@ -5,9 +5,10 @@ from pathlib import Path
 from typing import Any
 
 from vllm_kv_materialization.policy import MaterializationSignals
-from vllm_kv_materialization.shared_workloads import generate_case_requests
-from vllm_kv_materialization.shared_workloads import load_workloads_module
-
+from vllm_kv_materialization.shared_workloads import (
+	generate_case_requests,
+	load_workloads_module,
+)
 
 WORKLOADS = load_workloads_module()
 
@@ -70,7 +71,7 @@ def workload_case_to_traces(case_id: str, *, seed: int) -> list[dict[str, Any]]:
 		overlap_bonus = 0.28 * overlap_ratio
 		exact_turn_bonus = 0.06 if metadata.turn_index > 0 else 0.0
 		reusable_ratio = min(0.88, primary_ratio + overlap_bonus + exact_turn_bonus)
-		reusable_tokens = int(round(request.prompt_len * reusable_ratio))
+		reusable_tokens = round(request.prompt_len * reusable_ratio)
 
 		rank_count = rank_counts.get(metadata.home_rank, 0)
 		queue_pressure = min(

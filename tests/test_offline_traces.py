@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-from vllm_kv_materialization.offline_traces import build_signals
-from vllm_kv_materialization.offline_traces import workload_case_to_traces
+from vllm_kv_materialization.offline_traces import (
+	build_signals,
+	workload_case_to_traces,
+)
 
 
 def test_workload_case_to_traces_emits_shared_workload_driven_rows() -> None:

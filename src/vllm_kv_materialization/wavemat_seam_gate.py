@@ -2,10 +2,9 @@ from __future__ import annotations
 
 import json
 import time
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
-
 
 VIOLATION_PARTIAL = "partial_layer_range"
 VIOLATION_STALE = "stale_generation"

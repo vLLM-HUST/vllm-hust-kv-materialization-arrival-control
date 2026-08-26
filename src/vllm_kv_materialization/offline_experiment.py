@@ -6,11 +6,12 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
-from vllm_kv_materialization.offline_traces import build_signals
-from vllm_kv_materialization.offline_traces import load_traces
-from vllm_kv_materialization.offline_traces import workload_case_to_traces
+from vllm_kv_materialization.offline_traces import (
+    build_signals,
+    load_traces,
+    workload_case_to_traces,
+)
 from vllm_kv_materialization.policy import MaterializationPolicy
-
 
 SAMPLE_TRACES: list[dict[str, Any]] = [
     {

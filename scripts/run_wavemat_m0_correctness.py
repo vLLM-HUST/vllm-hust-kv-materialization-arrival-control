@@ -7,7 +7,6 @@ import time
 from pathlib import Path
 from typing import Any
 
-
 SHARED_PREFIX = (
     "The history of computing spans many centuries and reflects the human desire "
     "to automate calculation and process information. Early mechanical devices "
