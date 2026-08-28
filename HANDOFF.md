@@ -36,6 +36,22 @@ aggregate-only 口径（39/102），不恢复 141 个 lifecycle 的逐请求复�
 下文保留的是 M2 之前的研究路线背景；其中“继续做强 partial reuse / deeper seam”不再是
 当前执行计划，除非未来提出 materially different mechanism 后重新预注册。
 
+## 负结果后的新研究合同（2026-08-28）
+
+当前只允许推进一个不同的、带前置门的研究问题：有限 paged-KV 容量下，局部最优的
+`always_full_reuse` 是否会因为占用、逐出 victim 或阻塞无缓存关键请求而产生跨请求外部性。
+这不是旧三动作控制器的改名或调参延续。
+
+执行必须以 `docs/FINITE_CACHE_REUSE_ADMISSION_CONTRACT.md` 为准。先做不包含新 treatment
+的 D0 固定策略 crossover 矩阵；`always_full_reuse` 仍是不可删除的强基线，offline future-aware
+oracle 只能作为上界。只有 D0 同时通过固定策略 winner switch、原生 block/victim/wait receipt、
+正确性和 cleanup 门，才允许另立 M1 方案。没有 crossover、静态容量/并发门已足够、receipt
+无法归因、或任何 ownership/stale/cleanup 错误都立即停止。
+
+证据标签必须保持 `real-online`、`replay`、`host-fixture`、`smoke`、`simulation`、
+`projected`、`derived-artifact` 分离；旧 M2 和 WaveMat 负结果继续成立。两周交付止于
+一次有原始记录和 Go/Stop verdict 的 D0，不以实现新策略为交付目标。
+
 ## 当前定位
 
 这个仓库已经转交给 `cao zhe` 同学继续推进，并已迁移到 `intellistream` 组织下；从研究视角看，它仍然属于 advanced incubation 阶段。

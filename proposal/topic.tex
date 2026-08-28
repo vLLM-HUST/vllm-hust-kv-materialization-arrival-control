@@ -26,10 +26,10 @@
 \setbeamercolor{block body}{fg=black,bg=ProposalBlueLight!55}
 \setbeamercolor{alerted text}{fg=ProposalRed}
 
-\title[KV物化控制]{面向多GPU大模型服务的自适应KV物化控制}
-\subtitle{为什么“有可复用状态”不等于“应该直接复用”}
+\title[有限缓存复用准入]{面向有限Paged-KV容量的跨请求复用准入}
+\subtitle{旧三动作控制器已关闭；先验证全复用是否产生可观测外部性}
 \author[KV Materialization]{vLLM KV Materialization Plugin}
-\date[2026年5月]{2026年5月}
+\date[2026年8月]{2026年8月}
 
 \begin{document}
 
@@ -46,27 +46,38 @@
 
   \vspace{0.5em}
   \begin{block}{核心系统问题}
-    当一个请求到达时，面对已有可复用状态，系统究竟应该：
-    \[
-      \texttt{full\_reuse} \qquad \texttt{partial\_reuse} \qquad \texttt{recompute}
-    \]
+    当多个可复用 session 在固定 KV block 预算下重叠时，
+    \texttt{always\_full\_reuse} 是否会逐出更高价值状态，或阻塞无缓存关键请求？
   \end{block}
 \end{frame}
 
 \begin{frame}{研究范围与论文主张}
   \begin{itemize}
-    \item 本仓库只研究一个很窄的控制点：\alert{请求到达时的KV物化决策}。
-    \item 不把问题扩展成调度器重写、placement策略、eviction控制或decode backend选择。
-    \item placement、迁移、内存压力只作为\alert{代价模型背景变量}存在，而不是本文主体。
+    \item M2 已证明旧 request-local 三动作控制器输给最强固定策略，禁止继续调阈值或挑 workload。
+    \item 新问题只研究\alert{有限缓存占用的跨请求外部性}，不扩展成通用调度器或状态管理。
+    \item connector 分支必须先有非零传输 bytes、queue wait、completion identity 和双 endpoint receipt。
   \end{itemize}
 
   \vspace{0.5em}
   \begin{block}{论文主张}
-    reuse 不是“发现了就该用”，而是一个需要被\alert{控制}的系统决策问题。
+    负结果只关闭旧机制；新的 admission 机制必须先由无 treatment 的固定策略 crossover 证明有必要。
   \end{block}
 \end{frame}
 
-\begin{frame}{三动作决策面}
+\begin{frame}{新主线必须先过 D0}
+  \begin{itemize}
+    \item 固定臂：\texttt{always\_full\_reuse}、\texttt{always\_recompute}、旧控制器、固定并发门、固定 KV block 门、原生 cache policy。
+    \item oracle：future-aware offline oracle 只给上界，不是 online treatment。
+    \item Go 门：至少两个预注册高压 cell 出现固定策略 winner switch，且全复用 p95 TTFT 至少差 10\% 或 SLO goodput 至少低 5\%。
+    \item 正确性：request/output、block/generation/owner/refcount、action receipt 与 cleanup 必须 100\% 一致。
+  \end{itemize}
+
+  \begin{block}{停止条件}
+    无 crossover、静态控制已匹配 oracle、原生 receipt 无法归因、或任何 stale/ABA/orphan/cleanup 错误，都在实现新 treatment 前停止。
+  \end{block}
+\end{frame}
+
+\begin{frame}{三动作决策面（旧机制，已关闭）}
   \begin{itemize}
     \item \texttt{full\_reuse}：直接兑现已有前缀/KV状态。
     \item \texttt{partial\_reuse}：只复用高价值前缀段，剩余尾部重新计算。
@@ -148,7 +159,7 @@
   \alert{一句话：offline证明“值得控制”，live验证“当前系统能否真正做到”。}
 \end{frame}
 
-\begin{frame}{当前系统已经做到什么}
+\begin{frame}{当前系统已经做到什么（历史证据）}
   \begin{itemize}
     \item 已完成三动作 offline policy 与 evaluator。
     \item 已接入 \texttt{llm-serving-workloads} 作为共享 workload source of truth。
@@ -164,7 +175,7 @@
   \end{block}
 \end{frame}
 
-\begin{frame}{真实实验设置}
+\begin{frame}{旧 M2 真实实验设置}
   \begin{itemize}
     \item 模型：Qwen2.5-7B-Instruct
     \item 运行环境：carrier内本地 vLLM runtime，开启 prefix caching

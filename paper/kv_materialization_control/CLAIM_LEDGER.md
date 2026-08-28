@@ -17,6 +17,9 @@
 | M2 扩展 workload 的 cost-model 排序 | simulation/model | supported at confirmation boundary：离线模型未预测任何 >=5% 收益，且 4 个晋级 workload 的五轮在线最佳固定策略均为 full reuse；不进行逐 workload 参数校准 | offline study → four confirmation verdicts |
 | M2 现有 catalog 显著正收益结论 | derived-artifact | negative/stop：14 个新 canonical workload 完成 pilot，4 个晋级者全部完成五轮确认；102/102 lifecycle、6192/6192 请求有效，未发现 >=5% 且单侧 95% 上界低于 0 的 workload；停止 post-hoc 搜索和调参。证据边界：该 102/102 lifecycle 为 aggregate-only supporting evidence（逐 run 聚合 + verdict，raw bundle 原存执行机 /tmp、现已不可取回），不参与 fresh-clone 逐请求复核声明 | `experiments/results/m2_catalog_closure_20260803/README.md`, `mechanism_breakdown.csv` |
 | M2 issue #3 完整闭合：20 个 workload 的收益边界总账与继续/停止判断 | derived-artifact | negative/stop（verdict 固定为 `stop_mechanism_direction`）：2 个主矩阵 workload 均 fallback_or_no_gain；18 个扩展 workload 中晋级者五轮确认全部为负；141/141 lifecycle、8208/8208 请求。证据边界：39/141 lifecycle 仓内 raw 可逐请求复核（并归档于 release `m2-issue3-closure-evidence-20260811`），102/141 为 aggregate-only supporting evidence，39/102 口径在 102 个 raw bundle 归档前保持不变 | `experiments/M2_ISSUE_CLOSURE.md` + 各 `results/m2_*/` 生成物 + `experiments/RELEASE_MANIFEST.md` |
+| 有限缓存 reuse-admission 的固定策略 crossover | real-online | pending/D0：尚未观察到；不得从旧 M2、WaveMat、simulation 或 synthetic overlay 推断 | `docs/FINITE_CACHE_REUSE_ADMISSION_CONTRACT.md` |
+| 边际外部性 admission treatment 的服务收益 | real-online | blocked by D0：D0 通过前不得实现或宣称；若进入 M1，必须相对最强 deployable baseline 达到至少 5% SLO-goodput 提升、aggregate p95 回退不超过 5%、正确性与 cleanup 100% | future held-out M1 artifacts only |
+| connector materialization burst pathology | real-online | unestablished：本地 prefix-cache reuse 不是 connector/DMA 证据；没有非零 requested/realized bytes、queue wait、completion identity 和双 endpoint receipt 就停止该分支 | future conditional D0 receipt only |
 
 生成的 `claim_ledger.json` 是该轮结果的机器可读 ledger。requested action 仍不得写成
 realized reuse；例如 tool controller 的 lifecycle 中位 applied mix 是 8/8/16

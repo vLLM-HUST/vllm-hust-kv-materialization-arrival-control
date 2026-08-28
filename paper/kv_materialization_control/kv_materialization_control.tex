@@ -11,7 +11,7 @@
 \usepgfplotslibrary{groupplots}
 \pgfplotsset{compat=1.18}
 
-\title{Adaptive KV Materialization Control for Multi-GPU LLM Serving}
+\title{From Request-Local KV Reuse to Finite-Cache Reuse Admission}
 
 \author{\IEEEauthorblockN{Anonymous Artifact Draft}}
 
@@ -30,7 +30,7 @@ recompute from scratch? This artifact studies that narrow three-action control
 surface. Its workload-driven offline path evaluates the arrival-time decision
 surface over named shared cases from \texttt{llm-serving-workloads}; its live
 path documents what the current out-of-tree vLLM seam actually realizes online.
-The resulting claim boundary is explicit: the runtime realizes native
+The resulting historical claim boundary is explicit: the runtime realizes native
 \texttt{full\_reuse}/\texttt{recompute} and block-aligned segmented
 \texttt{partial\_reuse}, while scheduler-owned counters distinguish requested,
 effective, and realized actions. In a preregistered 18-lifecycle online matrix,
@@ -42,6 +42,11 @@ negative result and fix the preregistered verdict as
 per-workload tuning or post-hoc workload search. Raw-bundle evidence covers 39
 of the 141 completed lifecycles; the remaining 102 are aggregate-only
 supporting evidence, and this paper keeps that 39/102 reproducibility boundary.
+The negative result motivates a different, still-unproven question: whether
+full-reuse occupancy under finite paged-KV capacity creates a cross-request
+victim or SLO externality. We preregister a treatment-free fixed-policy
+crossover gate before any adaptive admission mechanism; this draft makes no
+claim that the crossover or treatment benefit has been observed.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -83,6 +88,14 @@ admission affects which work enters the system; memory evolution affects how
 state is written, retained, or retired over time. Our question begins after
 reusable state is already available and asks whether realizing it at request
 arrival is worth the cost.
+
+The completed online evidence rejects that request-local controller as an
+optimization direction on the tested carrier. The post-negative question
+therefore changes the decision object rather than retuning it: can retaining
+locally useful full-prefix state impose a measurable eviction, residence, or
+deadline externality on concurrent requests under a fixed paged-KV budget?
+This possibility was not measured by the old experiment and remains gated by a
+treatment-free fixed-policy crossover study.
 
 The systems hypothesis is straightforward: the best action depends on the
 tradeoff between recomputation work and realization overhead. Realization
@@ -597,6 +610,24 @@ submission-oriented tuning of this controller. The conclusion is bounded to
 the matched model/runtime/catalog tested here, not a universal impossibility
 theorem. Reopening the question would require a materially different mechanism
 or workload semantics, not another sweep of the present cost knobs.
+
+\subsection{Post-negative finite-cache contract}
+The only admitted reframe first compares \texttt{always\_full\_reuse},
+\texttt{always\_recompute}, the frozen old controller, fixed concurrency and
+KV-block caps, and the unmodified native cache policy under matched low/high
+overlap and roomy/constrained capacity. A future-aware oracle is an offline
+upper bound only. No treatment is implemented in D0.
+
+D0 requires \texttt{always\_full\_reuse} to retain at least one low-pressure
+win while another fixed deployable arm wins at least two preregistered
+constrained-overlap cells. In those cells, full reuse must have at least 10\%
+worse p95 TTFT or at least 5\% lower SLO goodput, explained by native block,
+victim, residence, wait, action, and cleanup receipts with 100\% correctness.
+Otherwise the reframe stops. Only after D0 passes may a held-out M1 evaluate a
+marginal-externality admission rule; M1 requires at least 5\% SLO-goodput gain,
+no more than 5\% aggregate p95 regression, and zero correctness or cleanup
+errors. Full details, evidence labels, hard stops, and the two-week delivery are
+frozen in \path{docs/FINITE_CACHE_REUSE_ADMISSION_CONTRACT.md}.
 
 \bibliographystyle{IEEEtran}
 \bibliography{kv_materialization_control}

@@ -1,12 +1,26 @@
 # KV Materialization Arrival Control
 
-This repository studies the request-arrival decision among full reuse,
-block-aligned partial reuse, and recomputation. It is distinct from
+The completed M2 study closes the request-local decision among full reuse,
+block-aligned partial reuse, and recomputation: `always_full_reuse` won all six
+matched rounds, so that controller must not be revived through threshold or
+workload tuning.
+
+The next research question is conditional and cross-request: under a fixed
+paged-KV block budget, can accepting every available full-prefix reuse evict
+more valuable state or delay uncached, deadline-critical requests? No adaptive
+reuse-admission mechanism is admitted until a treatment-free D0 matrix shows a
+repeatable fixed-policy crossover with native occupancy, victim, action, and
+cleanup receipts. The complete seven-question contract, baselines, oracle,
+performance gates, stop rules, evidence labels, and two-week delivery are in
+[`docs/FINITE_CACHE_REUSE_ADMISSION_CONTRACT.md`](docs/FINITE_CACHE_REUSE_ADMISSION_CONTRACT.md).
+
+This repository is distinct from
 `intellistream/kv-materialization-scheduling`, which studies cross-request
 resource coordination and scheduling.
 
-This repository studies one narrow control point in vLLM serving: arrival-time
-KV materialization decisions.
+The retained artifact studies one narrow control point in vLLM serving:
+arrival-time KV materialization decisions. The reframe asks whether their
+finite-cache occupancy creates a measurable cross-request externality.
 
 For an incoming request with reusable prefix or KV state already available, the
 controller chooses exactly one action:
@@ -15,9 +29,10 @@ controller chooses exactly one action:
 - `partial_reuse`
 - `recompute`
 
-Everything in this repository should stay subordinate to that question. This is
-not a general admission-control repository, not an online memory-evolution
-repository, and not a generic state-management repository.
+These actions remain the historical M2 action space, not the next treatment.
+Everything in this repository stays subordinate to the bounded reuse-admission
+question. This is not general admission control, online memory evolution, or
+generic state management.
 
 ## Reference Paper
 
