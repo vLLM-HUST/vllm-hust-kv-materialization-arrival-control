@@ -13,44 +13,44 @@ Database file #1: kv_materialization_control.bib
 -- See the "IEEEtran_bst_HOWTO.pdf" manual for usage information.
 
 Done.
-You've used 3 entries,
+You've used 10 entries,
             4087 wiz_defined-function locations,
-            830 strings with 7550 characters,
-and the built_in function-call counts, 1094 in all, are:
-= -- 63
-> -- 10
-< -- 0
-+ -- 6
-- -- 2
-* -- 50
-:= -- 181
-add.period$ -- 6
-call.type$ -- 3
-change.case$ -- 3
-chr.to.int$ -- 0
-cite$ -- 3
-duplicate$ -- 97
-empty$ -- 125
-format.name$ -- 3
-if$ -- 234
+            872 strings with 9081 characters,
+and the built_in function-call counts, 6733 in all, are:
+= -- 516
+> -- 134
+< -- 36
++ -- 78
+- -- 31
+* -- 326
+:= -- 1050
+add.period$ -- 20
+call.type$ -- 10
+change.case$ -- 12
+chr.to.int$ -- 96
+cite$ -- 10
+duplicate$ -- 490
+empty$ -- 635
+format.name$ -- 33
+if$ -- 1554
 int.to.chr$ -- 0
-int.to.str$ -- 3
-missing$ -- 20
-newline$ -- 32
-num.names$ -- 1
-pop$ -- 64
+int.to.str$ -- 10
+missing$ -- 91
+newline$ -- 63
+num.names$ -- 10
+pop$ -- 234
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 2
-skip$ -- 83
+skip$ -- 518
 stack$ -- 0
-substring$ -- 3
-swap$ -- 44
-text.length$ -- 0
+substring$ -- 254
+swap$ -- 339
+text.length$ -- 4
 text.prefix$ -- 0
 top$ -- 5
-type$ -- 3
+type$ -- 10
 warning$ -- 0
-while$ -- 1
-width$ -- 4
-write$ -- 42
+while$ -- 26
+width$ -- 12
+write$ -- 123

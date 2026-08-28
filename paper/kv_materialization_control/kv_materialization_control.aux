@@ -16,47 +16,45 @@
 \gdef\HyperFirstAtBeginDocument#1{#1}
 \providecommand\HyField@AuxAddToFields[1]{}
 \providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{vllm2023,lmcache}
+\citation{kvpr2025,ellm2026}
+\citation{cacheblend2025,cacheslide2026}
 \citation{distserve2024,mooncake2025}
-\citation{leap2024}
+\citation{lmcache}
+\citation{kvpr2025}
+\citation{ellm2026}
+\citation{vllm2023}
+\citation{lmcache}
+\citation{vllmkvconnector}
+\citation{kvpr2025}
+\citation{ellm2026}
+\citation{cacheblend2025}
+\citation{cacheslide2026}
+\citation{distserve2024}
+\citation{mooncake2025}
+\citation{h2o2023}
 \@writefile{toc}{\contentsline {section}{\numberline {I}Introduction}{1}{section.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {II}Problem Formulation}{1}{section.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-A}}Signals and Objective}{2}{subsection.2.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-B}}Why Partial Reuse Matters}{2}{subsection.2.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-C}}Current Partial-Reuse Boundary}{2}{subsection.2.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {III}Design Perspective}{2}{section.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {IV}Methodology}{2}{section.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-A}}Policy Families}{3}{subsection.4.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}Sensitivity and Interpretation}{3}{subsection.4.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Workload Source of Truth}{3}{subsection.4.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-D}}Baselines}{3}{subsection.4.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-E}}Research Questions}{3}{subsection.4.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-F}}Current Evidence Scope}{3}{subsection.4.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {V}Live Runtime Boundary}{3}{section.5}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Representative live runtime-boundary matrix.}}{4}{table.1}\protected@file@percent }
-\newlabel{tab:live-matrix}{{I}{4}{Representative live runtime-boundary matrix}{table.1}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Additional live boundary cases on the segmented seam, including the tokenizer-faithful dynamic-RAG rerun.}}{4}{table.2}\protected@file@percent }
-\newlabel{tab:live-boundary-cases}{{II}{4}{Additional live boundary cases on the segmented seam, including the tokenizer-faithful dynamic-RAG rerun}{table.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-A}}Fallback Taxonomy}{4}{subsection.5.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Representative Live Matrix}{4}{subsection.5.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-C}}Observed and Effective Actions}{4}{subsection.5.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-D}}M2 Fixed-Policy Benefit Boundary}{4}{subsection.5.4}\protected@file@percent }
-\citation{distserve2024,mooncake2025}
-\citation{leap2024}
-\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Median per-lifecycle M2 controller mechanism decomposition. Avoided prefill and recomputed-tail values come from engine counters, not requested actions. Performance columns are mean matched deltas against the best fixed policy; positive latency deltas and negative RPS deltas are regressions. Peak cache is the maximum runtime cache-usage fraction. R/P/F denotes recompute/partial/full. Realign counts block-boundary alignment; To full and To recompute count the corresponding dominance and collapse fallback reasons.}}{5}{table.3}\protected@file@percent }
-\newlabel{tab:m2-mechanism}{{III}{5}{Median per-lifecycle M2 controller mechanism decomposition. Avoided prefill and recomputed-tail values come from engine counters, not requested actions. Performance columns are mean matched deltas against the best fixed policy; positive latency deltas and negative RPS deltas are regressions. Peak cache is the maximum runtime cache-usage fraction. R/P/F denotes recompute/partial/full. Realign counts block-boundary alignment; To full and To recompute count the corresponding dominance and collapse fallback reasons}{table.3}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {VI}Offline Decision Study}{5}{section.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {VII}Related Work Perspective}{5}{section.7}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Workload shorthand used in Figure\nobreakspace  {}\ref  {fig:offline-decision-mix}. The default workload matrix still comes directly from \texttt  {llm-serving-workloads}; the paper uses compact Q-codes only to keep the figure legible.}}{6}{table.4}\protected@file@percent }
-\newlabel{tab:offline-workload-key}{{IV}{6}{Workload shorthand used in Figure~\ref {fig:offline-decision-mix}. The default workload matrix still comes directly from \texttt {llm-serving-workloads}; the paper uses compact Q-codes only to keep the figure legible}{table.4}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Per-workload decision mix for representative offline policies, using the Q-code shorthand from Table\nobreakspace  {}\ref  {tab:offline-workload-key}. The main pattern is still not a broad partial-reuse win: most workloads remain full-reuse dominant and the threshold baseline still over-selects partial reuse, but the confidence-aware oracle now exposes a small, workload-specific partial-reuse region instead of collapsing entirely to the endpoints.}}{6}{figure.1}\protected@file@percent }
-\newlabel{fig:offline-decision-mix}{{1}{6}{Per-workload decision mix for representative offline policies, using the Q-code shorthand from Table~\ref {tab:offline-workload-key}. The main pattern is still not a broad partial-reuse win: most workloads remain full-reuse dominant and the threshold baseline still over-selects partial reuse, but the confidence-aware oracle now exposes a small, workload-specific partial-reuse region instead of collapsing entirely to the endpoints}{figure.1}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {VIII}Artifact Boundary}{6}{section.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {IX}Current Contributions}{6}{section.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {II}Design: Scope and Runtime Boundary}{1}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {III}Closest Work and Non-Claims}{1}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {IV}Evidence Classes and Method}{1}{section.4}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Closest-work comparison. Granularity and decision time describe the mechanism actually studied, not a claim of feature parity.}}{2}{table.1}\protected@file@percent }
+\newlabel{tab:comparison}{{I}{2}{Closest-work comparison. Granularity and decision time describe the mechanism actually studied, not a claim of feature parity}{table.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {V}Evaluation: Repeated Online Negative Boundary}{2}{section.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {VI}Graph/Eager Diagnostic Boundary}{2}{section.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {VII}Limitations, Provenance, and Conclusion}{2}{section.7}\protected@file@percent }
 \bibstyle{IEEEtran}
 \bibdata{kv_materialization_control}
-\bibcite{distserve2024}{1}
-\bibcite{mooncake2025}{2}
-\bibcite{leap2024}{3}
-\@writefile{toc}{\contentsline {section}{\numberline {X}Limitations and Direction Decision}{7}{section.10}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{References}{7}{section*.1}\protected@file@percent }
-\gdef \@abspage@last{7}
+\bibcite{vllm2023}{1}
+\bibcite{lmcache}{2}
+\bibcite{kvpr2025}{3}
+\bibcite{ellm2026}{4}
+\bibcite{cacheblend2025}{5}
+\bibcite{cacheslide2026}{6}
+\bibcite{distserve2024}{7}
+\bibcite{mooncake2025}{8}
+\bibcite{vllmkvconnector}{9}
+\bibcite{h2o2023}{10}
+\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Median per-lifecycle online mechanism decomposition. Engine counters, not requested actions, define avoided prefill and recomputed tail. Positive latency deltas and negative RPS deltas are regressions.}}{3}{table.2}\protected@file@percent }
+\newlabel{tab:m2-mechanism}{{II}{3}{Median per-lifecycle online mechanism decomposition. Engine counters, not requested actions, define avoided prefill and recomputed tail. Positive latency deltas and negative RPS deltas are regressions}{table.2}{}}
+\@writefile{toc}{\contentsline {section}{References}{3}{section*.1}\protected@file@percent }
+\gdef \@abspage@last{3}
