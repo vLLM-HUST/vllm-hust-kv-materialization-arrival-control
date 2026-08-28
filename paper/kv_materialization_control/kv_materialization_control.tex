@@ -97,21 +97,21 @@ deadline externality on concurrent requests under a fixed paged-KV budget?
 This possibility was not measured by the old experiment and remains gated by a
 treatment-free fixed-policy crossover study.
 
-The systems hypothesis is straightforward: the best action depends on the
-tradeoff between recomputation work and realization overhead. Realization
-overhead can include transfer latency, bytes moved, device memory pressure, and
-stitching cost. Recompute cost depends on prompt length, model throughput, and
-request urgency. Because these factors vary across workloads, a serving stack
-needs an explicit materialization controller instead of a fixed ``always reuse''
-rule.
+Historically, we hypothesized that request-varying recomputation and realization
+costs required an explicit three-action controller. M2 rejects that mechanism
+on the tested carrier: the controller loses to \texttt{always\_full\_reuse} in
+all six matched rounds. We therefore do not tune that controller or its
+thresholds further. The active hypothesis is instead a finite-cache externality
+question, and remains unobserved pending a treatment-free fixed-policy D0.
 
 In contrast to a broad scheduler redesign, this paper targets one narrow and
 measurable hook. The benefit of that choice is methodological: it keeps the
 artifact honest about what is being optimized, and it makes offline and online
 evidence easier to interpret.
 
-\section{Problem Formulation}
-We study a single-hook decision problem at request arrival. For each incoming
+\section{Completed Historical Formulation}
+The following formulation records the closed mechanism evaluated by M2; it is
+not the current research direction. For each incoming
 request, the runtime observes a candidate reusable prefix together with signals
 about prefix length, estimated recomputation work, and estimated realization
 cost. The controller then chooses one of three actions:
@@ -178,7 +178,7 @@ the observed decision separate from the effective action and records when a
 block-aligned \texttt{partial\_reuse} cut point is realigned, dominated by
 \texttt{full\_reuse}, or collapses to \texttt{recompute}.
 
-\section{Design Perspective}
+\section{Historical Design Perspective}
 The design goal is not to maximize reuse rate. The design goal is to minimize
 request latency subject to the actual cost of realizing reusable state. From
 this perspective, full reuse is only one candidate action, not the default
@@ -200,8 +200,10 @@ live run that only observes decisions without enforcing them is useful for
 validating workload entry, prompt geometry, and service-side constraints, but
 it is not yet evidence that the controller changed runtime behavior.
 
-\section{Methodology}
-This artifact uses two evaluation layers and keeps them separate.
+\section{Completed Historical Methodology}
+The old controller study used two evaluation layers and kept them separate.
+This methodology is retained to explain the negative result, not as an
+imperative plan for further controller, seam, or threshold work.
 
 The first layer is a workload-driven offline decision study over named shared
 cases from \texttt{llm-serving-workloads}. This layer is used to compare the
@@ -248,7 +250,7 @@ It uses a fixed breakpoint to decide whether to fully reuse, partially reuse,
 or recompute. Its role is not to be optimal, but to provide a simple selective
 materialization baseline that is more expressive than binary reuse.
 
-\textbf{Adaptive heuristic.} This is the main policy under study. It uses the
+\textbf{Adaptive heuristic.} This was the main policy in the closed M2 study. It uses the
 signals in Section III-A to estimate whether full realization, partial
 realization, or recomputation has the highest utility for the arriving
 request. Unlike the threshold baseline, it can change its choice with queue
@@ -291,8 +293,8 @@ not to claim a sophisticated scheduler or memory manager, but to ask whether a
 runtime can outperform static materialization rules once realization cost is
 made explicit.
 
-\subsection{Research Questions}
-The methodology is organized around three concrete questions:
+\subsection{Historical Research Questions (Closed)}
+The completed M2 methodology was organized around three concrete questions:
 
 \begin{itemize}[leftmargin=1.5em]
 \item \textbf{RQ1:} Do workload-grounded request-arrival traces actually
@@ -305,11 +307,27 @@ still falls back, is the dominant remaining gap policy quality or runtime
 support for exact segmented materialization?
 \end{itemize}
 
-These questions keep the paper aligned with its intended contribution. This is
-not a broad online-serving optimization claim. It is a study of whether
-request-arrival KV materialization is a real control problem, whether simple
-controllers can solve a useful fraction of it, and where the current runtime
-boundary still prevents realization.
+M2 closes these questions as an optimization route on the tested carrier. They
+are retained only to explain what was tested and why the negative result rules
+out more threshold tuning or seam continuation under the same protocol.
+
+\subsection{Active Research Questions and D0 Methodology}
+The active study asks three different questions. \textbf{RQ1:} under fixed
+paged-KV capacity, does always fully reusing locally available state create a
+reproducible victim-residency, queue-wait, or deadline externality for concurrent
+requests? \textbf{RQ2:} does the winner switch across preregistered low/high
+overlap and roomy/constrained cells when comparing only deployable fixed
+policies? \textbf{RQ3:} can native block, victim, residence, wait, action,
+completion-identity, and cleanup receipts causally explain that switch?
+
+D0 contains no adaptive treatment. It matches the request set, order, model,
+runtime, concurrency, and KV-block cap across \texttt{always\_full\_reuse},
+\texttt{always\_recompute}, the frozen old controller, fixed capacity/concurrency
+gates, and the unmodified native cache policy. A future-aware oracle is an
+offline upper bound only. The finite-cache externality remains unobserved until
+this fixed-policy crossover passes its correctness, provenance, performance,
+and stop gates. Implementation and experiments remain the student owner's
+responsibility.
 
 \subsection{Current Evidence Scope}
 The repository currently supports a catalog-driven offline decision matrix that
@@ -540,9 +558,11 @@ Two threads are most relevant to this artifact.
 First, recent LLM-serving systems such as DistServe and Mooncake make reuse
 realization costs explicit by exposing remote or disaggregated state movement
 instead of hiding all reuse behind a local cache abstraction~\cite{distserve2024,mooncake2025}.
-These systems motivate why request-arrival materialization needs an explicit
-controller: reusable KV state may save computation, but realizing it can also
-consume bandwidth, increase startup latency, or amplify memory pressure.
+These systems motivate measuring realization cost and finite-capacity
+externalities explicitly. They do not rescue the rejected request-local
+controller: reusable KV state may save computation, but retaining or realizing
+it can also consume bandwidth, displace blocks, increase queue wait, or amplify
+memory pressure.
 
 Second, this artifact borrows its decision perspective from selective
 materialization work outside LLM serving. LEAP frames materialization as a
@@ -550,9 +570,10 @@ cost-sensitive online choice rather than a static yes-or-no optimization
 target~\cite{leap2024}. We borrow that viewpoint, not the domain mechanism.
 Our problem is not video-view sampling, but arrival-time KV-state realization
 with a three-action space of \texttt{full\_reuse}, \texttt{partial\_reuse},
-and \texttt{recompute}. The connection matters because it clarifies the paper's
-intended contribution: a serving-time selective materialization controller,
-not merely another prefix-cache hit study.
+and \texttt{recompute}. The connection explains the historical controller
+formulation. The current contribution is the negative mechanism boundary plus
+a falsifiable fixed-policy test for a distinct finite-cache externality, not a
+claim that a new controller already exists.
 
 \section{Artifact Boundary}
 This repository intentionally separates decision-side evidence from live runtime
@@ -575,22 +596,17 @@ bundles are archived to a persistent, content-addressed location.
 
 \section{Current Contributions}
 \begin{enumerate}[leftmargin=1.5em]
-\item A precise systems formulation of request-arrival KV materialization as a
-three-action control problem.
-\item A selective-materialization view of reuse that evaluates whether and how
-much reusable KV state should be realized, rather than treating reuse as a
-binary cache event.
-\item A workload-driven decision matrix sourced directly from the default
-shared benchmark case order in \texttt{llm-serving-workloads}, avoiding a
-second repo-local default workload subset.
-\item An explicit evidence boundary separating offline decision-surface claims
-from live runtime-boundary claims.
-\item A scheduler-accounted online implementation that separates requested,
-effective, and realized actions and measures lookup, alignment, commit, tail,
-and cache costs.
-\item A preregistered fixed-policy boundary study whose negative result stops
-the current mechanism direction: the controller loses to
-\texttt{always\_full\_reuse} in all six matched rounds.
+\item A preregistered negative result that closes the request-local three-action
+controller and its threshold/seam continuation: it loses to
+\texttt{always\_full\_reuse} in all six matched M2 rounds.
+\item An explicit evidence boundary separating offline, live-runtime, replay,
+host-fixture, simulation, projected, and derived evidence, including the
+39-lifecycle raw-bundle versus 102-lifecycle aggregate-only provenance limit.
+\item A new, falsifiable finite-cache externality question with mandatory strong
+fixed baselines, native causal receipts, correctness oracle, performance gate,
+hard stops, and a two-week D0 delivery contract.
+\item A treatment-free D0 admission rule: no adaptive mechanism is admitted
+unless a preregistered fixed-policy winner switch is observed and explained.
 \end{enumerate}
 
 \section{Limitations and Direction Decision}

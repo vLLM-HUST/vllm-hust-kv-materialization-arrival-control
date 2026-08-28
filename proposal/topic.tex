@@ -156,7 +156,7 @@
   \end{columns}
 
   \vspace{0.5em}
-  \alert{一句话：offline证明“值得控制”，live验证“当前系统能否真正做到”。}
+  \alert{历史边界：offline只给决策上界；M2已证明旧控制器未胜过最强固定策略。}
 \end{frame}
 
 \begin{frame}{当前系统已经做到什么（历史证据）}
@@ -200,7 +200,7 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{真实实验结果一：知识服务四格矩阵}
+\begin{frame}{历史 M2 结果一：知识服务四格矩阵}
   \begin{columns}[T]
     \begin{column}{0.57\textwidth}
       \begin{tikzpicture}
@@ -238,13 +238,15 @@
 
       \vspace{0.7em}
       \begin{block}{结论}
-        knowledge-service 上最优点仍是\textbf{新 tuned}；同时 \textbf{新 baseline} 也比 \textbf{旧 baseline} 的 mean/p95 分别低约 7\%/7\%。这说明更强的 runtime seam 在温和 guardrail 下也能带来正收益。
+        该四格矩阵只记录旧 seam/guardrail 的历史差异；后续 matched M2 中
+        \texttt{always\_full\_reuse} 胜过旧 controller，因此不能把局部 tuned 点写成
+        controller 或 seam 的进行中正收益。
       \end{block}
     \end{column}
   \end{columns}
 \end{frame}
 
-\begin{frame}{真实实验结果二：Tool-Scaffold}
+\begin{frame}{历史 M2 结果二：Tool-Scaffold}
   \begin{columns}[T]
     \begin{column}{0.57\textwidth}
       \begin{tikzpicture}
@@ -282,13 +284,14 @@
 
       \vspace{0.7em}
       \begin{block}{结论}
-        tool-scaffold 上，\textbf{旧 baseline} 仍是 mean/throughput 最优点；但新 seam 已把 \textbf{旧 tuned} 的负结果明显拉回，并让 \textbf{新 tuned} 在 p95 上成为最佳。这说明收益已经变成\textbf{workload-dependent}，不能再写成“全面变好”。
+        该结果属于旧机制诊断，不能据此继续调 threshold、guardrail 或 runtime seam。
+        最终 matched M2 关闭旧 controller；这些数字不构成新机制 admission。
       \end{block}
     \end{column}
   \end{columns}
 \end{frame}
 
-\begin{frame}{新增真实 workload：online 证据更完整}
+\begin{frame}{历史 runtime-boundary workload 证据}
   \scriptsize
   \begin{tabular}{p{0.28\textwidth}rrrrp{0.2\textwidth}}
     \toprule
@@ -308,9 +311,9 @@
   \vspace{0.2em}
   \begin{block}{这页想说明什么}
     \begin{itemize}
-      \item 这两组新增 live workload 不是 offline proxy，而是真实 Qwen2.5-7B 在线服务跑出来的结果。
-      \item 其中前两个 case 的 observed/effective action 都稳定落到 \texttt{partial\_reuse}，说明新 seam 已不只是“看到 partial”，而是能把 partial 真正 materialize 出来。
-      \item dynamic RAG 则补上了第三种真实 online 证据：当 retrieval overlap 在后续轮次继续增大时，系统会从首轮 \texttt{partial\_reuse} 自然切到后续轮次 \texttt{full\_reuse}。
+      \item 这些是真实 Qwen2.5-7B runtime-boundary 记录，但只证明旧动作被执行。
+      \item effective \texttt{partial\_reuse} 不是 controller 获益证据，也不重开旧机制。
+      \item dynamic RAG 只补充 tokenizer 与动作 provenance，不支持新的性能 claim。
     \end{itemize}
   \end{block}
 \end{frame}
@@ -332,9 +335,9 @@
       \small
       \begin{alertblock}{主因判断}
         \begin{enumerate}
-          \item 新 segmented seam 确实把旧 tuned 的负结果拉回到了可竞争区间，这说明此前主要瓶颈在 runtime realization。
-          \item dynamic RAG 的修正 rerun 说明：真实 online 失败有时并不是 policy 或模型窗口本身的问题，而是 workload token budget 是否与真实 tokenizer 对齐。
-          \item 因此更合理的论文结论应是：\textbf{runtime seam、guardrail 与 workload construction fidelity 联合作用}，并且收益具有 workload dependence。
+          \item 旧 seam、guardrail 与 tokenizer fidelity 会影响观测，但不改变 M2 的停止结论。
+          \item dynamic RAG 修正只关闭 workload construction 的 provenance 缺口。
+          \item 不再把 runtime realization 或温和 guardrail 作为进行中机制路线。
         \end{enumerate}
       \end{alertblock}
     \end{column}
@@ -351,34 +354,35 @@
       \item 它确实在测试一个 block-aligned segmented prefix-cache runtime seam；
       \item 但它还没有进入 connector-backed KV transfer/materialization 路径。
     \end{itemize}
-    \item 这次四格矩阵表明：更强的 runtime seam 足以把 tuned partial 的 live 性能显著拉回，但是否超过 baseline 仍取决于 guardrail 与 workload 形态。
+    \item 四格矩阵仅为旧机制历史诊断；它不能推翻 matched M2 的负结果。
   \end{itemize}
 
   \vspace{0.5em}
   \begin{block}{更准确的结论}
-    现阶段 online 结果说明的是：\alert{runtime realization 与 guardrail 共同决定收益}；更强的 seam 让 \texttt{partial\_reuse} 重新变得可竞争，但 paper claim 必须保持 workload-dependent。
+    现阶段可支持的结论是：\alert{旧 controller 与阈值路线已关闭}；有限缓存外部性仍未观察到。
   \end{block}
 \end{frame}
 
 \begin{frame}{下一步工作}
   \begin{itemize}
-    \item 方向一：继续沿 carrier seam 把 block-aligned segmented path 推向 connector-backed、exact token-level 的 materialization path。
-    \item 方向二：做更温和的参数扫描，明确 \texttt{partial\_reuse} 的 guardrail 何时应保留 \texttt{full\_reuse}/\texttt{recompute}。
-    \item 方向三：若环境允许，接入显式 \texttt{kv\_transfer\_config} 与 connector-backed path，验证 transfer 成本是否能被控制策略真正利用。
+    \item 学生 owner 只执行预注册、无新 treatment 的 D0 fixed-policy crossover。
+    \item 强基线必须包含 \texttt{always\_full\_reuse}、\texttt{always\_recompute}、冻结旧 controller、固定容量/并发门和原生 cache policy。
+    \item D0 保存原生 block/victim/residency/wait/action/completion/cleanup receipt；future-aware oracle 仅作离线上界。
+    \item 若没有固定策略 winner switch，或无法由 receipt 解释，立即停止有限缓存新假设；不得回到阈值、seam 或 connector 调优。
   \end{itemize}
 
   \vspace{0.6em}
   \begin{block}{答辩时最重要的一句话}
-    这项工作的难点不是“找重叠”，而是\alert{把有价值的重叠以正确代价兑现出来}。
+    当前唯一问题是：\alert{full reuse 在有限缓存下是否对并发请求产生可测外部性}；答案尚未知。
   \end{block}
 \end{frame}
 
 \begin{frame}{总结}
   \begin{enumerate}
-    \item arrival-time KV materialization 应被建模为三动作控制问题，而不是默认“有reuse就直接用”。
-    \item offline 结果已经证明这个决策面有研究价值。
-    \item 最新真实实验说明：把 carrier seam 推进到 segmented tail path 后，旧 tuned 的负结果被显著拉回，但不同 workload 对 baseline/tuned guardrail 的偏好并不相同。
-    \item 因此后续工作的重点仍是\alert{runtime realization seam + 温和guardrail}，并以 workload-dependent 的方式陈述 live 证据，而不是把它写成统一正收益。
+    \item M2 已关闭旧 request-local 三动作 controller、旧阈值和 seam continuation。
+    \item 新主线是尚未观察到的有限缓存跨请求外部性，不是对旧机制重新调参。
+    \item D0 不含 adaptive treatment；只有原生 receipt 支持的 fixed-policy crossover 才能 admit M1。
+    \item 实施、环境、实验与结果生成仍由学生 owner 完成；失败门触发即停止。
   \end{enumerate}
 \end{frame}
 
