@@ -1,0 +1,18 @@
+Script started on 2026-08-29 22:49:39+08:00 [<not executed on terminal>]
+Running TeX ...
+warning: kv_materialization_control.tex:322: Underfull \hbox (badness 1515) in paragraph at lines 315--322
+warning: kv_materialization_control.tex:635: Underfull \hbox (badness 6412) in paragraph at lines 630--635
+Running BibTeX on kv_materialization_control.aux ...
+Rerunning TeX because bibtex was run ...
+warning: kv_materialization_control.tex:322: Underfull \hbox (badness 1515) in paragraph at lines 315--322
+warning: kv_materialization_control.tex:635: Underfull \hbox (badness 6412) in paragraph at lines 630--635
+warning: warnings were issued by the TeX engine; use --print and/or --keep-logs for details.
+Running xdvipdfmx ...
+Writing `kv_materialization_control.out` (4.8330078125 KiB)
+Writing `kv_materialization_control.pdf` (87.5908203125 KiB)
+Writing `kv_materialization_control.log` (26.955078125 KiB)
+Writing `kv_materialization_control.aux` (6.744140625 KiB)
+Writing `kv_materialization_control.blg` (417 B)
+Writing `kv_materialization_control.bbl` (1.16015625 KiB)
+
+Script done on 2026-08-29 22:49:42+08:00 [COMMAND_EXIT_CODE="0"]

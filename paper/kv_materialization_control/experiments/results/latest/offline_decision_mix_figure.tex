@@ -1,0 +1,22 @@
+% Historical generated artifact recovered from repository commit
+% 32f42772e861e3ca7a08a91328bcb285f9a1b7a0. No experiment was rerun.
+\begin{figure}[t]
+\centering
+\footnotesize
+\begin{tikzpicture}
+\begin{axis}[
+xbar, bar width=5pt, width=0.80\columnwidth, height=0.23\textheight,
+xmin=0, xmax=100, xlabel={Requests selecting partial reuse (\%)},
+symbolic y coords={{Synthetic prefix},{Shared multi-tenant},{Shared memory write},{ShareGPT control},{Session maintenance},{Multi-tenant prefix},{Memory write},{Async document}},
+ytick=data, yticklabel style={font=\tiny}, xtick={0,25,50,75,100},
+xmajorgrids=true, grid style={draw=gray!20},
+legend columns=2,
+legend style={at={(0.5,1.03)}, anchor=south, draw=none, font=\scriptsize}]
+\addplot+[draw=none, fill=teal!70!black] coordinates {(18.8,{Async document}) (87.5,{Memory write}) (5.0,{Multi-tenant prefix}) (15.0,{Session maintenance}) (93.8,{ShareGPT control}) (81.2,{Shared memory write}) (16.7,{Shared multi-tenant}) (93.8,{Synthetic prefix})};
+\addplot+[draw=none, fill=orange!85!black] coordinates {(18.8,{Async document}) (12.5,{Memory write}) (2.5,{Multi-tenant prefix}) (5.0,{Session maintenance}) (53.1,{ShareGPT control}) (18.8,{Shared memory write}) (1.4,{Shared multi-tenant}) (53.1,{Synthetic prefix})};
+\legend{Adaptive heuristic,Oracle}
+\end{axis}
+\end{tikzpicture}
+\caption{The eight workload cases in which the historical offline oracle selects partial reuse at least once. Partial reuse is concentrated rather than universal; the heuristic also over-selects it in several cases.}
+\label{fig:offline-decision-mix}
+\end{figure}

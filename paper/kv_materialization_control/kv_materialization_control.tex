@@ -524,12 +524,11 @@ us ask whether a profitable partial region exists at all, how wide that region
 is under cost-model error, and how much headroom would remain even if the live
 runtime still lacks exact segmented materialization.
 
-\input{experiments/results/latest/offline_workload_key_table.tex}
 \input{experiments/results/latest/offline_decision_mix_figure.tex}
 
-Table~\ref{tab:offline-workload-key} maps the compact Q-codes used in
-Figure~\ref{fig:offline-decision-mix}. That shorthand is necessary because the
-full shared-catalog workload names make the figure unreadable at paper scale.
+Figure~\ref{fig:offline-decision-mix} uses the workload-family labels preserved
+by the historical offline artifact. The figure is retained as historical
+decision-study evidence and is not promoted to a new run.
 
 The resulting picture is also less flattering than a simple
 ``selective-materialization is obviously beneficial'' story. Most workloads
