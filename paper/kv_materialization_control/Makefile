@@ -51,7 +51,7 @@ live-benchmark: runtime-boundary-live
 
 optimization-live: runtime-boundary-live
 
-pdf: decision-study
+pdf:
 	@if command -v '$(TECTONIC)' >/dev/null 2>&1; then \
 		cd '$(CURDIR)' && '$(TECTONIC)' --keep-logs '$(PAPER_TEX)'; \
 	elif command -v '$(PDFLATEX)' >/dev/null 2>&1 && command -v '$(BIBTEX)' >/dev/null 2>&1; then \
