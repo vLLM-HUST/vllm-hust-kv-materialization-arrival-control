@@ -15,10 +15,21 @@
   },
   "canonical_runs": 63,
   "correct_requests": 4032,
-  "draft_pull_requests": {
-    "ascend_telemetry": "https://github.com/vllm-project/vllm-ascend/pull/15468",
-    "main_evidence": "https://github.com/intellistream/kv-materialization-arrival-control/pull/21",
-    "profiling_runner": "https://github.com/vLLM-HUST/vllm-hust-profiling/pull/3"
+  "pull_request_record": {
+    "ascend_telemetry": {
+      "merged": false,
+      "state": "closed",
+      "url": "https://github.com/vllm-project/vllm-ascend/pull/15468"
+    },
+    "main_evidence": {
+      "state": "open_draft",
+      "url": "https://github.com/intellistream/kv-materialization-arrival-control/pull/21"
+    },
+    "profiling_runner": {
+      "merged": false,
+      "state": "closed",
+      "url": "https://github.com/vLLM-HUST/vllm-hust-profiling/pull/3"
+    }
   },
   "execution_identity_correction": {
     "owner_acknowledgement_required": true,

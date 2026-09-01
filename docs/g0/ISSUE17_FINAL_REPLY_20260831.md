@@ -36,8 +36,7 @@ ServeGen/moderate 只有 1/3 重复达到 10%，命中“病理不能跨重复�
 - 正式 JSON/Markdown、pathology CSV/SVG 由 `make g0-formal-rebuild` 从真实 run tree 重建；
 - raw manifest 覆盖 frozen suite、63 个 canonical runs、2 个 rejected attempts 和报告；
 - 主仓证据 Draft PR：<https://github.com/intellistream/kv-materialization-arrival-control/pull/21>；
-- profiling runner Draft PR：<https://github.com/vLLM-HUST/vllm-hust-profiling/pull/3>；
-- AscendStore telemetry Draft PR：<https://github.com/vllm-project/vllm-ascend/pull/15468>；
+- profiling 与 AscendStore runtime 由 reconstruction commit `3d2ef06` / `643b36992` 和 custody 中的只读源码快照固定；不保留外部活跃 PR；
 - GitHub Release：<https://github.com/intellistream/kv-materialization-arrival-control/releases/tag/g0-issue17-stop-20260901-v2>；
 - raw archive asset ID `539131048`，size `16,033,682` bytes，SHA-256 `6474d718f65aeee3824e25897934922672c2a51e92f6c218be6f5b16a7f0ad4a`；
 - raw manifest SHA-256 `7847e2cbfd12858e09bc0ade41e55dc31219110f33f223e156428ee17781a2a4`，覆盖 8 个 suite 文件、1,260 个 canonical-run 文件、28 个 rejected 文件和 4 个报告文件；
