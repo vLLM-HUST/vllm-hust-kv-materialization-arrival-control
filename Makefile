@@ -28,8 +28,9 @@ M2_PILOT_SHARD_INDEX ?= 0
 M2_PILOT_NUM_SHARDS ?= 1
 M2_SIGNIFICANCE_CONFIRMATION_DIR ?= /tmp/kv_materialization_m2_significance_confirmation
 M2_SIGNIFICANCE_CONFIRMATION_RESULTS_DIR ?= $(M2_SIGNIFICANCE_CONFIRMATION_DIR)/generated
+G0_PILOT_DOCS_DIR ?= docs/g0
 
-.PHONY: help bootstrap-env install-dev smoke test shared-workloads-smoke shared-workloads-test lint format build bench paper offline-experiment experiment decision-study study-experiment shared-workloads-offline paper-experiment runtime-boundary-live live-benchmark shared-workloads-live optimization-live m1-online-rebuild m2-online-boundary m2-online-rebuild m2-candidate-pilot m2-candidate-pilot-rebuild m2-anchor-confirmation m2-anchor-confirmation-rebuild m2-significance-confirmation m2-significance-confirmation-rebuild pdf paper-pdf evidence clean
+.PHONY: help bootstrap-env install-dev smoke test shared-workloads-smoke shared-workloads-test lint format build bench paper offline-experiment experiment decision-study study-experiment shared-workloads-offline paper-experiment runtime-boundary-live live-benchmark shared-workloads-live optimization-live m1-online-rebuild m2-online-boundary m2-online-rebuild m2-candidate-pilot m2-candidate-pilot-rebuild m2-anchor-confirmation m2-anchor-confirmation-rebuild m2-significance-confirmation m2-significance-confirmation-rebuild g0-init g0-rebuild g0-pilot-report pdf paper-pdf evidence clean
 
 help:
 	@printf '%s\n' \
@@ -54,6 +55,9 @@ help:
 		'  make m2-anchor-confirmation MODEL=<model>  Run promoted-workload confirmation' \
 		'  make m2-anchor-confirmation-rebuild M2_ANCHOR_CONFIRMATION_DIR=<suite>  Rebuild confirmation verdict' \
 		'  make m2-significance-confirmation MODEL=<model> WORKLOAD_CASE=<promoted> REQUEST_RATE=<rate>  Run five-round significance confirmation' \
+		'  make g0-init G0_SUITE_DIR=/outside/suite BURSTGPT_TRACE=<trace> SERVEGEN_TRACE=<trace>  Initialize G0 pathology gate' \
+		'  make g0-rebuild G0_SUITE_DIR=/outside/suite  Rebuild fail-closed G0 verdict from raw bundles' \
+		'  make g0-pilot-report  Rebuild the explicitly non-verdict real-runtime pilot report' \
 		'  make shared-workloads-live MODEL=<model> [WORKLOAD_CASE=<case>]  Compatibility alias of make runtime-boundary-live' \
 		'  make optimization-live MODEL=<model> [WORKLOAD_CASE=<case>]  Compatibility alias of make runtime-boundary-live' \
 		'  make pdf          Build the paper PDF after refreshing latest offline-study results' \
@@ -165,6 +169,70 @@ m2-significance-confirmation-rebuild:
 	PYTHONPATH=src $(PYTHON) $(BENCH_DIR)/aggregate_m2_significance_confirmation.py \
 		--input-dir '$(M2_SIGNIFICANCE_CONFIRMATION_DIR)' \
 		--output-dir '$(M2_SIGNIFICANCE_CONFIRMATION_RESULTS_DIR)'
+
+g0-init:
+	PYTHONPATH=src $(PYTHON) scripts/g0_pathology.py init --suite-dir '$(G0_SUITE_DIR)' --burstgpt-trace '$(BURSTGPT_TRACE)' --servegen-trace '$(SERVEGEN_TRACE)'
+
+g0-rebuild:
+	PYTHONPATH=src $(PYTHON) scripts/g0_pathology.py rebuild --suite-dir '$(G0_SUITE_DIR)'
+
+g0-formal-rebuild:
+	python3 scripts/rebuild_g0_formal.py \
+		--suite-dir '$(G0_SUITE_DIR)' \
+		--run-root '$(G0_RUN_ROOT)' \
+		--output-json '$(G0_FORMAL_JSON)' \
+		--output-markdown '$(G0_FORMAL_MARKDOWN)' \
+		--output-pathology-csv '$(G0_PATHOLOGY_CSV)' \
+		--output-pathology-svg '$(G0_PATHOLOGY_SVG)'
+
+g0-formal-manifest:
+	python3 scripts/build_g0_raw_manifest.py build \
+		--suite-dir '$(G0_SUITE_DIR)' \
+		--run-root '$(G0_RUN_ROOT)' \
+		--rejected-root '$(G0_REJECTED_ROOT)' \
+		--report-root '$(G0_REPORT_ROOT)' \
+		--output '$(G0_RAW_MANIFEST)'
+
+g0-formal-manifest-verify:
+	python3 scripts/build_g0_raw_manifest.py verify --manifest '$(G0_RAW_MANIFEST)'
+
+g0-pilot-report:
+	python3 scripts/summarize_g0_pilot.py \
+		--run burstgpt/high/no_control=/tmp/g0-formal-pilot-burstgpt-high-nocontrol-r1 \
+		--run burstgpt/high/concurrency_cap=/tmp/g0-formal-pilot-burstgpt-high-concurrency4-r1 \
+		--run burstgpt/high/request_token_bucket=/tmp/g0-formal-pilot-burstgpt-high-tokenbucket8c4-r1 \
+		--run burstgpt/high/materialization_paced_oracle=/tmp/g0-formal-pilot-burstgpt-high-oracle-r1 \
+		--run burstgpt/moderate/no_control=/tmp/g0-formal-pilot-burstgpt-moderate-nocontrol-r1 \
+		--run burstgpt/moderate/request_token_bucket=/tmp/g0-formal-pilot-burstgpt-moderate-tokenbucket8c4-r1 \
+		--run burstgpt/moderate/materialization_paced_oracle=/tmp/g0-formal-pilot-burstgpt-moderate-oracle-r1 \
+		--run burstgpt/low_control/no_control=/tmp/g0-low-control-v2-burstgpt-nocontrol-r1 \
+		--run burstgpt/low_control/materialization_paced_oracle=/tmp/g0-low-control-v2-burstgpt-oracle-r1 \
+		--run servegen/high/no_control=/tmp/g0-formal-pilot-servegen-high-nocontrol-r1 \
+		--run servegen/high/request_token_bucket=/tmp/g0-formal-pilot-servegen-high-tokenbucket8c4-r1 \
+		--run servegen/high/materialization_paced_oracle=/tmp/g0-formal-pilot-servegen-high-oracle-r1 \
+		--run servegen/moderate/no_control=/tmp/g0-formal-pilot-servegen-moderate-nocontrol-r1 \
+		--run servegen/moderate/request_token_bucket=/tmp/g0-formal-pilot-servegen-moderate-tokenbucket8c4-r1 \
+		--run servegen/moderate/materialization_paced_oracle=/tmp/g0-formal-pilot-servegen-moderate-oracle-r1 \
+		--run servegen/low_control/no_control=/tmp/g0-low-control-v2-servegen-nocontrol-r1 \
+		--run servegen/low_control/materialization_paced_oracle=/tmp/g0-low-control-v2-servegen-oracle-r1 \
+		--frontier-run burstgpt/high/oracle_b4=/tmp/g0-formal-pilot-burstgpt-high-oracle-r1 \
+		--frontier-run burstgpt/high/oracle_b8=/tmp/g0-frontier-burstgpt-high-oracle-b8-r1 \
+		--frontier-run burstgpt/high/oracle_b16=/tmp/g0-frontier-burstgpt-high-oracle-b16-r1 \
+		--frontier-run burstgpt/high/oracle_b32=/tmp/g0-frontier-burstgpt-high-oracle-b32-r1 \
+		--frontier-run burstgpt/moderate/oracle_b4=/tmp/g0-formal-pilot-burstgpt-moderate-oracle-r1 \
+		--frontier-run burstgpt/moderate/oracle_b8=/tmp/g0-frontier-v3-burstgpt-moderate-oracle-b8-r1 \
+		--frontier-run burstgpt/moderate/oracle_b16=/tmp/g0-frontier-v3-burstgpt-moderate-oracle-b16-r1 \
+		--frontier-run burstgpt/moderate/oracle_b32=/tmp/g0-frontier-v3-burstgpt-moderate-oracle-b32-r1 \
+		--frontier-run servegen/high/oracle_b4=/tmp/g0-formal-pilot-servegen-high-oracle-r1 \
+		--frontier-run servegen/high/oracle_b8=/tmp/g0-frontier-v3-servegen-high-oracle-b8-r1 \
+		--frontier-run servegen/high/oracle_b16=/tmp/g0-frontier-v3-servegen-high-oracle-b16-r1 \
+		--frontier-run servegen/high/oracle_b32=/tmp/g0-frontier-v3-servegen-high-oracle-b32-r1 \
+		--frontier-run servegen/moderate/oracle_b4=/tmp/g0-formal-pilot-servegen-moderate-oracle-r1 \
+		--frontier-run servegen/moderate/oracle_b8=/tmp/g0-frontier-v3-servegen-moderate-oracle-b8-r1 \
+		--frontier-run servegen/moderate/oracle_b16=/tmp/g0-frontier-v3-servegen-moderate-oracle-b16-r1 \
+		--frontier-run servegen/moderate/oracle_b32=/tmp/g0-frontier-v3-servegen-moderate-oracle-b32-r1 \
+		--output-json '$(G0_PILOT_DOCS_DIR)/pilot_20260831.json' \
+		--output-markdown '$(G0_PILOT_DOCS_DIR)/pilot_20260831.md'
 
 pdf: paper-pdf
 

@@ -1,0 +1,189 @@
+{
+  "archives": [
+    {
+      "bytes": 348605,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-formal-pilot-burstgpt-high-concurrency4-r1.tar.gz",
+      "sha256": "083d0226134506ebca4c3ebad5f0cad4257cfe4fe888005ed2c1d970a4b33d88"
+    },
+    {
+      "bytes": 172175,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-formal-pilot-burstgpt-high-nocontrol-r1.tar.gz",
+      "sha256": "bf8c230e61f311ba1c3eff35da31ab0ec923093f7843ca725a1a33178c01147b"
+    },
+    {
+      "bytes": 261659,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-formal-pilot-burstgpt-high-oracle-r1.tar.gz",
+      "sha256": "90558fb547741aa59aff1f4fa2ff898af2cd4a394b82e02296a5c6d44ef5b21b"
+    },
+    {
+      "bytes": 277218,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-formal-pilot-burstgpt-high-tokenbucket8c4-r1.tar.gz",
+      "sha256": "64d3973ba010610cabfc4dc3e2d72d9faa179c34b09c30135fe964bc0cd8c31a"
+    },
+    {
+      "bytes": 180382,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-formal-pilot-burstgpt-moderate-nocontrol-r1.tar.gz",
+      "sha256": "fbbe55689aeec69a3d9c6003cb648ac38fc940ccf45609f7c3baae7cf8de0d82"
+    },
+    {
+      "bytes": 305119,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-formal-pilot-burstgpt-moderate-oracle-r1.tar.gz",
+      "sha256": "c8b0c64ccb1b0c2cf342d4871351f2b94820e533d7b0745a5c17a8d1e18057a0"
+    },
+    {
+      "bytes": 318154,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-formal-pilot-burstgpt-moderate-tokenbucket8c4-r1.tar.gz",
+      "sha256": "198f0c820023560ef6b958eb88341ab449e602b2325aba7517e1eac57b56c918"
+    },
+    {
+      "bytes": 184160,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-formal-pilot-servegen-high-nocontrol-r1.tar.gz",
+      "sha256": "77127ac33377013514eb43a9eb95533c8d77b24164ac19d8bdd867bb9c60ec3d"
+    },
+    {
+      "bytes": 263070,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-formal-pilot-servegen-high-oracle-r1.tar.gz",
+      "sha256": "773d7a6e6de070b49c629db655a4651f0a94266c6035e51f2867c64af794435e"
+    },
+    {
+      "bytes": 275561,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-formal-pilot-servegen-high-tokenbucket8c4-r1.tar.gz",
+      "sha256": "6793435c11d613274d2cf4502062c8f5969ab624e941277cfe7d68346e6b7849"
+    },
+    {
+      "bytes": 202307,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-formal-pilot-servegen-moderate-nocontrol-r1.tar.gz",
+      "sha256": "6233965a24002a386c9bff87c6ac9470e39ac549ea6d8137eea4802cec4a6f13"
+    },
+    {
+      "bytes": 318388,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-formal-pilot-servegen-moderate-oracle-r1.tar.gz",
+      "sha256": "3c86a0adebb8cd0cb8f1123630cd8ba522b376da252609265f03fd532dd9dd5e"
+    },
+    {
+      "bytes": 310239,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-formal-pilot-servegen-moderate-tokenbucket8c4-r1.tar.gz",
+      "sha256": "3dc5c0bfbd3d8128821d84901c604353dcda2bc0d2f0b6da450a088458c7593d"
+    },
+    {
+      "bytes": 204785,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-frontier-burstgpt-high-oracle-b16-r1.tar.gz",
+      "sha256": "470534ef7f9e74d0f081ba411392f464869ff3f0adfc44f6c369fed2a7860218"
+    },
+    {
+      "bytes": 186717,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-frontier-burstgpt-high-oracle-b32-r1.tar.gz",
+      "sha256": "b48758833a2206deb04eda38e0c54fb62185035d17561f587d2f5f9cb8d6cbe8"
+    },
+    {
+      "bytes": 228239,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-frontier-burstgpt-high-oracle-b8-r1.tar.gz",
+      "sha256": "3cf747e10a88efd8f2067411e11b76888b32a97eb39ad62fbb770c5c06258fa7"
+    },
+    {
+      "bytes": 207721,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-frontier-v3-burstgpt-moderate-oracle-b16-r1.tar.gz",
+      "sha256": "18f49432678efcfbe39395ab7fadd51bdf5db0ebe1a2ddde9d4a5dda844751d1"
+    },
+    {
+      "bytes": 188436,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-frontier-v3-burstgpt-moderate-oracle-b32-r1.tar.gz",
+      "sha256": "8c0c1a8890abd930d7e8ba77adff2af1e3e9e5ca3154f96617b8680af4237028"
+    },
+    {
+      "bytes": 241997,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-frontier-v3-burstgpt-moderate-oracle-b8-r1.tar.gz",
+      "sha256": "269cd97a2d8ff11568263cedd07693e7897a967ec2aa3c6d69f390ec4f375699"
+    },
+    {
+      "bytes": 206748,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-frontier-v3-servegen-high-oracle-b16-r1.tar.gz",
+      "sha256": "1fe7e6ca30b571ac6f60ef1531aa6ca7e7076d4fed01e36afbe10b61f6f5c1d5"
+    },
+    {
+      "bytes": 194598,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-frontier-v3-servegen-high-oracle-b32-r1.tar.gz",
+      "sha256": "44bb55c80417f94194ba3c86c8c6e09b323a13e4c922e601464b4b2c4ef2583c"
+    },
+    {
+      "bytes": 230280,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-frontier-v3-servegen-high-oracle-b8-r1.tar.gz",
+      "sha256": "6533e08120415b57f03147751a6f3a2fc9760cf04728c6240e0c524f16d141f3"
+    },
+    {
+      "bytes": 217325,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-frontier-v3-servegen-moderate-oracle-b16-r1.tar.gz",
+      "sha256": "0caa2fc3e8044cb7a4a9faae4dc6d8a982a1997cd9a3cd2de4d8c721713a18d3"
+    },
+    {
+      "bytes": 205393,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-frontier-v3-servegen-moderate-oracle-b32-r1.tar.gz",
+      "sha256": "1b26d18dbc6fe55661fee120b6df3d09d750d29e602380e78fc50f7f8df99d48"
+    },
+    {
+      "bytes": 257910,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-frontier-v3-servegen-moderate-oracle-b8-r1.tar.gz",
+      "sha256": "8dcb188532acaa37082de191af5c4a9bccbac7d20e3c79ecc2ccd0749b36f7d4"
+    },
+    {
+      "bytes": 785579,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-low-control-v2-burstgpt-nocontrol-r1.tar.gz",
+      "sha256": "1dcf71196319ba30cb8c686d2ec6b1bfb31a73b00f0a197e478c7eb2b2071cc8"
+    },
+    {
+      "bytes": 782633,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-low-control-v2-burstgpt-oracle-r1.tar.gz",
+      "sha256": "32f3ec1720cb4a0a172ea6e21a26c8453475a9dfb5cab67d8d544ea11dbc38c9"
+    },
+    {
+      "bytes": 782635,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-low-control-v2-servegen-nocontrol-r1.tar.gz",
+      "sha256": "74c27bdbdbfe8aa6c32d12e4035d719d758b6db7aa07c8fb0553c822a53668fd"
+    },
+    {
+      "bytes": 784313,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-low-control-v2-servegen-oracle-r1.tar.gz",
+      "sha256": "45bee6bd5b69590f69e549ecfdf11c4a9877b0ae7416f7bb8afcffb68db85fa8"
+    },
+    {
+      "bytes": 35417,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/pilot_20260831/g0-suite-low-control-v2-20260831.tar.gz",
+      "sha256": "8a3548de6316a65539d36a94a706cd54e79e5dcb25d1c57b29005bd4e31ce34b"
+    }
+  ],
+  "artifact": "g0-pilot-raw-custody",
+  "custodian": "local workspace owner",
+  "recovery": "Extract an archive with tar -xzf into an empty directory; verify SHA-256 before use.",
+  "schema_version": 1,
+  "status": "pilot_incomplete_no_verdict"
+}
