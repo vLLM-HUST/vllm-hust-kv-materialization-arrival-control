@@ -12,9 +12,13 @@ The formal runs therefore executed one internally consistent, isolated carrier:
 - vLLM-Ascend base `f4a08bddd0cc65a0bd8c3d377b158ae5ca7527db`
   plus the read-only G0 source snapshot
   `af62e947cbdd53eb5f278c7bf83e7f56db7ec0529195011864dba5e75df35182`;
+  reconstruction commit `643b36992`, Draft PR
+  <https://github.com/vllm-project/vllm-ascend/pull/15468>;
 - profiling base `9be6a32b9e64e06c7a60def100452abf127850bb`
   plus source snapshot
   `4c9a4f956e1e2e25f28bcb7c93f0c096cd5d5582abdba67da0b27ff02b76867a`;
+  reconstruction commit `3d2ef06`, Draft PR
+  <https://github.com/vLLM-HUST/vllm-hust-profiling/pull/3>;
 - DeepSeek-V2-Lite bf16, TP1, eager mode, physical NPU 2.
 
 No run mixed the vendored and Ascend carriers, and no WaveMat graph result was

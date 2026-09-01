@@ -19,6 +19,10 @@ frozen tolerance. The report is
 `/root/g0-formal/issue17/reports/formal_v1_20260831/g0_formal_report.json`;
 the read-only archive and custody record are under
 `/root/g0-artifacts/issue17/formal_20260831`.
+The published custody release is
+<https://github.com/intellistream/kv-materialization-arrival-control/releases/tag/g0-issue17-stop-20260901-v2>;
+its raw archive asset ID is `539131048`, with SHA-256
+`6474d718f65aeee3824e25897934922672c2a51e92f6c218be6f5b16a7f0ad4a`.
 
 `pilot_20260831.md` and `pilot_20260831.json` are a real-runtime, single-repeat
 2 workload × 2 intensity core pilot plus paired strict 1 req/s controls. They

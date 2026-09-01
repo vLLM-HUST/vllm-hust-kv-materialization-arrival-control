@@ -180,3 +180,10 @@ to tune or select workloads after inspection. Two failed HTTP attempts are
 preserved separately under the rejected custody tree and are excluded from
 the 63 canonical valid runs; their correctness failure and request IDs remain
 machine-readable.
+
+The final v2 custody is published at
+<https://github.com/intellistream/kv-materialization-arrival-control/releases/tag/g0-issue17-stop-20260901-v2>.
+Raw archive asset ID `539131048` has size 16,033,682 bytes and SHA-256
+`6474d718f65aeee3824e25897934922672c2a51e92f6c218be6f5b16a7f0ad4a`.
+The independently downloadable v2 manifest has SHA-256
+`7847e2cbfd12858e09bc0ade41e55dc31219110f33f223e156428ee17781a2a4`.
