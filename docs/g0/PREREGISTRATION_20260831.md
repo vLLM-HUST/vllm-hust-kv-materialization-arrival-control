@@ -171,15 +171,25 @@ All three pairs had higher no-control materialization pressure and identical
 request output hashes, so the result is not caused by missing activation or
 correctness drift. In the same cell, ordinary request token bucket achieved a
 7.18% median p95 improvement versus the oracle's 7.81%, with a slightly lower
-goodput loss; under the frozen one-percentage-point equivalence tolerance this
-is also a generic-baseline Stop trigger.
+goodput loss. The report code uses a one-percentage-point equivalence
+tolerance, but that exact tolerance was not stated in the approved Issue reply
+or suite manifest. Generic equivalence is therefore supporting evidence, not
+an independently preregistered Stop trigger. The repeatability Stop is
+independent of it.
 
 Sequences 64–96 and the capacity frontier were intentionally not executed.
-Continuing after either Stop trigger would violate the issue instruction not
+Continuing after the repeatability Stop would violate the issue instruction not
 to tune or select workloads after inspection. Two failed HTTP attempts are
 preserved separately under the rejected custody tree and are excluded from
 the 63 canonical valid runs; their correctness failure and request IDs remain
 machine-readable.
+
+Post-run review also found that the raw telemetry has no explicit
+`cache_epoch`, `fallback_reason`, or `waiting_reason` fields and no standalone
+per-run `run_manifest.json` / environment-config file. These omissions are
+disclosed rather than repaired post hoc; see
+`docs/g0/REVIEW_CORRECTIONS_20260901.md`. Owner acceptance of that boundary and
+the carrier correction is required before Issue closure.
 
 The final v2 custody is published at
 <https://github.com/intellistream/kv-materialization-arrival-control/releases/tag/g0-issue17-stop-20260901-v2>.

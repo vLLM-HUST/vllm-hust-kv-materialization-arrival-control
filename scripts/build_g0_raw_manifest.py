@@ -96,6 +96,33 @@ def verify_tree(root: Path, expected: list[dict[str, Any]]) -> list[str]:
     return errors
 
 
+def verify_manifest(
+    manifest: dict[str, Any],
+    *,
+    suite_root: Path | None = None,
+    run_root: Path | None = None,
+    rejected_root: Path | None = None,
+    report_root: Path | None = None,
+) -> list[str]:
+    """Verify a manifest, optionally relocating each archived tree.
+
+    The recorded absolute roots remain provenance for the producing host.  The
+    overrides make the same relative-path manifest usable after extracting the
+    custody archive on another machine.
+    """
+    suite = suite_root or Path(manifest["suite_root"])
+    runs = run_root or Path(manifest["run_root"])
+    errors = verify_tree(suite, manifest["suite_files"])
+    errors.extend(verify_tree(runs, manifest["run_files"]))
+    if manifest.get("rejected_root"):
+        rejected = rejected_root or Path(manifest["rejected_root"])
+        errors.extend(verify_tree(rejected, manifest["rejected_files"]))
+    if manifest.get("report_root"):
+        reports = report_root or Path(manifest["report_root"])
+        errors.extend(verify_tree(reports, manifest["report_files"]))
+    return errors
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -107,6 +134,10 @@ def main() -> int:
     build_parser.add_argument("--output", required=True)
     verify_parser = subparsers.add_parser("verify")
     verify_parser.add_argument("--manifest", required=True)
+    verify_parser.add_argument("--suite-dir")
+    verify_parser.add_argument("--run-root")
+    verify_parser.add_argument("--rejected-root")
+    verify_parser.add_argument("--report-root")
     args = parser.parse_args()
 
     if args.command == "build":
@@ -124,14 +155,15 @@ def main() -> int:
         return 0
 
     manifest = json.loads(Path(args.manifest).read_text(encoding="utf-8"))
-    errors = verify_tree(Path(manifest["suite_root"]), manifest["suite_files"])
-    errors.extend(verify_tree(Path(manifest["run_root"]), manifest["run_files"]))
-    if manifest.get("rejected_root"):
-        errors.extend(
-            verify_tree(Path(manifest["rejected_root"]), manifest["rejected_files"])
-        )
-    if manifest.get("report_root"):
-        errors.extend(verify_tree(Path(manifest["report_root"]), manifest["report_files"]))
+    errors = verify_manifest(
+        manifest,
+        suite_root=Path(args.suite_dir).resolve() if args.suite_dir else None,
+        run_root=Path(args.run_root).resolve() if args.run_root else None,
+        rejected_root=(
+            Path(args.rejected_root).resolve() if args.rejected_root else None
+        ),
+        report_root=Path(args.report_root).resolve() if args.report_root else None,
+    )
     if errors:
         for error in errors:
             print(error)

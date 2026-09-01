@@ -193,8 +193,8 @@ def test_pathology_table_and_svg_are_dependency_free(tmp_path: Path) -> None:
     assert "Layer-ready wait p95" in svg_path.read_text()
 
 
-def test_complete_cell_emits_both_preregistered_fail_fast_triggers() -> None:
-    triggers = g0.preregistered_stop_triggers(
+def test_v2_report_preserves_repeatability_and_generic_observation() -> None:
+    triggers = g0.report_stop_triggers(
         {
             "servegen/moderate": {
                 "reproducible_tail_gate": False,

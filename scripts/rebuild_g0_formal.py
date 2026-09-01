@@ -350,7 +350,14 @@ def cell_evidence(rounds: list[dict[str, dict[str, Any]]]) -> dict[str, Any]:
     }
 
 
-def preregistered_stop_triggers(cells: dict[str, dict[str, Any]]) -> list[dict[str, str]]:
+def report_stop_triggers(cells: dict[str, dict[str, Any]]) -> list[dict[str, str]]:
+    """Return report-layer triggers preserved by the immutable v2 custody.
+
+    Repeatability and counter activation come directly from the approved gate.
+    Generic equivalence uses the report's one-point tolerance and is retained
+    for byte-for-byte v2 reconstruction, but review treats it as supporting
+    evidence rather than an independently preregistered trigger.
+    """
     triggers = []
     for name, row in sorted(cells.items()):
         if not row["reproducible_tail_gate"]:
@@ -704,7 +711,7 @@ def rebuild(suite: Path, run_root: Path) -> dict[str, Any]:
     execution_prefix_complete = executed_sequences == list(
         range(1, max(executed_sequences, default=0) + 1)
     )
-    stop_triggers = preregistered_stop_triggers(cells)
+    stop_triggers = report_stop_triggers(cells)
 
     verdict = "none"
     status = "incomplete_no_verdict"

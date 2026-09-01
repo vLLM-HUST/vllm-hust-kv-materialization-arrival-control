@@ -1,6 +1,10 @@
 # G0 raw-signal gate
 
-**Current status: formal G0 complete — Stop.** The original static audit
+**Current status: technical early-Stop evidence complete; Issue owner decision
+pending.** No additional performance matrix or wave-shaping mechanism work is
+warranted on the executed AscendStore carrier. The Issue is not governance-
+complete until the owner accepts the post-hoc carrier correction and the
+truth-oracle boundary in `REVIEW_CORRECTIONS_20260901.md`. The original static audit
 correctly found that the unmodified AscendStore connector did not export the
 required counters. An isolated G0 worktree at `/root/g0-vllm-ascend` now
 exports requested/realized bytes, bytes in flight, connector enqueue/wait,
@@ -12,10 +16,10 @@ the matched recompute/minimum-retrieve baselines. The old
 carrier and is not the current study verdict.
 
 Formal execution validated the contiguous canonical run prefix 1–63 and then
-stopped at the first preregistered fail-fast condition. ServeGen/moderate did
-not reproduce the >=10% p95 TTFT pathology in two of three repeats, and the
-ordinary request token bucket was equivalent to the paced oracle under the
-frozen tolerance. The report is
+stopped at the repeatability condition. ServeGen/moderate did not reproduce
+the >=10% p95 TTFT pathology in two of three repeats. Ordinary request-token-
+bucket equivalence is supporting evidence only because its exact one-point
+tolerance was not stated in the approved Issue reply. The report is
 `/root/g0-formal/issue17/reports/formal_v1_20260831/g0_formal_report.json`;
 the read-only archive and custody record are under
 `/root/g0-artifacts/issue17/formal_20260831`.
@@ -57,4 +61,11 @@ make g0-formal-rebuild \
   G0_FORMAL_MARKDOWN=/tmp/g0-formal.md \
   G0_PATHOLOGY_CSV=/tmp/g0-pathology.csv \
   G0_PATHOLOGY_SVG=/tmp/g0-pathology.svg
+```
+
+For a location-independent rebuild starting from the immutable GitHub Release,
+including relocated manifest verification, use:
+
+```bash
+make g0-release-rebuild
 ```

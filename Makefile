@@ -29,8 +29,10 @@ M2_PILOT_NUM_SHARDS ?= 1
 M2_SIGNIFICANCE_CONFIRMATION_DIR ?= /tmp/kv_materialization_m2_significance_confirmation
 M2_SIGNIFICANCE_CONFIRMATION_RESULTS_DIR ?= $(M2_SIGNIFICANCE_CONFIRMATION_DIR)/generated
 G0_PILOT_DOCS_DIR ?= docs/g0
+G0_RELEASE_ARCHIVE ?=
+G0_RELEASE_OUTPUT_DIR ?=
 
-.PHONY: help bootstrap-env install-dev smoke test shared-workloads-smoke shared-workloads-test lint format build bench paper offline-experiment experiment decision-study study-experiment shared-workloads-offline paper-experiment runtime-boundary-live live-benchmark shared-workloads-live optimization-live m1-online-rebuild m2-online-boundary m2-online-rebuild m2-candidate-pilot m2-candidate-pilot-rebuild m2-anchor-confirmation m2-anchor-confirmation-rebuild m2-significance-confirmation m2-significance-confirmation-rebuild g0-init g0-rebuild g0-pilot-report pdf paper-pdf evidence clean
+.PHONY: help bootstrap-env install-dev smoke test shared-workloads-smoke shared-workloads-test lint format build bench paper offline-experiment experiment decision-study study-experiment shared-workloads-offline paper-experiment runtime-boundary-live live-benchmark shared-workloads-live optimization-live m1-online-rebuild m2-online-boundary m2-online-rebuild m2-candidate-pilot m2-candidate-pilot-rebuild m2-anchor-confirmation m2-anchor-confirmation-rebuild m2-significance-confirmation m2-significance-confirmation-rebuild g0-init g0-rebuild g0-pilot-report g0-release-rebuild pdf paper-pdf evidence clean
 
 help:
 	@printf '%s\n' \
@@ -58,6 +60,7 @@ help:
 		'  make g0-init G0_SUITE_DIR=/outside/suite BURSTGPT_TRACE=<trace> SERVEGEN_TRACE=<trace>  Initialize G0 pathology gate' \
 		'  make g0-rebuild G0_SUITE_DIR=/outside/suite  Rebuild fail-closed G0 verdict from raw bundles' \
 		'  make g0-pilot-report  Rebuild the explicitly non-verdict real-runtime pilot report' \
+		'  make g0-release-rebuild  Download, relocate-verify, and rebuild the immutable G0 Stop release' \
 		'  make shared-workloads-live MODEL=<model> [WORKLOAD_CASE=<case>]  Compatibility alias of make runtime-boundary-live' \
 		'  make optimization-live MODEL=<model> [WORKLOAD_CASE=<case>]  Compatibility alias of make runtime-boundary-live' \
 		'  make pdf          Build the paper PDF after refreshing latest offline-study results' \
@@ -195,6 +198,9 @@ g0-formal-manifest:
 
 g0-formal-manifest-verify:
 	python3 scripts/build_g0_raw_manifest.py verify --manifest '$(G0_RAW_MANIFEST)'
+
+g0-release-rebuild:
+	python3 scripts/rebuild_g0_release.py $(if $(G0_RELEASE_ARCHIVE),--archive '$(G0_RELEASE_ARCHIVE)') $(if $(G0_RELEASE_OUTPUT_DIR),--output-dir '$(G0_RELEASE_OUTPUT_DIR)')
 
 g0-pilot-report:
 	python3 scripts/summarize_g0_pilot.py \

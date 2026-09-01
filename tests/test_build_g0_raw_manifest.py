@@ -55,3 +55,28 @@ def test_manifest_includes_derived_reports(tmp_path: Path) -> None:
     manifest = custody.build(suite, runs, report_root=reports)
     assert manifest["report_file_count"] == 1
     assert custody.verify_tree(reports, manifest["report_files"]) == []
+
+
+def test_manifest_can_verify_relocated_archive_trees(tmp_path: Path) -> None:
+    original = tmp_path / "producer"
+    extracted = tmp_path / "consumer"
+    suite, runs, rejected, reports = (
+        original / "suite",
+        original / "runs",
+        original / "rejected",
+        original / "reports",
+    )
+    for root in (suite, runs, rejected, reports):
+        root.mkdir(parents=True)
+        (root / "artifact.json").write_text("{}\n", encoding="utf-8")
+    manifest = custody.build(suite, runs, rejected, reports)
+
+    original.rename(extracted)
+    errors = custody.verify_manifest(
+        manifest,
+        suite_root=extracted / "suite",
+        run_root=extracted / "runs",
+        rejected_root=extracted / "rejected",
+        report_root=extracted / "reports",
+    )
+    assert errors == []
