@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Transferred the repository to `vLLM-HUST`, registered Wei He
+  (`healer-positive`) as the maintainer, and corrected the package, issue,
+  clone, and workload-source URLs for MOD publication.
 - Fixed the M2 issue #3 closure wording per the final review: the verdict
   `stop_mechanism_direction` is now the fixed final-summary and paper-boundary
   statement, and the 39 in-repo raw-bundle lifecycles are archived in release

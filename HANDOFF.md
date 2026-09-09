@@ -38,7 +38,9 @@ aggregate-only 口径（39/102），不恢复 141 个 lifecycle 的逐请求复�
 
 ## 当前定位
 
-这个仓库已经转交给 `cao zhe` 同学继续推进，并已迁移到 `intellistream` 组织下；从研究视角看，它仍然属于 advanced incubation 阶段。
+这个仓库由何维（GitHub：`healer-positive`）负责推进，并已迁移到
+`vLLM-HUST` 组织，作为 vLLM-HUST MOD 管理；从研究视角看，它仍然属于
+advanced incubation 阶段。
 
 它已经不是一个空模板，也不是单纯的工程脚手架。当前更准确的状态是：
 

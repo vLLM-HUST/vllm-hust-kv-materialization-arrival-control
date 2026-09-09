@@ -9,19 +9,18 @@ description = "Standalone vLLM plugin for adaptive KV materialization studies"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-	"llm-serving-workloads @ git+https://github.com/intellistream/llm-serving-workloads.git@ceef92d52e0c49f26ba1efc6706edd1f6df5d913",
+	"llm-serving-workloads @ git+https://github.com/vLLM-HUST/llm-serving-workloads.git@ceef92d52e0c49f26ba1efc6706edd1f6df5d913",
 ]
 authors = [
-	{name = "caozhe"},
-	{name = "xuheng li"},
+	{name = "Wei He"},
 ]
 maintainers = [
-	{name = "cao zhe"},
+	{name = "Wei He"},
 ]
 
 [project.urls]
-Repository = "https://github.com/intellistream/kv-materialization-plugin"
-Issues = "https://github.com/intellistream/kv-materialization-plugin/issues"
+Repository = "https://github.com/vLLM-HUST/vllm-hust-kv-materialization-arrival-control"
+Issues = "https://github.com/vLLM-HUST/vllm-hust-kv-materialization-arrival-control/issues"
 
 [project.scripts]
 vllm-kv-materialization-serve = "vllm_kv_materialization.launcher:main"

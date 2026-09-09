@@ -1,5 +1,9 @@
 # KV Materialization Arrival Control
 
+Maintainer: [Wei He (`healer-positive`)](https://github.com/healer-positive).
+This repository is a vLLM-HUST MOD exposed through the
+`vllm.general_plugins` entry-point interface.
+
 This repository studies the request-arrival decision among full reuse,
 block-aligned partial reuse, and recomputation. It is distinct from
 `intellistream/kv-materialization-scheduling`, which studies cross-request
@@ -157,7 +161,7 @@ does not continue per-workload controller tuning.
 The verdict is fixed in the M2 issue #3 closure summary and the paper boundary.
 The 39 in-repo raw-bundle lifecycles are also archived in release
 `m2-issue3-closure-evidence-20260811`
-(<https://github.com/intellistream/kv-materialization-arrival-control/releases/tag/m2-issue3-closure-evidence-20260811>,
+(<https://github.com/vLLM-HUST/vllm-hust-kv-materialization-arrival-control/releases/tag/m2-issue3-closure-evidence-20260811>,
 asset `m2_raw_bundles_39_lifecycles.tar.gz`); the other 102 M2 lifecycles
 remain aggregate-only supporting evidence, and the 39/102 reproducibility
 boundary is kept until those raw bundles are archived to a persistent,
@@ -224,9 +228,9 @@ make kv-materialization-live \
 
 ## Ownership And Transfer
 
-- current student owner: `cao zhe`
-- current organization: `intellistream`
-- status: handed off to `cao zhe` and transferred to `intellistream`
+- current student owner: `Wei He` (`healer-positive`)
+- current organization: `vLLM-HUST`
+- status: maintained as a vLLM-HUST MOD by `healer-positive`
 - transfer readiness: keep repository docs and scripts free of user-specific
   absolute paths and source-organization hardcoding
 
@@ -308,7 +312,7 @@ submodule (not a symlink) with:
 Fresh-checkout CPU validation:
 
 ```bash
-git clone --recurse-submodules https://github.com/intellistream/kv-materialization-arrival-control.git
+git clone --recurse-submodules https://github.com/vLLM-HUST/vllm-hust-kv-materialization-arrival-control.git
 cd kv-materialization-arrival-control
 bash scripts/setup_repo_env.sh
 make test
