@@ -279,14 +279,18 @@ vllm-hust-ext run -- vllm serve <model>
 The package is discovered without importing its runtime implementation. On
 launch, vLLM loads the `kv_materialization` general plugin, which registers a
 request processor through the versioned public host hook and registers a
-runtime observer through the typed KV-materialization hook. The plugin never
-rewrites `OpenAIServing`, request protocol, renderer, or sampling methods. A
-host without request-processing hook API `1.0` and KV-materialization API `1.0`
-is rejected at startup instead of falling back to monkey patching. Installation
-alone is inert: registration requires either Extension Manager enablement or
-explicit selection through `VLLM_PLUGINS=kv_materialization`. The Extension
-Manager preserves existing plugin selections (for example `ascend`) when it
-adds this activation entry point.
+runtime observer through the typed KV-materialization hook. That native path
+does not rewrite `OpenAIServing`, request protocol, renderer, or sampling
+methods. The deployed vLLM 0.23 Ascend line is supported by a deliberately
+version-scoped compatibility adapter when its carrier includes the historical
+KV-materialization runtime seam; other hosts without request-processing hook
+API `1.0` and KV-materialization API `1.0` are rejected at startup. The 0.23
+adapter still loads only through the declared `vllm.general_plugins` entry
+point and does not replace the current public-hook contract. Installation alone
+is inert: registration requires either Extension Manager enablement or explicit
+selection through `VLLM_PLUGINS=kv_materialization`. The Extension Manager
+preserves existing plugin selections (for example `ascend`) when it adds this
+activation entry point.
 
 For a direct launch that explicitly opts into this plugin, use the wrapper:
 

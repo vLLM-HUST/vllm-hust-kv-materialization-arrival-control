@@ -54,6 +54,16 @@ _REQUEST_HEADERS = (
 _REGISTERED = False
 
 
+def _legacy_vllm_023_available() -> bool:
+    """Return whether the host is the supported deployed compatibility line."""
+
+    try:
+        from vllm import __version__ as host_version
+    except (ImportError, AttributeError):
+        return False
+    return str(host_version).split("+", maxsplit=1)[0].startswith("0.23.")
+
+
 def _package_version() -> str:
     try:
         return version("vllm-kv-materialization")
@@ -117,6 +127,7 @@ def register_plugin() -> None:
     if _REGISTERED or not _activation_requested():
         return
 
+    host_api = "native-1.0"
     try:
         from vllm.plugins.request_processing import (
             REQUEST_PROCESSING_HOOK_API_VERSION,
@@ -127,11 +138,35 @@ def register_plugin() -> None:
             register_kv_materialization_runtime_observer,
         )
     except ImportError as error:
-        raise RuntimeError(
-            "KV materialization requires the versioned vLLM-HUST "
-            "request-processing and KV runtime hooks; the installed host is "
-            "unsupported"
-        ) from error
+        if not _legacy_vllm_023_available():
+            raise RuntimeError(
+                "KV materialization requires the versioned vLLM-HUST "
+                "request-processing and KV runtime hooks; the installed host is "
+                "unsupported"
+            ) from error
+        from vllm_kv_materialization.legacy_vllm_023 import (
+            register_legacy_vllm_023_adapter,
+        )
+
+        register_legacy_vllm_023_adapter()
+        host_api = "legacy-vllm-0.23-adapter"
+        os.environ["VLLM_KV_MATERIALIZATION_PLUGIN_LOADED"] = "1"
+        os.environ["VLLM_KV_MATERIALIZATION_PLUGIN_MODE"] = os.getenv(
+            "VLLM_KV_MATERIALIZATION_PLUGIN_MODE",
+            "prefix_cache_runtime_control",
+        )
+        _REGISTERED = True
+        logger.info(
+            "Registered extension=%s distribution_version=%s host_api=%s",
+            EXTENSION_ID,
+            _package_version(),
+            host_api,
+        )
+        print(
+            f"KV_MATERIALIZATION_PLUGIN_REGISTERED host_api={host_api}",
+            flush=True,
+        )
+        return
 
     if REQUEST_PROCESSING_HOOK_API_VERSION != REQUIRED_REQUEST_PROCESSING_API:
         raise RuntimeError(
@@ -172,4 +207,8 @@ def register_plugin() -> None:
         _package_version(),
         REQUEST_PROCESSING_HOOK_API_VERSION,
         KV_MATERIALIZATION_RUNTIME_CONTROL_API_VERSION,
+    )
+    print(
+        f"KV_MATERIALIZATION_PLUGIN_REGISTERED host_api={host_api}",
+        flush=True,
     )

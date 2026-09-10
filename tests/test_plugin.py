@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 from types import ModuleType, SimpleNamespace
 
@@ -208,3 +209,29 @@ def test_register_plugin_rejects_host_without_public_hook(
 
     with pytest.raises(RuntimeError, match="installed host is unsupported"):
         plugin.register_plugin()
+
+
+def test_register_plugin_uses_vllm_023_compatibility_adapter(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    vllm = ModuleType("vllm")
+    vllm.__version__ = "0.23.1.post1.dev572"
+    plugins = ModuleType("vllm.plugins")
+    registrations: list[str] = []
+    legacy = ModuleType("vllm_kv_materialization.legacy_vllm_023")
+    legacy.register_legacy_vllm_023_adapter = lambda: registrations.append("legacy")
+    monkeypatch.setitem(sys.modules, "vllm", vllm)
+    monkeypatch.setitem(sys.modules, "vllm.plugins", plugins)
+    monkeypatch.delitem(sys.modules, "vllm.plugins.request_processing", raising=False)
+    monkeypatch.setitem(
+        sys.modules,
+        "vllm_kv_materialization.legacy_vllm_023",
+        legacy,
+    )
+    monkeypatch.setenv("VLLM_PLUGINS", plugin.PLUGIN_NAME)
+
+    plugin.register_plugin()
+
+    assert registrations == ["legacy"]
+    assert plugin._REGISTERED is True
+    assert os.environ["VLLM_KV_MATERIALIZATION_PLUGIN_LOADED"] == "1"
