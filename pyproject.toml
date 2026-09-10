@@ -40,7 +40,7 @@ dev = [
 	"pytest>=8.0",
 	"ruff>=0.12",
 	"tomli>=2.0; python_version < '3.11'",
-	"vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git@cf1ea71e3e2cb81ab06267ef05eddb3e580ea20b",
+	"vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git@782e7a03a30eab6b04bbdbb2c3fc86fdf6e32ee6",
 ]
 
 [tool.setuptools]
