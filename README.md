@@ -1,8 +1,9 @@
 # KV Materialization Arrival Control
 
 Maintainer: [Wei He (`healer-positive`)](https://github.com/healer-positive).
-This repository is a vLLM-HUST MOD exposed through the
-`vllm.general_plugins` entry-point interface.
+This repository is a vLLM-HUST MOD registered through both the
+`vllm_hust.extension_bundles` discovery interface and the
+`vllm.general_plugins` runtime interface.
 
 This repository studies the request-arrival decision among full reuse,
 block-aligned partial reuse, and recomputation. It is distinct from
@@ -258,11 +259,53 @@ make build
 
 ## Usage
 
-Run vLLM with the plugin enabled through the wrapper launcher:
+### Install and manage as a vLLM-HUST extension
+
+The supported host is the vLLM-HUST runtime pinned by the `vendor/vllm`
+submodule. Install the Extension Manager and this package, inspect the static
+Manifest 0.2 descriptor, then explicitly enable the extension:
+
+```bash
+uv pip install \
+  "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git@cf1ea71e3e2cb81ab06267ef05eddb3e580ea20b"
+uv pip install .
+vllm-hust-ext extension inspect \
+  org.vllm-hust.kv-materialization-arrival-control
+vllm-hust-ext extension enable \
+  org.vllm-hust.kv-materialization-arrival-control
+vllm-hust-ext run -- vllm serve <model>
+```
+
+The package is discovered without importing its runtime implementation. On
+launch, vLLM loads the `kv_materialization` general plugin, which registers a
+request processor through the versioned public host hook and registers a
+runtime observer through the typed KV-materialization hook. The plugin never
+rewrites `OpenAIServing`, request protocol, renderer, or sampling methods. A
+host without request-processing hook API `1.0` and KV-materialization API `1.0`
+is rejected at startup instead of falling back to monkey patching. Installation
+alone is inert: registration requires either Extension Manager enablement or
+explicit selection through `VLLM_PLUGINS=kv_materialization`. The Extension
+Manager preserves existing plugin selections (for example `ascend`) when it
+adds this activation entry point.
+
+For a direct launch that explicitly opts into this plugin, use the wrapper:
 
 ```bash
 vllm-kv-materialization-serve serve --model <model>
 ```
+
+Disable and remove the extension with:
+
+```bash
+vllm-hust-ext extension disable \
+  org.vllm-hust.kv-materialization-arrival-control
+vllm-hust-ext extension forget \
+  org.vllm-hust.kv-materialization-arrival-control
+uv pip uninstall vllm-kv-materialization
+```
+
+Disabling only changes Extension Manager launch intent. It does not delete KV
+data, stop an external service, or modify the installed vLLM package.
 
 Run the toy policy harness:
 
@@ -305,9 +348,11 @@ The runtime-boundary live path writes endpoint summaries under
 submodule (not a symlink) with:
 
 - URL: `https://github.com/vLLM-HUST/vllm-hust.git`
-- branch: `feature/kv-materialization-runtime-integration`
-- pinned carrier commit: `68b8be04493d39d5706f3d0d18f465f5eab947c4`
-- base: vLLM-HUST `main` at `e4ce33646f2ef1781289e6dc651fad0d00177c55`
+- branch: `feature/kv-materialization-runtime-plugin-v2`
+- pinned carrier commit: `8c018264e994e8147d7f2dc5aafc613fa0218aec`
+- base: vLLM-HUST `main` at `d14cd5cc6ff205652429dc93feeb9700c6623108`
+- public request-processing hook API: `1.0`
+- public KV-materialization runtime-control API: `1.0`
 
 Fresh-checkout CPU validation:
 
@@ -326,8 +371,12 @@ git submodule update --init --recursive
 ```
 
 This repository exists because vLLM supports out-of-tree plugins through
-`vllm.general_plugins`. That seam is the right place to study arrival-time
-materialization decisions without turning this repo into an upstream fork.
+`vllm.general_plugins`. Registration uses that stable discovery boundary;
+per-request decisions use the separately versioned
+`vllm.request-processing-hook` host contract. The runtime carrier validates the
+resulting `kv_materialization_runtime_control` metadata through
+`vllm.kv-materialization-runtime-control` and applies it to local and connector
+reuse, segmented hashing, and cache commit paths.
 
 
 Run A/B with only plugin-owned environment variables changed between baseline and experiment. Record command shape, devices, model, graph config, prompt, max tokens, output length, TTFT, TPOT, throughput, result paths, confirmed facts, hypotheses, rejected directions, and the next experiment. If startup fails, stop through the same manager and record the failure; do not switch to manual Docker startup.

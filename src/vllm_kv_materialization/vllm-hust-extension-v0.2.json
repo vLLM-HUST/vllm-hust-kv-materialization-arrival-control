@@ -1,0 +1,58 @@
+{
+  "schema_version": "0.2-experimental",
+  "extension_id": "org.vllm-hust.kv-materialization-arrival-control",
+  "extension_version": "0.1.0",
+  "kind": "in_process_plugin",
+  "host": {
+    "provider": "vllm",
+    "name": "vllm",
+    "version_range": ">=0.28.1.post1.dev202,<0.29"
+  },
+  "runtime": {
+    "type": "python",
+    "process_scope": "vllm-processes",
+    "isolation": "trusted_in_process"
+  },
+  "lifecycle_owner": "vllm",
+  "protocols": [
+    {
+      "name": "vllm.request-processing-hook",
+      "version_range": ">=1,<2"
+    },
+    {
+      "name": "vllm.kv-materialization-runtime-control",
+      "version_range": ">=1,<2"
+    }
+  ],
+  "implementation": [
+    {
+      "type": "python_entry_point",
+      "group": "vllm.general_plugins",
+      "name": "kv_materialization"
+    }
+  ],
+  "requires_services": [],
+  "components": [
+    {
+      "component_id": "request-arrival-controller",
+      "contracts": [
+        "vllm.request-processing-hook.v1",
+        "vllm.kv-materialization-runtime-control.v1"
+      ],
+      "execution_planes": ["api", "scheduler"],
+      "isolation": "trusted_in_process",
+      "implementation_ref": "vllm_kv_materialization.plugin:process_request",
+      "permissions": ["filesystem_write"]
+    }
+  ],
+  "activation": {
+    "entry_points": [
+      {
+        "group": "vllm.general_plugins",
+        "name": "kv_materialization"
+      }
+    ],
+    "environment": {},
+    "additional_config": {}
+  }
+}

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+from types import SimpleNamespace
 
 from vllm_kv_materialization.live_control import (
     HEADER_PRIMARY_ANCHOR,
@@ -28,9 +29,34 @@ from vllm_kv_materialization.live_control import (
 class _RecordingCoordinator:
     def __init__(self) -> None:
         self.calls: list[tuple[object, int]] = []
+        self.single_type_managers: tuple[object, ...] = ()
 
     def cache_blocks(self, request: object, num_computed_tokens: int) -> None:
         self.calls.append((request, num_computed_tokens))
+
+
+def _runtime_control_payload(
+    decision: str,
+    *,
+    prompt_tokens: int,
+    target_reuse_tokens: int,
+    cache_salt: str | None = "kvmat:anchor:test",
+    segmented_tail_cache_salt: str | None = None,
+) -> dict[str, object]:
+    return {
+        "schema_version": 1,
+        "observed_decision": decision,
+        "effective_decision": decision,
+        "control_path": "test",
+        "cache_salt": cache_salt,
+        "decision_supported": True,
+        "support_tier": "native_runtime_action",
+        "fallback_reason": None,
+        "target_reuse_tokens": target_reuse_tokens,
+        "target_tail_tokens": prompt_tokens - target_reuse_tokens,
+        "segmented_tail_cache_salt": segmented_tail_cache_salt,
+        "requires_segmented_materialization": decision == "partial_reuse",
+    }
 
 
 def test_estimate_reusable_prefix_tokens_prefers_header_value() -> None:
@@ -173,6 +199,7 @@ def test_compute_runtime_control_marks_partial_as_degraded_full_reuse(
     ]
 
     assert runtime_hint["target_reuse_tokens"] == observation.reusable_prefix_tokens
+    assert runtime_hint["cache_salt"] == plan.cache_salt
     assert (
         runtime_hint["target_tail_tokens"] == 1600 - observation.reusable_prefix_tokens
     )
@@ -336,18 +363,23 @@ def test_partial_reuse_caps_cacheable_tokens_to_reuse_boundary() -> None:
     manager = object.__new__(KVCacheManager)
     manager.enable_caching = True
     manager.log_stats = False
+    manager.hash_block_size = 128
     manager.coordinator = _RecordingCoordinator()
+    manager.block_pool = SimpleNamespace(get_usage=lambda: 0.0)
+    manager._emit_materialization_event = lambda *args, **kwargs: None
 
     sampling_params = SamplingParams.from_optional(
         max_tokens=1,
         extra_args={
-            RUNTIME_KV_TRANSFER_CONTROL_KEY: {
-                "effective_decision": "partial_reuse",
-                "target_reuse_tokens": 768,
-            }
+            RUNTIME_KV_TRANSFER_CONTROL_KEY: _runtime_control_payload(
+                "partial_reuse",
+                prompt_tokens=1536,
+                target_reuse_tokens=768,
+                segmented_tail_cache_salt="kvmat:segment:test",
+            )
         },
     )
-    request = Request("req-cache-cap", [1, 2, 3], sampling_params, None)
+    request = Request("req-cache-cap", list(range(1536)), sampling_params, None)
 
     KVCacheManager.cache_blocks(manager, request, 1536)
 
@@ -377,6 +409,7 @@ def test_partial_reuse_exports_segmented_tail_salt(monkeypatch) -> None:
     ]
 
     assert plan.effective_decision == "partial_reuse"
+    assert runtime_hint["cache_salt"] == plan.cache_salt
     assert runtime_hint["segmented_tail_cache_salt"] == plan.segmented_tail_cache_salt
     assert (
         runtime_hint["segmented_tail_cache_salt"]
@@ -394,11 +427,12 @@ def test_partial_reuse_resets_tail_hash_chain_at_boundary() -> None:
 
     init_none_hash(_stable_hash)
     block_hasher = get_request_block_hasher(2, _stable_hash)
-    runtime_control = {
-        "effective_decision": "partial_reuse",
-        "target_reuse_tokens": 4,
-        "segmented_tail_cache_salt": "kvmat:segment:test",
-    }
+    runtime_control = _runtime_control_payload(
+        "partial_reuse",
+        prompt_tokens=8,
+        target_reuse_tokens=4,
+        segmented_tail_cache_salt="kvmat:segment:test",
+    )
     sampling_params = SamplingParams.from_optional(
         max_tokens=1,
         extra_args={RUNTIME_KV_TRANSFER_CONTROL_KEY: runtime_control},
@@ -433,18 +467,22 @@ def test_full_reuse_keeps_cacheable_tokens_uncapped() -> None:
     manager = object.__new__(KVCacheManager)
     manager.enable_caching = True
     manager.log_stats = False
+    manager.hash_block_size = 128
     manager.coordinator = _RecordingCoordinator()
+    manager.block_pool = SimpleNamespace(get_usage=lambda: 0.0)
+    manager._emit_materialization_event = lambda *args, **kwargs: None
 
     sampling_params = SamplingParams.from_optional(
         max_tokens=1,
         extra_args={
-            RUNTIME_KV_TRANSFER_CONTROL_KEY: {
-                "effective_decision": "full_reuse",
-                "target_reuse_tokens": 768,
-            }
+            RUNTIME_KV_TRANSFER_CONTROL_KEY: _runtime_control_payload(
+                "full_reuse",
+                prompt_tokens=1536,
+                target_reuse_tokens=768,
+            )
         },
     )
-    request = Request("req-cache-full", [1, 2, 3], sampling_params, None)
+    request = Request("req-cache-full", list(range(1536)), sampling_params, None)
 
     KVCacheManager.cache_blocks(manager, request, 1536)
 

@@ -1,219 +1,175 @@
 from __future__ import annotations
 
+import json
 import logging
 import os
-from typing import Any
+import time
+from collections.abc import Mapping
+from importlib.metadata import PackageNotFoundError, version
+from typing import TYPE_CHECKING, Any
 
 from vllm_kv_materialization.live_control import (
-    RuntimeControlPlan,
-    apply_runtime_control,
+    HEADER_HOME_RANK,
+    HEADER_PRIMARY_ANCHOR,
+    HEADER_QUEUE_PRESSURE,
+    HEADER_REQUEST_ID,
+    HEADER_REUSE_CONFIDENCE,
+    HEADER_SECONDARY_ANCHORS,
+    HEADER_SHARED_PREFIX_TOKENS,
+    HEADER_TURN_INDEX,
+    HEADER_WORKLOAD_CASE,
+    HEADER_WORKLOAD_FAMILY,
     bind_request_headers,
+    build_runtime_control_extra_args,
     compute_runtime_control,
-    merge_runtime_control_extra_args,
-    observe_request,
+    record_observation,
     reset_request_headers,
 )
 
+if TYPE_CHECKING:
+    from vllm.plugins.request_processing import RequestProcessingContext
+
 logger = logging.getLogger(__name__)
 
-_PATCHED = False
-_RUNTIME_PLANS_ATTR = "_kv_materialization_runtime_plans"
-_RUNTIME_PLAN_CURSOR_ATTR = "_kv_materialization_runtime_plan_cursor"
+EXTENSION_ID = "org.vllm-hust.kv-materialization-arrival-control"
+PLUGIN_NAME = "kv_materialization"
+REQUIRED_REQUEST_PROCESSING_API = "1.0"
+REQUIRED_KV_MATERIALIZATION_API = "1.0"
+_ENABLED_BUNDLES_ENV = "VLLMHUST_EXT_ENABLED_BUNDLES"
+_VLLM_PLUGINS_ENV = "VLLM_PLUGINS"
+_RUNTIME_EVENT_LOG_ENV = "VLLM_KV_MATERIALIZATION_RUNTIME_EVENT_LOG_PATH"
+_REQUEST_HEADERS = (
+    HEADER_REQUEST_ID,
+    HEADER_PRIMARY_ANCHOR,
+    HEADER_SECONDARY_ANCHORS,
+    HEADER_SHARED_PREFIX_TOKENS,
+    HEADER_REUSE_CONFIDENCE,
+    HEADER_QUEUE_PRESSURE,
+    HEADER_WORKLOAD_CASE,
+    HEADER_WORKLOAD_FAMILY,
+    HEADER_TURN_INDEX,
+    HEADER_HOME_RANK,
+)
+
+_REGISTERED = False
 
 
-def _store_runtime_plans(request: Any, plans: list[RuntimeControlPlan]) -> None:
-    setattr(request, _RUNTIME_PLANS_ATTR, tuple(plans))
-    setattr(request, _RUNTIME_PLAN_CURSOR_ATTR, 0)
-
-
-def _consume_runtime_plan(request: Any) -> RuntimeControlPlan | None:
-    plans = getattr(request, _RUNTIME_PLANS_ATTR, ())
-    cursor = getattr(request, _RUNTIME_PLAN_CURSOR_ATTR, 0)
-    if not isinstance(plans, tuple) or cursor >= len(plans):
-        return None
-    setattr(request, _RUNTIME_PLAN_CURSOR_ATTR, cursor + 1)
-    return plans[cursor]
-
-
-def _attach_runtime_plan_to_sampling_params(
-    request: Any,
-    original_to_sampling_params,
-    max_tokens: int,
-    default_sampling_params: dict,
-):
-    plan = _consume_runtime_plan(request)
-    if plan is None:
-        return original_to_sampling_params(request, max_tokens, default_sampling_params)
-
-    previous_vllm_xargs = getattr(request, "vllm_xargs", None)
+def _package_version() -> str:
     try:
-        request.vllm_xargs = merge_runtime_control_extra_args(
-            previous_vllm_xargs,
-            plan,
-        )
-        return original_to_sampling_params(request, max_tokens, default_sampling_params)
+        return version("vllm-kv-materialization")
+    except PackageNotFoundError:
+        return "source-tree"
+
+
+def observe_runtime_event(payload: Mapping[str, object]) -> None:
+    """Persist an engine-owned receipt only when explicitly configured."""
+
+    path = os.getenv(_RUNTIME_EVENT_LOG_ENV)
+    if not path:
+        return
+    record = {"timestamp_s": time.time(), **payload}
+    encoded = (json.dumps(record, sort_keys=True) + "\n").encode()
+    fd = os.open(path, os.O_APPEND | os.O_CREAT | os.O_WRONLY, 0o644)
+    try:
+        os.write(fd, encoded)
     finally:
-        request.vllm_xargs = previous_vllm_xargs
+        os.close(fd)
+
+
+def _activation_requested() -> bool:
+    """Require explicit Manager or direct-vLLM activation intent."""
+
+    raw = os.getenv(_ENABLED_BUNDLES_ENV)
+    if raw is not None:
+        enabled = {item.strip() for item in raw.split(",") if item.strip()}
+        return EXTENSION_ID in enabled
+
+    allowed_plugins = {
+        item.strip()
+        for item in os.getenv(_VLLM_PLUGINS_ENV, "").split(",")
+        if item.strip()
+    }
+    return PLUGIN_NAME in allowed_plugins
+
+
+def process_request(
+    context: RequestProcessingContext,
+) -> Mapping[str, Any]:
+    """Create engine metadata through the public request-processing hook."""
+
+    token = bind_request_headers(context.headers)
+    try:
+        observation, plan = compute_runtime_control(
+            context.request_id,
+            context.prompt_tokens,
+            context.max_tokens,
+        )
+        record_observation(observation)
+    finally:
+        reset_request_headers(token)
+    return build_runtime_control_extra_args(plan)
 
 
 def register_plugin() -> None:
-    """Register the plugin.
+    """Register the MOD through the versioned vLLM-HUST host seam."""
 
-    The current patch surface is intentionally minimal. It only marks plugin
-    availability so offline and future in-process experiments can verify that
-    the plugin was loaded correctly.
-    """
-
-    global _PATCHED
-    if _PATCHED:
+    global _REGISTERED
+    if _REGISTERED or not _activation_requested():
         return
 
     try:
-        from vllm import envs as vllm_envs
-        from vllm.entrypoints.openai.chat_completion.protocol import (
-            ChatCompletionRequest,
+        from vllm.plugins.request_processing import (
+            REQUEST_PROCESSING_HOOK_API_VERSION,
+            register_request_processor,
         )
-        from vllm.entrypoints.openai.chat_completion.serving import OpenAIServingChat
-        from vllm.entrypoints.openai.completion.protocol import CompletionRequest
-        from vllm.entrypoints.openai.completion.serving import OpenAIServingCompletion
-        from vllm.entrypoints.openai.engine.serving import OpenAIServing
-        from vllm.renderers.inputs.preprocess import extract_prompt_components
-    except Exception:
-        logger.exception("Failed to import vLLM during plugin registration.")
-        return
+        from vllm.v1.core.kv_materialization import (
+            KV_MATERIALIZATION_RUNTIME_CONTROL_API_VERSION,
+            register_kv_materialization_runtime_observer,
+        )
+    except ImportError as error:
+        raise RuntimeError(
+            "KV materialization requires the versioned vLLM-HUST "
+            "request-processing and KV runtime hooks; the installed host is "
+            "unsupported"
+        ) from error
 
-    original_log_inputs = OpenAIServing._log_inputs
-    original_chat_create = OpenAIServingChat.create_chat_completion
-    original_completion_create = OpenAIServingCompletion.create_completion
-    try:
-        from vllm.entrypoints.serve.render.serving import OpenAIServingRender
-    except ImportError:
-        OpenAIServingRender = None
-
-    if OpenAIServingRender is None:
-        original_render_chat = OpenAIServingChat.render_chat_request
-        original_render_completion = OpenAIServingCompletion.render_completion_request
-    else:
-        original_render_chat = OpenAIServingRender.render_chat
-        original_render_completion = OpenAIServingRender.render_completion
-    original_chat_to_sampling_params = ChatCompletionRequest.to_sampling_params
-    original_completion_to_sampling_params = CompletionRequest.to_sampling_params
-
-    def _prompt_token_count(model_config, prompt) -> int:
-        try:
-            components = extract_prompt_components(model_config, prompt)
-            return len(components.token_ids or [])
-        except Exception:
-            logger.exception(
-                "Failed to extract prompt components for KV materialization control."
-            )
-            return 0
-
-    async def patched_render_chat(self, request):
-        result = await original_render_chat(self, request)
-        if not isinstance(result, tuple) or len(result) != 2:
-            return result
-
-        conversation, engine_prompts = result
-        controlled_prompts = []
-        runtime_plans = []
-        for index, engine_prompt in enumerate(engine_prompts):
-            prompt_tokens = _prompt_token_count(self.model_config, engine_prompt)
-            output_tokens = int(
-                getattr(request, "max_completion_tokens", None)
-                or getattr(request, "max_tokens", 0)
-                or 0
-            )
-            request_id = str(getattr(request, "request_id", None) or f"chat-{index}")
-            _, plan = compute_runtime_control(request_id, prompt_tokens, output_tokens)
-            runtime_plans.append(plan)
-            controlled_prompts.append(apply_runtime_control(engine_prompt, plan))
-        _store_runtime_plans(request, runtime_plans)
-        return conversation, controlled_prompts
-
-    async def patched_render_completion(self, request):
-        result = await original_render_completion(self, request)
-        if not isinstance(result, list):
-            return result
-
-        controlled_prompts = []
-        runtime_plans = []
-        for index, engine_prompt in enumerate(result):
-            prompt_tokens = _prompt_token_count(self.model_config, engine_prompt)
-            output_tokens = int(getattr(request, "max_tokens", 0) or 0)
-            request_id = str(
-                getattr(request, "request_id", None) or f"completion-{index}"
-            )
-            _, plan = compute_runtime_control(request_id, prompt_tokens, output_tokens)
-            runtime_plans.append(plan)
-            controlled_prompts.append(apply_runtime_control(engine_prompt, plan))
-        _store_runtime_plans(request, runtime_plans)
-        return controlled_prompts
-
-    def patched_chat_to_sampling_params(self, max_tokens, default_sampling_params):
-        return _attach_runtime_plan_to_sampling_params(
-            self,
-            original_chat_to_sampling_params,
-            max_tokens,
-            default_sampling_params,
+    if REQUEST_PROCESSING_HOOK_API_VERSION != REQUIRED_REQUEST_PROCESSING_API:
+        raise RuntimeError(
+            "Unsupported vLLM-HUST request-processing hook API: "
+            f"expected {REQUIRED_REQUEST_PROCESSING_API}, got "
+            f"{REQUEST_PROCESSING_HOOK_API_VERSION}"
         )
 
-    def patched_completion_to_sampling_params(
-        self, max_tokens, default_sampling_params
+    if (
+        KV_MATERIALIZATION_RUNTIME_CONTROL_API_VERSION
+        != REQUIRED_KV_MATERIALIZATION_API
     ):
-        return _attach_runtime_plan_to_sampling_params(
-            self,
-            original_completion_to_sampling_params,
-            max_tokens,
-            default_sampling_params,
+        raise RuntimeError(
+            "Unsupported vLLM-HUST KV materialization API: "
+            f"expected {REQUIRED_KV_MATERIALIZATION_API}, got "
+            f"{KV_MATERIALIZATION_RUNTIME_CONTROL_API_VERSION}"
         )
 
-    def patched_log_inputs(self, request_id, inputs, params, lora_request) -> None:
-        original_log_inputs(self, request_id, inputs, params, lora_request)
-        try:
-            prompt_components = self._extract_prompt_components(inputs)
-            prompt_tokens = len(prompt_components.token_ids or [])
-            output_tokens = int(getattr(params, "max_tokens", 0) or 0)
-            observe_request(request_id, prompt_tokens, output_tokens)
-        except Exception:
-            logger.exception("Failed to record KV materialization observation.")
-
-    async def patched_chat_create(self, request, raw_request=None):
-        token = bind_request_headers(getattr(raw_request, "headers", None))
-        try:
-            return await original_chat_create(self, request, raw_request)
-        finally:
-            reset_request_headers(token)
-
-    async def patched_completion_create(self, request, raw_request=None):
-        token = bind_request_headers(getattr(raw_request, "headers", None))
-        try:
-            return await original_completion_create(self, request, raw_request)
-        finally:
-            reset_request_headers(token)
-
-    OpenAIServing._log_inputs = patched_log_inputs
-    OpenAIServingChat.create_chat_completion = patched_chat_create
-    OpenAIServingCompletion.create_completion = patched_completion_create
-    if OpenAIServingRender is None:
-        OpenAIServingChat.render_chat_request = patched_render_chat
-        OpenAIServingCompletion.render_completion_request = patched_render_completion
-    else:
-        OpenAIServingRender.render_chat = patched_render_chat
-        OpenAIServingRender.render_completion = patched_render_completion
-    ChatCompletionRequest.to_sampling_params = patched_chat_to_sampling_params
-    CompletionRequest.to_sampling_params = patched_completion_to_sampling_params
-
-    vllm_envs.VLLM_KV_MATERIALIZATION_PLUGIN_LOADED = True
-    vllm_envs.VLLM_KV_MATERIALIZATION_PLUGIN_MODE = os.getenv(
-        "VLLM_KV_MATERIALIZATION_PLUGIN_MODE", "prefix_cache_runtime_control"
+    register_request_processor(
+        PLUGIN_NAME,
+        process_request,
+        header_names=_REQUEST_HEADERS,
     )
-
-    _PATCHED = True
+    register_kv_materialization_runtime_observer(
+        PLUGIN_NAME,
+        observe_runtime_event,
+    )
+    os.environ["VLLM_KV_MATERIALIZATION_PLUGIN_LOADED"] = "1"
+    os.environ["VLLM_KV_MATERIALIZATION_PLUGIN_MODE"] = os.getenv(
+        "VLLM_KV_MATERIALIZATION_PLUGIN_MODE",
+        "prefix_cache_runtime_control",
+    )
+    _REGISTERED = True
     logger.info(
-        "Registered vLLM KV materialization plugin with prefix-cache runtime control."
-    )
-    print(
-        "KV_MATERIALIZATION_PLUGIN_REGISTERED mode=prefix_cache_runtime_control",
-        flush=True,
+        "Registered extension=%s distribution_version=%s request_api=%s "
+        "kv_materialization_api=%s",
+        EXTENSION_ID,
+        _package_version(),
+        REQUEST_PROCESSING_HOOK_API_VERSION,
+        KV_MATERIALIZATION_RUNTIME_CONTROL_API_VERSION,
     )
