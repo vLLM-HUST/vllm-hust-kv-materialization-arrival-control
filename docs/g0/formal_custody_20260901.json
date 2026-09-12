@@ -1,0 +1,75 @@
+{
+  "archive": {
+    "bytes": 16033682,
+    "local_mode": "0o444",
+    "local_path": "/root/g0-artifacts/issue17/formal_20260831/g0-formal-stop-v2.tar.gz",
+    "sha256": "6474d718f65aeee3824e25897934922672c2a51e92f6c218be6f5b16a7f0ad4a"
+  },
+  "artifact": "issue17-g0-formal-stop-custody-v2",
+  "bootstrap": {
+    "confidence_pct": 95,
+    "method": "exact_n_to_n_resampling_with_replacement",
+    "replicates_per_cell": 27,
+    "sampling_unit": "paired_server_lifecycle",
+    "statistic": "median"
+  },
+  "canonical_runs": 63,
+  "correct_requests": 4032,
+  "pull_request_record": {
+    "ascend_telemetry": {
+      "merged": false,
+      "state": "closed",
+      "url": "https://github.com/vllm-project/vllm-ascend/pull/15468"
+    },
+    "main_evidence": {
+      "state": "open_draft",
+      "url": "https://github.com/intellistream/kv-materialization-arrival-control/pull/21"
+    },
+    "profiling_runner": {
+      "merged": false,
+      "state": "closed",
+      "url": "https://github.com/vLLM-HUST/vllm-hust-profiling/pull/3"
+    }
+  },
+  "execution_identity_correction": {
+    "owner_acknowledgement_required": true,
+    "path_in_archive": "suite/formal_v1_20260831/execution_identity_posthoc_correction.json",
+    "posthoc_correction": true,
+    "sha256": "1e92245ee3ea2518d85033b1807061ace7e798c5833c2c1864cbfdb73a35698d"
+  },
+  "manifest": {
+    "bytes": 297064,
+    "path_in_archive": "custody/formal_v1_20260831/raw_manifest_v2.json",
+    "sha256": "7847e2cbfd12858e09bc0ade41e55dc31219110f33f223e156428ee17781a2a4",
+    "suite_files": 8,
+    "canonical_run_files": 1260,
+    "rejected_files": 28,
+    "report_files": 4
+  },
+  "reconstruction_commits": {
+    "main_evidence": "fec6838",
+    "profiling_runner": "3d2ef06",
+    "vllm_ascend_telemetry": "643b36992"
+  },
+  "rejected_attempts": 2,
+  "release": {
+    "asset_api_url": "https://api.github.com/repos/intellistream/kv-materialization-arrival-control/releases/assets/539131048",
+    "asset_browser_download_url": "https://github.com/intellistream/kv-materialization-arrival-control/releases/download/g0-issue17-stop-20260901-v2/g0-formal-stop-v2.tar.gz",
+    "asset_digest_reported_by_github": "sha256:6474d718f65aeee3824e25897934922672c2a51e92f6c218be6f5b16a7f0ad4a",
+    "asset_id": 539131048,
+    "release_id": 380270094,
+    "release_url": "https://github.com/intellistream/kv-materialization-arrival-control/releases/tag/g0-issue17-stop-20260901-v2",
+    "tag": "g0-issue17-stop-20260901-v2"
+  },
+  "report": {
+    "json_sha256": "1cc9244ce1b11cc6ae642080f94e419786bee9bfd29b5755a3be1a9b6bf06698",
+    "markdown_sha256": "7ee0c26105d57c1ff3f7bfd2ca0cccae715791257b9e255a2b88c32a54d4f597",
+    "status": "complete_early_stop",
+    "verdict": "stop"
+  },
+  "schema_version": 2,
+  "unexecuted_after_stop": {
+    "base_sequences": "64-96",
+    "frontier_sequences": "97-132"
+  }
+}

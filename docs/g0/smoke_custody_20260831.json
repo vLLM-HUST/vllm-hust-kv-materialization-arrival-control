@@ -1,0 +1,27 @@
+{
+  "archives": [
+    {
+      "bytes": 170824,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/smoke_20260831/g0-smoke-v6-burstgpt-moderate-always_recompute.tar.gz",
+      "sha256": "7652dd23dccdb378dfd0d1898cd29761b3f4857cea2f2bbd37621545617a0af2"
+    },
+    {
+      "bytes": 179739,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/smoke_20260831/g0-smoke-v6-burstgpt-moderate-fixed_prefetch_depth.tar.gz",
+      "sha256": "9b23bcf7e442315cb11211fa507e251cd870c2ae2c9c1a26e8451e7a9634869c"
+    },
+    {
+      "bytes": 178867,
+      "mode": "0o444",
+      "path": "/root/g0-artifacts/issue17/smoke_20260831/g0-smoke-v6-burstgpt-moderate-minimum_retrieve_threshold.tar.gz",
+      "sha256": "d1af92a8a1c0b9123f16b4145607622fcce3956615fe4802f6095442c5c2fc59"
+    }
+  ],
+  "artifact": "g0-matched-baseline-smoke-custody",
+  "custodian": "local workspace owner",
+  "excluded_from_formal_verdict": true,
+  "recovery": "Verify SHA-256, then extract into an empty directory with tar -xzf.",
+  "schema_version": 1
+}

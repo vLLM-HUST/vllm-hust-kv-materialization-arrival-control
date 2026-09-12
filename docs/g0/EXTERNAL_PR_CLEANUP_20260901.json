@@ -1,0 +1,29 @@
+{
+  "artifact": "issue17-external-pr-cleanup",
+  "issue_comment_posted_by_agent": false,
+  "main_pull_request": {
+    "number": 21,
+    "repository": "intellistream/kv-materialization-arrival-control",
+    "state": "open_draft",
+    "url": "https://github.com/intellistream/kv-materialization-arrival-control/pull/21"
+  },
+  "profiling_pull_request": {
+    "closed_at": "2026-09-01T06:56:19Z",
+    "merged": false,
+    "number": 3,
+    "repository": "vLLM-HUST/vllm-hust-profiling",
+    "state": "closed",
+    "url": "https://github.com/vLLM-HUST/vllm-hust-profiling/pull/3"
+  },
+  "reason": "Minimal-scope cleanup keeps only the primary evidence PR and published raw custody release. Runtime reconstruction remains anchored by commits and immutable source snapshots, not active external PRs.",
+  "release_retained": "https://github.com/intellistream/kv-materialization-arrival-control/releases/tag/g0-issue17-stop-20260901-v2",
+  "schema_version": 1,
+  "vllm_ascend_pull_request": {
+    "closed_at": "2026-09-01T06:56:22Z",
+    "merged": false,
+    "number": 15468,
+    "repository": "vllm-project/vllm-ascend",
+    "state": "closed",
+    "url": "https://github.com/vllm-project/vllm-ascend/pull/15468"
+  }
+}

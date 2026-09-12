@@ -1,0 +1,41 @@
+{
+  "artifact": "g0-materialization-telemetry-seam-audit",
+  "checks": {
+    "connector_stats_export": false,
+    "in_flight_bytes_export": false,
+    "layer_ready_hook": true,
+    "load_hook": true,
+    "per_request_transfer_export": false,
+    "queue_depth_export": false,
+    "queue_exists": true
+  },
+  "connector": {
+    "git_commit": "f4a08bddd0cc65a0bd8c3d377b158ae5ca7527db",
+    "path": "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/ascend_store_connector.py",
+    "sha256": "1e156620d8c8d9b983da8d00dbb54444bb88c574cf069daac1f15691e47e1b6a"
+  },
+  "interpretation": "The connector has internal execution hooks but does not export the raw materialization counters needed to separate congestion from generic queueing.",
+  "missing_required_exports": [
+    "connector_stats_export",
+    "queue_depth_export",
+    "in_flight_bytes_export",
+    "per_request_transfer_export"
+  ],
+  "pool_worker": {
+    "git_commit": "f4a08bddd0cc65a0bd8c3d377b158ae5ca7527db",
+    "path": "/vllm-workspace/vllm-ascend/vllm_ascend/distributed/kv_transfer/kv_pool/ascend_store/pool_worker.py",
+    "sha256": "3c880206af1f2083b048043f1483be72a1978665095a00bb537e1af3e5cbcef3"
+  },
+  "repository": {
+    "parent_commit": "77cd81d911127d0ebe838cacf8747a9e66a82129",
+    "vendor_vllm_gitlink": "68b8be04493d39d5706f3d0d18f465f5eab947c4"
+  },
+  "required_exports": [
+    "connector_stats_export",
+    "queue_depth_export",
+    "in_flight_bytes_export",
+    "per_request_transfer_export"
+  ],
+  "schema_version": 1,
+  "verdict": "telemetry_unavailable_stop"
+}
