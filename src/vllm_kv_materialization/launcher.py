@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import os
 
+from vllm_kv_materialization.plugin import EXTENSION_ID, PLUGIN_NAME
+
 
 def _merge_plugins(existing: str | None, plugin_name: str) -> str:
     if not existing:
@@ -15,7 +17,11 @@ def _merge_plugins(existing: str | None, plugin_name: str) -> str:
 def main() -> None:
     os.environ["VLLM_PLUGINS"] = _merge_plugins(
         os.getenv("VLLM_PLUGINS"),
-        "kv_materialization",
+        PLUGIN_NAME,
+    )
+    os.environ["VLLMHUST_EXT_ENABLED_BUNDLES"] = _merge_plugins(
+        os.getenv("VLLMHUST_EXT_ENABLED_BUNDLES"),
+        EXTENSION_ID,
     )
 
     from vllm.entrypoints.cli.main import main as vllm_main

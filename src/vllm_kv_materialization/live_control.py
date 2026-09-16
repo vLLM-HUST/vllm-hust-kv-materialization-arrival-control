@@ -447,6 +447,7 @@ def build_runtime_control_extra_args(plan: RuntimeControlPlan) -> dict[str, Any]
             "observed_decision": plan.observed_decision,
             "effective_decision": plan.effective_decision,
             "control_path": plan.control_path,
+            "cache_salt": plan.cache_salt,
             "decision_supported": plan.decision_supported,
             "support_tier": plan.support_tier,
             "fallback_reason": plan.fallback_reason,
@@ -692,11 +693,13 @@ def observe_request(
             _ANCHOR_SEEN_COUNTS[observation.primary_anchor_id] = (
                 _ANCHOR_SEEN_COUNTS.get(observation.primary_anchor_id, 0) + 1
             )
-    _append_observation(observation)
+    record_observation(observation)
     return observation
 
 
-def _append_observation(observation: LiveObservation) -> None:
+def record_observation(observation: LiveObservation) -> None:
+    """Persist one controller observation when a log path is configured."""
+
     log_path = os.getenv("VLLM_KV_MATERIALIZATION_LOG_PATH", "").strip()
     if not log_path:
         return

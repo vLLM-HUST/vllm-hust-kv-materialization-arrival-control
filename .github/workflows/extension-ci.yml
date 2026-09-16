@@ -1,0 +1,44 @@
+name: Extension CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  package:
+    strategy:
+      matrix:
+        python: ["3.10", "3.12"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: >-
+          python -m pip install build pytest ruff
+          "vllm-hust-ext @
+          git+https://github.com/vLLM-HUST/extension-manager.git@cf1ea71e3e2cb81ab06267ef05eddb3e580ea20b"
+      - run: python -m build
+      - run: python -m pip install --no-deps --force-reinstall dist/*.whl
+      - run: >-
+          ruff check src/vllm_kv_materialization/__init__.py
+          src/vllm_kv_materialization/plugin.py
+          src/vllm_kv_materialization/live_control.py
+          src/vllm_kv_materialization/launcher.py tests/test_manifest.py
+          tests/test_plugin.py tests/test_launcher.py
+      - run: >-
+          ruff format --check src/vllm_kv_materialization/__init__.py
+          src/vllm_kv_materialization/plugin.py
+          src/vllm_kv_materialization/live_control.py
+          src/vllm_kv_materialization/launcher.py tests/test_manifest.py
+          tests/test_plugin.py tests/test_launcher.py
+      - run: >-
+          pytest -q -c /dev/null tests/test_manifest.py tests/test_plugin.py
+          tests/test_launcher.py
+      - run: >-
+          vllm-hust-ext extension inspect
+          org.vllm-hust.kv-materialization-arrival-control

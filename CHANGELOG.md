@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+- Added the vLLM-HUST Extension Manifest 0.2 descriptor, Extension Manager
+  discovery registration, packaged-manifest checks, and extension lifecycle
+  documentation.
+- Replaced import-time monkey patches of OpenAI serving internals with a
+  versioned, fail-closed request-processing host hook. Disabled extensions now
+  register no processor, installation alone remains inert, and hosts without
+  hook API `1.0` are rejected.
+- Added default-off request-processing and typed KV-materialization registries
+  to the current vLLM-HUST carrier. Chat, Completions, Responses, and beam
+  requests now carry validated control metadata without changing behavior when
+  no processor is registered.
+- Applied `recompute` and aligned `partial_reuse` boundaries consistently to
+  local prefix-cache lookup, KVConnector reuse, shared-cache commit, and
+  segmented tail hashing. Runtime receipts are emitted by the host and optional
+  JSONL persistence remains owned by this plugin.
+- Limited request processors to explicitly declared non-sensitive headers and
+  made experiment workload dependencies optional so ordinary vLLM plugin
+  loading stays lightweight.
 - Transferred the repository to `vLLM-HUST`, registered Wei He
   (`healer-positive`) as the maintainer, and corrected the package, issue,
   clone, and workload-source URLs for MOD publication.
