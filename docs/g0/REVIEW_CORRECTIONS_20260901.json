@@ -1,0 +1,35 @@
+{
+  "artifact": "issue17-g0-review-corrections",
+  "carrier_scope": {
+    "executed": "DeepSeek-V2-Lite bf16 TP1 eager AscendStore carrier",
+    "owner_acknowledgement_required": true,
+    "posthoc_correction": true,
+    "unexecuted_approved_carrier": "vendor/vllm@68b8be04493d39d5706f3d0d18f465f5eab947c4"
+  },
+  "decision": {
+    "generic_equivalence_role": "supporting_observation_only",
+    "issue_owner_decision_pending": true,
+    "primary_stop_trigger": "servegen/moderate tail pathology met the 10% gate in only one of three repeats",
+    "recommended_action": "stop_additional_matrix_and_mechanism_work",
+    "scope": "executed_ascendstore_carrier_only"
+  },
+  "immutable_raw_omissions": {
+    "explicit_fields_absent": [
+      "cache_epoch",
+      "fallback_reason",
+      "waiting_reason"
+    ],
+    "standalone_run_files_absent": [
+      "run_manifest.json",
+      "environment_config"
+    ],
+    "posthoc_raw_repair_forbidden": true
+  },
+  "portable_rebuild": {
+    "command": "make g0-release-rebuild",
+    "producer_absolute_paths_retained_as_provenance": true,
+    "relocated_tree_verification_supported": true
+  },
+  "pull_request_merge_closes_issue": false,
+  "schema_version": 1
+}
