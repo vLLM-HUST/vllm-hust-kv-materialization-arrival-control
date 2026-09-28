@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.2-experimental",
+  "schema_version": "0.3-experimental",
   "extension_id": "org.vllm-hust.kv-materialization-arrival-control",
   "extension_version": "0.1.0",
   "kind": "in_process_plugin",
@@ -32,6 +32,18 @@
     }
   ],
   "requires_services": [],
+  "resource_claims": [
+    {
+      "resource": "vllm.kv-materialization.policy",
+      "scope": "vllm-process",
+      "mode": "exclusive"
+    },
+    {
+      "resource": "vllm.runtime.observer",
+      "scope": "vllm-process",
+      "mode": "shared"
+    }
+  ],
   "components": [
     {
       "component_id": "request-arrival-controller",

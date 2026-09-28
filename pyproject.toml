@@ -40,7 +40,7 @@ dev = [
 	"pytest>=8.0",
 	"ruff>=0.12",
 	"tomli>=2.0; python_version < '3.11'",
-	"vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git@9668255f0b36939155681916993462082282ea35",
+	"vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git@2dffcf7fdea3cad36bc24c0c4174394bcc06d796",
 ]
 
 [tool.setuptools]
@@ -50,7 +50,7 @@ package-dir = {"" = "src"}
 where = ["src"]
 
 [tool.setuptools.package-data]
-vllm_kv_materialization = ["vllm-hust-extension-v0.2.json"]
+vllm_kv_materialization = ["vllm-hust-extension-v0.3.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -5,13 +5,26 @@ from importlib.resources import files
 
 
 def test_extension_manifest_activates_registered_plugin_without_machine_paths() -> None:
-    path = files("vllm_kv_materialization").joinpath("vllm-hust-extension-v0.2.json")
+    path = files("vllm_kv_materialization").joinpath("vllm-hust-extension-v0.3.json")
     payload = json.loads(path.read_text(encoding="utf-8"))
 
     assert payload["extension_id"] == (
         "org.vllm-hust.kv-materialization-arrival-control"
     )
     assert payload["host"]["provider"] == "vllm"
+    assert payload["schema_version"] == "0.3-experimental"
+    assert payload["resource_claims"] == [
+        {
+            "resource": "vllm.kv-materialization.policy",
+            "scope": "vllm-process",
+            "mode": "exclusive",
+        },
+        {
+            "resource": "vllm.runtime.observer",
+            "scope": "vllm-process",
+            "mode": "shared",
+        },
+    ]
     assert payload["implementation"] == [
         {
             "type": "python_entry_point",

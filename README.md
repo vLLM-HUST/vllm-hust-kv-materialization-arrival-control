@@ -263,11 +263,11 @@ make build
 
 The supported host is the vLLM-HUST runtime pinned by the `vendor/vllm`
 submodule. Install the Extension Manager and this package, inspect the static
-Manifest 0.2 descriptor, then explicitly enable the extension:
+experimental Manifest 0.3 descriptor, then explicitly enable the extension:
 
 ```bash
 uv pip install \
-  "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git@9668255f0b36939155681916993462082282ea35"
+  "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git@2dffcf7fdea3cad36bc24c0c4174394bcc06d796"
 uv pip install .
 vllm-hust-ext extension inspect \
   org.vllm-hust.kv-materialization-arrival-control
@@ -276,21 +276,38 @@ vllm-hust-ext extension enable \
 vllm-hust-ext run -- vllm serve <model>
 ```
 
+While that Manager-supervised process is handling requests, inspect it from a
+second shell:
+
+```bash
+vllm-hust-ext extension status \
+  org.vllm-hust.kv-materialization-arrival-control
+```
+
+`runtime_effective` appears only after the host KV runtime invokes the
+registered observer, and only while the exact reporting PID/start identity is
+alive. Plugin discovery, import, registration, enablement, and environment
+variables are not sufficient evidence. Stop the supervised process with
+SIGINT/SIGTERM; the Manager forwards the signal, reaps its process group, and
+the stale observer receipt no longer projects `runtime_effective`.
+
 The package is discovered without importing its runtime implementation. On
 launch, vLLM loads the `kv_materialization` general plugin, which registers a
 request processor through the versioned public host hook and registers a
 runtime observer through the typed KV-materialization hook. That native path
 does not rewrite `OpenAIServing`, request protocol, renderer, or sampling
-methods. The deployed vLLM 0.23 Ascend line is supported by a deliberately
-version-scoped compatibility adapter when its carrier includes the historical
-KV-materialization runtime seam; other hosts without request-processing hook
-API `1.0` and KV-materialization API `1.0` are rejected at startup. The 0.23
-adapter still loads only through the declared `vllm.general_plugins` entry
-point and does not replace the current public-hook contract. Installation alone
-is inert: registration requires either Extension Manager enablement or explicit
-selection through `VLLM_PLUGINS=kv_materialization`. The Extension Manager
-preserves existing plugin selections (for example `ascend`) when it adds this
-activation entry point.
+methods. The ECPA manifest accepts only the pinned vLLM-HUST 0.29 host line and
+requires request-processing hook API `1.x` plus KV-materialization API `1.x`;
+unknown or incompatible APIs are rejected. A deliberately version-scoped
+adapter remains available for historical vLLM 0.23 experiments, but that
+adapter is not the current native host contract and its earlier smoke/NPU
+results are not evidence that this 0.29 path has completed NPU qualification.
+Installation alone is inert: registration requires either Extension Manager
+enablement or explicit selection through `VLLM_PLUGINS=kv_materialization`.
+The Extension Manager preserves existing plugin selections (for example
+`ascend`) when it adds this activation entry point, and rejects another
+exclusive owner of the same process-scoped KV-materialization policy before
+launch.
 
 For a direct launch that explicitly opts into this plugin, use the wrapper:
 
