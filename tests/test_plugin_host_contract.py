@@ -1,12 +1,45 @@
 from __future__ import annotations
 
+import importlib.util
+import logging
+import sys
+from pathlib import Path
+from types import ModuleType
+
 import pytest
-from vllm.plugins import request_processing
-from vllm.plugins.request_processing import (
-    RequestProcessingContext,
-    apply_request_processors,
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def _load_pinned_host_contract(module_name: str, relative_path: str) -> ModuleType:
+    spec = importlib.util.spec_from_file_location(
+        module_name,
+        ROOT / "vendor" / "vllm" / relative_path,
+    )
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+for package_name in ("vllm", "vllm.plugins", "vllm.v1", "vllm.v1.core"):
+    package = ModuleType(package_name)
+    package.__path__ = []
+    sys.modules[package_name] = package
+
+host_logger = ModuleType("vllm.logger")
+host_logger.init_logger = logging.getLogger
+sys.modules["vllm.logger"] = host_logger
+
+request_processing = _load_pinned_host_contract(
+    "vllm.plugins.request_processing",
+    "vllm/plugins/request_processing.py",
 )
-from vllm.v1.core import kv_materialization
+kv_materialization = _load_pinned_host_contract(
+    "vllm.v1.core.kv_materialization",
+    "vllm/v1/core/kv_materialization.py",
+)
 
 from vllm_kv_materialization import plugin
 from vllm_kv_materialization.live_control import RUNTIME_KV_TRANSFER_CONTROL_KEY
@@ -22,8 +55,8 @@ def test_plugin_uses_pinned_host_request_processing_contract(
     monkeypatch.setenv("VLLM_KV_POLICY_MODE", "always_recompute")
     plugin.register_plugin()
 
-    extra_args = apply_request_processors(
-        RequestProcessingContext(
+    extra_args = request_processing.apply_request_processors(
+        request_processing.RequestProcessingContext(
             endpoint="chat",
             request_id="contract-request-1",
             prompt_tokens=128,

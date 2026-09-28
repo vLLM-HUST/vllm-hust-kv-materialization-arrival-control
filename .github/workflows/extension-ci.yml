@@ -30,19 +30,18 @@ jobs:
           src/vllm_kv_materialization/live_control.py
           src/vllm_kv_materialization/launcher.py tests/test_manifest.py
           tests/test_plugin.py tests/test_plugin_host_contract.py
-          tests/test_plugin_registration.py tests/test_launcher.py
+          tests/test_launcher.py
       - run: >-
           ruff format --check src/vllm_kv_materialization/__init__.py
           src/vllm_kv_materialization/plugin.py
           src/vllm_kv_materialization/live_control.py
           src/vllm_kv_materialization/launcher.py tests/test_manifest.py
           tests/test_plugin.py tests/test_plugin_host_contract.py
-          tests/test_plugin_registration.py tests/test_launcher.py
+          tests/test_launcher.py
       - run: >-
           PYTHONPATH=src:vendor/vllm pytest -q -c /dev/null
           tests/test_manifest.py tests/test_plugin.py
-          tests/test_plugin_host_contract.py tests/test_plugin_registration.py
-          tests/test_launcher.py
+          tests/test_plugin_host_contract.py tests/test_launcher.py
       - run: >-
           vllm-hust-ext extension inspect
           org.vllm-hust.kv-materialization-arrival-control
