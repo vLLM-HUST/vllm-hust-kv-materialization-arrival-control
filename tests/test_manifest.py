@@ -19,7 +19,7 @@ except ModuleNotFoundError:  # pragma: no cover - Python 3.10 only
 
 ROOT = Path(__file__).parents[1]
 MANIFEST = Path(vllm_kv_materialization.__file__).with_name(
-    "vllm-hust-extension-v0.2.json"
+    "vllm-hust-extension-v0.3.json"
 )
 
 
@@ -33,6 +33,7 @@ def test_manifest_matches_package_registration() -> None:
     assert manifest.bundle_id == EXTENSION_ID
     assert manifest.bundle_version == project["version"]
     assert manifest.kind == "in_process_plugin"
+    assert manifest.schema_version == "0.3-experimental"
     assert manifest.lifecycle_owner == "vllm"
     assert registrations["vllm_hust.extension_bundles"][EXTENSION_ID] == (
         "vllm_kv_materialization"
@@ -61,6 +62,10 @@ def test_manifest_declares_fail_closed_host_contract() -> None:
     )
     assert manifest.requires_services == ()
     assert manifest.components[0].permissions == ("filesystem_write",)
+    assert [claim.mode for claim in manifest.resource_claims] == [
+        "exclusive",
+        "shared",
+    ]
 
 
 def test_package_import_does_not_load_experiment_dependencies() -> None:
