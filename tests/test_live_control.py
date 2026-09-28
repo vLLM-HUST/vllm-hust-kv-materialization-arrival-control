@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 
 from vllm_kv_materialization.live_control import (
+    HEADER_CORRELATION_ID,
     HEADER_PRIMARY_ANCHOR,
     HEADER_REQUEST_ID,
     HEADER_REUSE_CONFIDENCE,
@@ -41,6 +42,29 @@ def test_estimate_reusable_prefix_tokens_prefers_header_value() -> None:
     }
 
     assert estimate_reusable_prefix_tokens(headers, 1024) == 640
+
+
+def test_correlation_identity_tracks_exact_previous_request_prefix(monkeypatch) -> None:
+    monkeypatch.delenv("VLLM_KV_MATERIALIZATION_LOG_PATH", raising=False)
+    correlation_id = "swe-session-correlation-test"
+    token = bind_request_headers({HEADER_CORRELATION_ID: correlation_id})
+    try:
+        first, _ = compute_runtime_control("first", 1000, 64)
+    finally:
+        reset_request_headers(token)
+
+    token = bind_request_headers({HEADER_CORRELATION_ID: correlation_id})
+    try:
+        second, _ = compute_runtime_control("second", 1200, 32)
+    finally:
+        reset_request_headers(token)
+
+    assert first.primary_anchor_id == correlation_id
+    assert first.turn_index == 0
+    assert first.reusable_prefix_tokens == 0
+    assert second.primary_anchor_id == correlation_id
+    assert second.turn_index == 1
+    assert second.reusable_prefix_tokens == 1064
 
 
 def test_observe_request_returns_full_reuse_for_seen_anchor(monkeypatch) -> None:

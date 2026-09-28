@@ -10,7 +10,7 @@ from vllm_kv_materialization.live_control import (
     bind_request_headers,
     compute_runtime_control,
     merge_runtime_control_extra_args,
-    observe_request,
+    record_observation,
     reset_request_headers,
 )
 
@@ -76,13 +76,11 @@ def register_plugin() -> None:
         from vllm.entrypoints.openai.chat_completion.serving import OpenAIServingChat
         from vllm.entrypoints.openai.completion.protocol import CompletionRequest
         from vllm.entrypoints.openai.completion.serving import OpenAIServingCompletion
-        from vllm.entrypoints.openai.engine.serving import OpenAIServing
         from vllm.renderers.inputs.preprocess import extract_prompt_components
     except Exception:
         logger.exception("Failed to import vLLM during plugin registration.")
         return
 
-    original_log_inputs = OpenAIServing._log_inputs
     original_chat_create = OpenAIServingChat.create_chat_completion
     original_completion_create = OpenAIServingCompletion.create_completion
     try:
@@ -125,7 +123,10 @@ def register_plugin() -> None:
                 or 0
             )
             request_id = str(getattr(request, "request_id", None) or f"chat-{index}")
-            _, plan = compute_runtime_control(request_id, prompt_tokens, output_tokens)
+            observation, plan = compute_runtime_control(
+                request_id, prompt_tokens, output_tokens
+            )
+            record_observation(observation)
             runtime_plans.append(plan)
             controlled_prompts.append(apply_runtime_control(engine_prompt, plan))
         _store_runtime_plans(request, runtime_plans)
@@ -144,7 +145,10 @@ def register_plugin() -> None:
             request_id = str(
                 getattr(request, "request_id", None) or f"completion-{index}"
             )
-            _, plan = compute_runtime_control(request_id, prompt_tokens, output_tokens)
+            observation, plan = compute_runtime_control(
+                request_id, prompt_tokens, output_tokens
+            )
+            record_observation(observation)
             runtime_plans.append(plan)
             controlled_prompts.append(apply_runtime_control(engine_prompt, plan))
         _store_runtime_plans(request, runtime_plans)
@@ -168,16 +172,6 @@ def register_plugin() -> None:
             default_sampling_params,
         )
 
-    def patched_log_inputs(self, request_id, inputs, params, lora_request) -> None:
-        original_log_inputs(self, request_id, inputs, params, lora_request)
-        try:
-            prompt_components = self._extract_prompt_components(inputs)
-            prompt_tokens = len(prompt_components.token_ids or [])
-            output_tokens = int(getattr(params, "max_tokens", 0) or 0)
-            observe_request(request_id, prompt_tokens, output_tokens)
-        except Exception:
-            logger.exception("Failed to record KV materialization observation.")
-
     async def patched_chat_create(self, request, raw_request=None):
         token = bind_request_headers(getattr(raw_request, "headers", None))
         try:
@@ -192,7 +186,6 @@ def register_plugin() -> None:
         finally:
             reset_request_headers(token)
 
-    OpenAIServing._log_inputs = patched_log_inputs
     OpenAIServingChat.create_chat_completion = patched_chat_create
     OpenAIServingCompletion.create_completion = patched_completion_create
     if OpenAIServingRender is None:
