@@ -6,22 +6,22 @@
   "host": {
     "provider": "vllm",
     "name": "vllm",
-    "version_range": ">=0.25.1,<0.26"
+    "version_range": ">=0.29,<0.30"
   },
   "runtime": {
     "type": "python",
-    "process_scope": "api_and_scheduler",
+    "process_scope": "vllm-processes",
     "isolation": "trusted_in_process"
   },
   "lifecycle_owner": "vllm",
   "protocols": [
     {
-      "name": "vllm.general_plugins",
-      "version_range": null
+      "name": "vllm.request-processing-hook",
+      "version_range": ">=1,<2"
     },
     {
       "name": "vllm.kv-materialization-runtime-control",
-      "version_range": null
+      "version_range": ">=1,<2"
     }
   ],
   "implementation": [
@@ -32,6 +32,19 @@
     }
   ],
   "requires_services": [],
+  "components": [
+    {
+      "component_id": "request-arrival-controller",
+      "contracts": [
+        "vllm.request-processing-hook.v1",
+        "vllm.kv-materialization-runtime-control.v1"
+      ],
+      "execution_planes": ["api", "scheduler"],
+      "isolation": "trusted_in_process",
+      "implementation_ref": "vllm_kv_materialization.plugin:process_request",
+      "permissions": ["filesystem_write"]
+    }
+  ],
   "activation": {
     "entry_points": [
       {
@@ -39,12 +52,7 @@
         "name": "kv_materialization"
       }
     ],
-    "environment": {
-      "VLLM_PLUGINS": "ascend,kv_materialization",
-      "VLLM_KV_MATERIALIZATION_PLUGIN_MODE": "prefix_cache_runtime_control",
-      "VLLM_KV_POLICY_MODE": "controller",
-      "VLLM_KV_RUNTIME_SEAM": "segmented"
-    },
+    "environment": {},
     "additional_config": {}
   }
 }
