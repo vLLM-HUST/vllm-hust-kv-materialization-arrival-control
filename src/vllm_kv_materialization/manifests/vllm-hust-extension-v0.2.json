@@ -1,0 +1,50 @@
+{
+  "schema_version": "0.2-experimental",
+  "extension_id": "org.vllm-hust.kv-materialization-arrival-control",
+  "extension_version": "0.1.0",
+  "kind": "in_process_plugin",
+  "host": {
+    "provider": "vllm",
+    "name": "vllm",
+    "version_range": ">=0.25.1,<0.26"
+  },
+  "runtime": {
+    "type": "python",
+    "process_scope": "api_and_scheduler",
+    "isolation": "trusted_in_process"
+  },
+  "lifecycle_owner": "vllm",
+  "protocols": [
+    {
+      "name": "vllm.general_plugins",
+      "version_range": null
+    },
+    {
+      "name": "vllm.kv-materialization-runtime-control",
+      "version_range": null
+    }
+  ],
+  "implementation": [
+    {
+      "type": "python_entry_point",
+      "group": "vllm.general_plugins",
+      "name": "kv_materialization"
+    }
+  ],
+  "requires_services": [],
+  "activation": {
+    "entry_points": [
+      {
+        "group": "vllm.general_plugins",
+        "name": "kv_materialization"
+      }
+    ],
+    "environment": {
+      "VLLM_PLUGINS": "ascend,kv_materialization",
+      "VLLM_KV_MATERIALIZATION_PLUGIN_MODE": "prefix_cache_runtime_control",
+      "VLLM_KV_POLICY_MODE": "controller",
+      "VLLM_KV_RUNTIME_SEAM": "segmented"
+    },
+    "additional_config": {}
+  }
+}
