@@ -6,7 +6,7 @@
   "host": {
     "provider": "vllm",
     "name": "vllm",
-    "version_range": ">=0.28.1.post1.dev202,<0.29"
+    "version_range": ">=0.29,<0.30"
   },
   "runtime": {
     "type": "python",

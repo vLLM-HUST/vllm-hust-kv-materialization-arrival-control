@@ -1,0 +1,2156 @@
+{
+  "artifact": "g0-real-runtime-pilot",
+  "capacity_frontier": [
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 756,
+        "layer_ready_waits": 756,
+        "request_ids": 64,
+        "transfer_finishes": 756,
+        "transfer_starts": 756
+      },
+      "arm": "materialization_paced_oracle",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 689,
+          "path": "/tmp/g0-formal-pilot-burstgpt-high-oracle-r1/benchmark/random-online.json",
+          "sha256": "33c7edabf5986a71273c9d6bb75c26cc86f7415bbc2116cdbb982b40d5987789"
+        },
+        "connector_summary": {
+          "bytes": 825,
+          "path": "/tmp/g0-formal-pilot-burstgpt-high-oracle-r1/parsed/g0_connector_summary.json",
+          "sha256": "d47c562bee7a9c9a74f6405f0c605702160c15c1895697315eaf62c55bf2b3f6"
+        },
+        "connector_telemetry": {
+          "bytes": 1143159,
+          "path": "/tmp/g0-formal-pilot-burstgpt-high-oracle-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "2fa39b064ed33ac7a82edd7f9f01bb759a2d70674995ce75db7a7f891bc325f5"
+        },
+        "requests": {
+          "bytes": 32655,
+          "path": "/tmp/g0-formal-pilot-burstgpt-high-oracle-r1/benchmark/request_results.jsonl",
+          "sha256": "35adb0ed05fcf36f1c7001519f9e9c8ded8e76a9a8273c906a43eb49a8c78e41"
+        }
+      },
+      "cell": "burstgpt/high",
+      "compute_transfer_overlap": null,
+      "connector_queue_wait_p95_ms": 0.365986,
+      "correctness_rate": 1.0,
+      "goodput_loss_vs_no_control_pct": 62.91345756921558,
+      "goodput_rps": 7.339621471002228,
+      "label": "burstgpt/high/oracle_b4",
+      "layer_ready_wait_p95_ms": 1.080266,
+      "oracle_byte_budget": 31850496,
+      "p95_improvement_vs_no_control_pct": 14.380525895603446,
+      "peak_bytes_in_flight": 1179648,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-formal-pilot-burstgpt-high-oracle-r1",
+      "ttft_p95_ms": 537.5652604969218,
+      "ttft_p99_ms": 540.5199375236407
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 864,
+        "layer_ready_waits": 864,
+        "request_ids": 64,
+        "transfer_finishes": 864,
+        "transfer_starts": 864
+      },
+      "arm": "materialization_paced_oracle",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 689,
+          "path": "/tmp/g0-formal-pilot-burstgpt-moderate-oracle-r1/benchmark/random-online.json",
+          "sha256": "4f8cf4e52c1283e887fb679aeff69accc92a4d4cc4cc4c7b839d8f1a8ef725bd"
+        },
+        "connector_summary": {
+          "bytes": 1926,
+          "path": "/tmp/g0-formal-pilot-burstgpt-moderate-oracle-r1/parsed/g0_connector_summary.json",
+          "sha256": "282b7caaf7366dda29a25bd37a9054ce1fb72134b589fb81b49a04d2d6efee47"
+        },
+        "connector_telemetry": {
+          "bytes": 1438416,
+          "path": "/tmp/g0-formal-pilot-burstgpt-moderate-oracle-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "c4f1332c97fc89d958a8cf331a17941a25a34e80d9fcfb8adc39001112661dba"
+        },
+        "requests": {
+          "bytes": 32594,
+          "path": "/tmp/g0-formal-pilot-burstgpt-moderate-oracle-r1/benchmark/request_results.jsonl",
+          "sha256": "220ae9c8f2b67da368f5407db04836b1db48a12230970edd4633b3eb1872cb9f"
+        },
+        "resource_samples": {
+          "bytes": 14066,
+          "path": "/tmp/g0-formal-pilot-burstgpt-moderate-oracle-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "f8550e524f987aed8d70eebec61ea0471eba8696e47f313d8cdc493f066a8d67"
+        }
+      },
+      "cell": "burstgpt/moderate",
+      "compute_transfer_overlap": {
+        "chrome_trace": {
+          "bytes": 921413,
+          "path": "/tmp/g0-formal-pilot-burstgpt-moderate-oracle-r1/parsed/chrome_tracing.json",
+          "sha256": "6f24593546f11a6f9033e7965e63ef858c7be6283a176dcd95d4fe521c159baf"
+        },
+        "compute_envelope_busy_ms": 9229.62225,
+        "compute_intervals": 63,
+        "compute_overlap_ratio": 0.03665353151370848,
+        "definition": "wall-clock intersection of msServiceProfiler modelExec envelopes and connector transfer intervals",
+        "overlap_ms": 338.29825,
+        "transfer_intervals": 864,
+        "transfer_overlap_ratio": 1.0,
+        "transfer_union_busy_ms": 338.29825
+      },
+      "connector_queue_wait_p95_ms": 0.376106,
+      "correctness_rate": 1.0,
+      "goodput_loss_vs_no_control_pct": 25.702773989056016,
+      "goodput_rps": 5.192484372279932,
+      "label": "burstgpt/moderate/oracle_b4",
+      "layer_ready_wait_p95_ms": 1.043836,
+      "oracle_byte_budget": 31850496,
+      "p95_improvement_vs_no_control_pct": 12.131169336648862,
+      "peak_bytes_in_flight": 1179648,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-formal-pilot-burstgpt-moderate-oracle-r1",
+      "ttft_p95_ms": 552.1637374768034,
+      "ttft_p99_ms": 559.749429859221
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 783,
+        "layer_ready_waits": 783,
+        "request_ids": 64,
+        "transfer_finishes": 783,
+        "transfer_starts": 783
+      },
+      "arm": "materialization_paced_oracle",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 690,
+          "path": "/tmp/g0-formal-pilot-servegen-high-oracle-r1/benchmark/random-online.json",
+          "sha256": "4c857dd463a59715d99e8c2f19cb6da622f90e23fc73378b08a6c735b71307ea"
+        },
+        "connector_summary": {
+          "bytes": 1277,
+          "path": "/tmp/g0-formal-pilot-servegen-high-oracle-r1/parsed/g0_connector_summary.json",
+          "sha256": "724b499bdb5037ead556da8a193a278674b7626b3a2d45f39a888b9ab754a0c6"
+        },
+        "connector_telemetry": {
+          "bytes": 1172054,
+          "path": "/tmp/g0-formal-pilot-servegen-high-oracle-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "321123678683277a90380dc4ff7aca3bfeb79687f4c357c888030fdb11be8ec8"
+        },
+        "requests": {
+          "bytes": 33467,
+          "path": "/tmp/g0-formal-pilot-servegen-high-oracle-r1/benchmark/request_results.jsonl",
+          "sha256": "1d7a54f40302cd4d316e4d8b1d38a1d6db48167f2446d245ee95e55f6ddf565e"
+        },
+        "resource_samples": {
+          "bytes": 12737,
+          "path": "/tmp/g0-formal-pilot-servegen-high-oracle-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "ab740a31bc59844b6e5b7da10e4871a3305b0addff4ee73fa6910b1789c30bda"
+        }
+      },
+      "cell": "servegen/high",
+      "compute_transfer_overlap": null,
+      "connector_queue_wait_p95_ms": 0.344675,
+      "correctness_rate": 1.0,
+      "goodput_loss_vs_no_control_pct": 62.292556790884326,
+      "goodput_rps": 7.641009429610373,
+      "label": "servegen/high/oracle_b4",
+      "layer_ready_wait_p95_ms": 0.996265,
+      "oracle_byte_budget": 31850496,
+      "p95_improvement_vs_no_control_pct": 24.393394459929794,
+      "peak_bytes_in_flight": 1179648,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-formal-pilot-servegen-high-oracle-r1",
+      "ttft_p95_ms": 512.9217468900606,
+      "ttft_p99_ms": 516.3407326582819
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 1026,
+        "layer_ready_waits": 1026,
+        "request_ids": 64,
+        "transfer_finishes": 1026,
+        "transfer_starts": 1026
+      },
+      "arm": "materialization_paced_oracle",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 693,
+          "path": "/tmp/g0-formal-pilot-servegen-moderate-oracle-r1/benchmark/random-online.json",
+          "sha256": "eb870c76a29f5208bd817c39da20ddeb78218af1e8206f191c452f4cfd23c99c"
+        },
+        "connector_summary": {
+          "bytes": 1924,
+          "path": "/tmp/g0-formal-pilot-servegen-moderate-oracle-r1/parsed/g0_connector_summary.json",
+          "sha256": "60100246ea3115ae334c8c16ec5e6e99b2651e56086202a35638cb23b3e0c708"
+        },
+        "connector_telemetry": {
+          "bytes": 1631647,
+          "path": "/tmp/g0-formal-pilot-servegen-moderate-oracle-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "562596c40036cab913286d011608b3045ea87200543399e8cab82b5523d2e3ec"
+        },
+        "requests": {
+          "bytes": 33366,
+          "path": "/tmp/g0-formal-pilot-servegen-moderate-oracle-r1/benchmark/request_results.jsonl",
+          "sha256": "98e6ad22a7a1722c25e1bf860367e02816ca85d6f553c8ee30cdd6bd5f9a8c16"
+        },
+        "resource_samples": {
+          "bytes": 14070,
+          "path": "/tmp/g0-formal-pilot-servegen-moderate-oracle-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "8f20a8c64d914e025382ef87801c5a386b5317e8646e8b261844f5d2cc1ec4b9"
+        }
+      },
+      "cell": "servegen/moderate",
+      "compute_transfer_overlap": {
+        "chrome_trace": {
+          "bytes": 925260,
+          "path": "/tmp/g0-formal-pilot-servegen-moderate-oracle-r1/parsed/chrome_tracing.json",
+          "sha256": "f1a58505204e66f8acb1b5da5caf319c340409c03348b6b4990b8b521b8aace6"
+        },
+        "compute_envelope_busy_ms": 9825.0875,
+        "compute_intervals": 63,
+        "compute_overlap_ratio": 0.03812019485831551,
+        "definition": "wall-clock intersection of msServiceProfiler modelExec envelopes and connector transfer intervals",
+        "overlap_ms": 374.53425,
+        "transfer_intervals": 1026,
+        "transfer_overlap_ratio": 1.0,
+        "transfer_union_busy_ms": 374.53425
+      },
+      "connector_queue_wait_p95_ms": 0.35588,
+      "correctness_rate": 1.0,
+      "goodput_loss_vs_no_control_pct": 23.787386718363013,
+      "goodput_rps": 5.4131041822431625,
+      "label": "servegen/moderate/oracle_b4",
+      "layer_ready_wait_p95_ms": 0.974,
+      "oracle_byte_budget": 31850496,
+      "p95_improvement_vs_no_control_pct": 9.26322491455025,
+      "peak_bytes_in_flight": 884736,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-formal-pilot-servegen-moderate-oracle-r1",
+      "ttft_p95_ms": 591.1867697490379,
+      "ttft_p99_ms": 595.3905581217259
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 405,
+        "layer_ready_waits": 405,
+        "request_ids": 64,
+        "transfer_finishes": 405,
+        "transfer_starts": 405
+      },
+      "arm": "materialization_paced_oracle",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 690,
+          "path": "/tmp/g0-frontier-burstgpt-high-oracle-b8-r1/benchmark/random-online.json",
+          "sha256": "9fc787f1f8b9816e6fe95a13b5cde5770d93d3290087002cefe17f8ce1a2a5e4"
+        },
+        "connector_summary": {
+          "bytes": 1906,
+          "path": "/tmp/g0-frontier-burstgpt-high-oracle-b8-r1/parsed/g0_connector_summary.json",
+          "sha256": "e44c2b164fe1d255b1f1ba8c69c5c29980699318ab4c4c7052250266697e467e"
+        },
+        "connector_telemetry": {
+          "bytes": 887851,
+          "path": "/tmp/g0-frontier-burstgpt-high-oracle-b8-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "e0efbe818a7ea66c32df89099cd800dc9d86ba435fb5ec6f06cf7d31ed01b922"
+        },
+        "requests": {
+          "bytes": 32651,
+          "path": "/tmp/g0-frontier-burstgpt-high-oracle-b8-r1/benchmark/request_results.jsonl",
+          "sha256": "10d2ecdbeec345e6e6818d7c629576a9dd496e6a655d65c65695d00584347bd0"
+        },
+        "resource_samples": {
+          "bytes": 12731,
+          "path": "/tmp/g0-frontier-burstgpt-high-oracle-b8-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "058a74f25bd9a15437bbb02dcdaa326987d86ebcece6d3b82e346cf2ec076b10"
+        }
+      },
+      "cell": "burstgpt/high",
+      "compute_transfer_overlap": {
+        "chrome_trace": {
+          "bytes": 833424,
+          "path": "/tmp/g0-frontier-burstgpt-high-oracle-b8-r1/parsed/chrome_tracing.json",
+          "sha256": "53bcd95366c16e7108fab1281bd23eb06cda7c369189e6956755352caefc1cfc"
+        },
+        "compute_envelope_busy_ms": 4611.002,
+        "compute_intervals": 30,
+        "compute_overlap_ratio": 0.04132713453605095,
+        "definition": "wall-clock intersection of msServiceProfiler modelExec envelopes and connector transfer intervals",
+        "overlap_ms": 190.5595,
+        "transfer_intervals": 405,
+        "transfer_overlap_ratio": 1.0,
+        "transfer_union_busy_ms": 190.5595
+      },
+      "connector_queue_wait_p95_ms": 0.415583,
+      "correctness_rate": 1.0,
+      "goodput_loss_vs_no_control_pct": 32.17328891452701,
+      "goodput_rps": 13.423262249898364,
+      "label": "burstgpt/high/oracle_b8",
+      "layer_ready_wait_p95_ms": 1.235408,
+      "oracle_byte_budget": 63700992,
+      "p95_improvement_vs_no_control_pct": 12.467067403079469,
+      "peak_bytes_in_flight": 2211840,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-frontier-burstgpt-high-oracle-b8-r1",
+      "ttft_p95_ms": 549.578985455446,
+      "ttft_p99_ms": 550.9114156011492
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 459,
+        "layer_ready_waits": 459,
+        "request_ids": 64,
+        "transfer_finishes": 459,
+        "transfer_starts": 459
+      },
+      "arm": "materialization_paced_oracle",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 690,
+          "path": "/tmp/g0-frontier-v3-burstgpt-moderate-oracle-b8-r1/benchmark/random-online.json",
+          "sha256": "6fc8b69448d9b8fbe101df6717a85006c46eee3deecdffe66cd5f41f2c58a068"
+        },
+        "connector_summary": {
+          "bytes": 1933,
+          "path": "/tmp/g0-frontier-v3-burstgpt-moderate-oracle-b8-r1/parsed/g0_connector_summary.json",
+          "sha256": "01dfd41cfebd7272a1da693358c86f6683fbdfd0c0831ab72dddd35964f8c9c4"
+        },
+        "connector_telemetry": {
+          "bytes": 952765,
+          "path": "/tmp/g0-frontier-v3-burstgpt-moderate-oracle-b8-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "1e3803d008f42c2b474ed004e25f5b68bd41cac6a9a421f761275d91f68c4f23"
+        },
+        "requests": {
+          "bytes": 32576,
+          "path": "/tmp/g0-frontier-v3-burstgpt-moderate-oracle-b8-r1/benchmark/request_results.jsonl",
+          "sha256": "e8fec3e5d0040c12c86cd830523121ecf35969a7d0a1c3b9b33168866b0363bf"
+        },
+        "resource_samples": {
+          "bytes": 14068,
+          "path": "/tmp/g0-frontier-v3-burstgpt-moderate-oracle-b8-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "2d06c0193f8c0a59d9acf60e027929be31aec9c692e6aea4e978fb57d8365730"
+        }
+      },
+      "cell": "burstgpt/moderate",
+      "compute_transfer_overlap": {
+        "chrome_trace": {
+          "bytes": 856097,
+          "path": "/tmp/g0-frontier-v3-burstgpt-moderate-oracle-b8-r1/parsed/chrome_tracing.json",
+          "sha256": "65711ff2ff2ef86914c5f5f65a96c3e228f0eecf789ae9f1222be3dbe30e8d83"
+        },
+        "compute_envelope_busy_ms": 5887.47925,
+        "compute_intervals": 39,
+        "compute_overlap_ratio": 0.039700309771792404,
+        "definition": "wall-clock intersection of msServiceProfiler modelExec envelopes and connector transfer intervals",
+        "overlap_ms": 233.73475,
+        "transfer_intervals": 459,
+        "transfer_overlap_ratio": 1.0,
+        "transfer_union_busy_ms": 233.73475
+      },
+      "connector_queue_wait_p95_ms": 0.416603,
+      "correctness_rate": 1.0,
+      "goodput_loss_vs_no_control_pct": 13.992511872275571,
+      "goodput_rps": 6.010891146009647,
+      "label": "burstgpt/moderate/oracle_b8",
+      "layer_ready_wait_p95_ms": 1.278068,
+      "oracle_byte_budget": 63700992,
+      "p95_improvement_vs_no_control_pct": 11.549532569160414,
+      "peak_bytes_in_flight": 2211840,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-frontier-v3-burstgpt-moderate-oracle-b8-r1",
+      "ttft_p95_ms": 555.8187164831907,
+      "ttft_p99_ms": 556.9101147772744
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 432,
+        "layer_ready_waits": 432,
+        "request_ids": 64,
+        "transfer_finishes": 432,
+        "transfer_starts": 432
+      },
+      "arm": "materialization_paced_oracle",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 691,
+          "path": "/tmp/g0-frontier-v3-servegen-high-oracle-b8-r1/benchmark/random-online.json",
+          "sha256": "a74131667916dba80c935adabc57c09aac8399b0eee680111a9beecf374a7f29"
+        },
+        "connector_summary": {
+          "bytes": 1916,
+          "path": "/tmp/g0-frontier-v3-servegen-high-oracle-b8-r1/parsed/g0_connector_summary.json",
+          "sha256": "1b84895c02da24ede73b34d536e73cc174ed889b1ba3da8c1e8d941496d2b0d3"
+        },
+        "connector_telemetry": {
+          "bytes": 920386,
+          "path": "/tmp/g0-frontier-v3-servegen-high-oracle-b8-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "4ed17fec6b1296d059e06b548df914f694a1c57f488933ff2703a203548d0e43"
+        },
+        "requests": {
+          "bytes": 33453,
+          "path": "/tmp/g0-frontier-v3-servegen-high-oracle-b8-r1/benchmark/request_results.jsonl",
+          "sha256": "cedef0fec477f52bd67e08c55fde126c631321f2203b93de29667b6a24012bdd"
+        },
+        "resource_samples": {
+          "bytes": 13268,
+          "path": "/tmp/g0-frontier-v3-servegen-high-oracle-b8-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "4662433eec76234a8f82617ae55e4e90c0e5b2835c99fe5715a896d772552c6f"
+        }
+      },
+      "cell": "servegen/high",
+      "compute_transfer_overlap": {
+        "chrome_trace": {
+          "bytes": 834071,
+          "path": "/tmp/g0-frontier-v3-servegen-high-oracle-b8-r1/parsed/chrome_tracing.json",
+          "sha256": "a49e20262bfe8fc01bf2655c22648446aec2329a9c4dbf246c59883b12e04b13"
+        },
+        "compute_envelope_busy_ms": 4700.2335,
+        "compute_intervals": 30,
+        "compute_overlap_ratio": 0.046761719391174926,
+        "definition": "wall-clock intersection of msServiceProfiler modelExec envelopes and connector transfer intervals",
+        "overlap_ms": 219.791,
+        "transfer_intervals": 432,
+        "transfer_overlap_ratio": 1.0,
+        "transfer_union_busy_ms": 219.791
+      },
+      "connector_queue_wait_p95_ms": 0.383682,
+      "correctness_rate": 1.0,
+      "goodput_loss_vs_no_control_pct": 34.971611672929036,
+      "goodput_rps": 13.177306285232152,
+      "label": "servegen/high/oracle_b8",
+      "layer_ready_wait_p95_ms": 1.280551,
+      "oracle_byte_budget": 63700992,
+      "p95_improvement_vs_no_control_pct": 19.599257023859916,
+      "peak_bytes_in_flight": 2211840,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-frontier-v3-servegen-high-oracle-b8-r1",
+      "ttft_p95_ms": 545.4455896280706,
+      "ttft_p99_ms": 547.376790442504
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 594,
+        "layer_ready_waits": 594,
+        "request_ids": 64,
+        "transfer_finishes": 594,
+        "transfer_starts": 594
+      },
+      "arm": "materialization_paced_oracle",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 687,
+          "path": "/tmp/g0-frontier-v3-servegen-moderate-oracle-b8-r1/benchmark/random-online.json",
+          "sha256": "72cdd54f64aeb4ce31afe415f2adf3ee61dcab7275f9dd3f2f80095d65927def"
+        },
+        "connector_summary": {
+          "bytes": 1928,
+          "path": "/tmp/g0-frontier-v3-servegen-moderate-oracle-b8-r1/parsed/g0_connector_summary.json",
+          "sha256": "9d2366c2fc9791ecc4d6b2efca70403c62b7f186517c64dd783232c7d643b0dc"
+        },
+        "connector_telemetry": {
+          "bytes": 1115099,
+          "path": "/tmp/g0-frontier-v3-servegen-moderate-oracle-b8-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "05078ce860f5b9110b96d071466888fd0c5cc138927d719332dd49ede2b504ea"
+        },
+        "requests": {
+          "bytes": 33383,
+          "path": "/tmp/g0-frontier-v3-servegen-moderate-oracle-b8-r1/benchmark/request_results.jsonl",
+          "sha256": "9e589adc0701b3593f65e2c3ccfa0f8458dda1c6860630b2890276216d19df28"
+        },
+        "resource_samples": {
+          "bytes": 13798,
+          "path": "/tmp/g0-frontier-v3-servegen-moderate-oracle-b8-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "c43e78bf6e8ca0b4745b4156b12ba38060743d19c4f82d416dfd1cac71ddb265"
+        }
+      },
+      "cell": "servegen/moderate",
+      "compute_transfer_overlap": {
+        "chrome_trace": {
+          "bytes": 859323,
+          "path": "/tmp/g0-frontier-v3-servegen-moderate-oracle-b8-r1/parsed/chrome_tracing.json",
+          "sha256": "1a733d64aca1ff82fb11644086cf2d9da61f930d4cbeaf993bb7d7c28e4a29a6"
+        },
+        "compute_envelope_busy_ms": 6238.2745,
+        "compute_intervals": 39,
+        "compute_overlap_ratio": 0.04334916650429538,
+        "definition": "wall-clock intersection of msServiceProfiler modelExec envelopes and connector transfer intervals",
+        "overlap_ms": 270.424,
+        "transfer_intervals": 594,
+        "transfer_overlap_ratio": 1.0,
+        "transfer_union_busy_ms": 270.424
+      },
+      "connector_queue_wait_p95_ms": 0.411053,
+      "correctness_rate": 1.0,
+      "goodput_loss_vs_no_control_pct": 13.909283583191122,
+      "goodput_rps": 6.114709849483965,
+      "label": "servegen/moderate/oracle_b8",
+      "layer_ready_wait_p95_ms": 1.192999,
+      "oracle_byte_budget": 63700992,
+      "p95_improvement_vs_no_control_pct": 2.8606232884325067,
+      "peak_bytes_in_flight": 1916928,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-frontier-v3-servegen-moderate-oracle-b8-r1",
+      "ttft_p95_ms": 632.9023075755686,
+      "ttft_p99_ms": 634.984922176227
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 243,
+        "layer_ready_waits": 243,
+        "request_ids": 64,
+        "transfer_finishes": 243,
+        "transfer_starts": 243
+      },
+      "arm": "materialization_paced_oracle",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 690,
+          "path": "/tmp/g0-frontier-burstgpt-high-oracle-b16-r1/benchmark/random-online.json",
+          "sha256": "0ee95ce0ec4f13f6b8bccafc01321106a6b2d18e217ccc675e636e1b0a861f69"
+        },
+        "connector_summary": {
+          "bytes": 1915,
+          "path": "/tmp/g0-frontier-burstgpt-high-oracle-b16-r1/parsed/g0_connector_summary.json",
+          "sha256": "867f242af9e353e246aec427893a5f7bceaf0bf5731e074650ceff8bbb7274c9"
+        },
+        "connector_telemetry": {
+          "bytes": 693035,
+          "path": "/tmp/g0-frontier-burstgpt-high-oracle-b16-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "f9a18386c45cd55bfa23d26b99da44e7a6bd62ec411450ee97cb95f00cab301c"
+        },
+        "requests": {
+          "bytes": 32726,
+          "path": "/tmp/g0-frontier-burstgpt-high-oracle-b16-r1/benchmark/request_results.jsonl",
+          "sha256": "87cce682ec501f5d22d748792dadc073756650c7b8768ab9f52a1feb1fe11758"
+        },
+        "resource_samples": {
+          "bytes": 13269,
+          "path": "/tmp/g0-frontier-burstgpt-high-oracle-b16-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "2ed25c5295b48da30a70b53e8cbbebe9010aadd0495394e210e3859fd1462e14"
+        }
+      },
+      "cell": "burstgpt/high",
+      "compute_transfer_overlap": {
+        "chrome_trace": {
+          "bytes": 818029,
+          "path": "/tmp/g0-frontier-burstgpt-high-oracle-b16-r1/parsed/chrome_tracing.json",
+          "sha256": "728682c795d1491ce7168bd08be8ee8b4444da1789f6d74066a65ed61c691d84"
+        },
+        "compute_envelope_busy_ms": 3573.04225,
+        "compute_intervals": 25,
+        "compute_overlap_ratio": 0.04577982530153401,
+        "definition": "wall-clock intersection of msServiceProfiler modelExec envelopes and connector transfer intervals",
+        "overlap_ms": 163.57325,
+        "transfer_intervals": 243,
+        "transfer_overlap_ratio": 1.0,
+        "transfer_union_busy_ms": 163.57325
+      },
+      "connector_queue_wait_p95_ms": 0.413613,
+      "correctness_rate": 1.0,
+      "goodput_loss_vs_no_control_pct": 13.014952101918787,
+      "goodput_rps": 17.214797696508008,
+      "label": "burstgpt/high/oracle_b16",
+      "layer_ready_wait_p95_ms": 1.694092,
+      "oracle_byte_budget": 127401984,
+      "p95_improvement_vs_no_control_pct": 6.77245297652137,
+      "peak_bytes_in_flight": 4571136,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-frontier-burstgpt-high-oracle-b16-r1",
+      "ttft_p95_ms": 585.3328477591276,
+      "ttft_p99_ms": 585.79307527747
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 243,
+        "layer_ready_waits": 243,
+        "request_ids": 64,
+        "transfer_finishes": 243,
+        "transfer_starts": 243
+      },
+      "arm": "materialization_paced_oracle",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 691,
+          "path": "/tmp/g0-frontier-v3-burstgpt-moderate-oracle-b16-r1/benchmark/random-online.json",
+          "sha256": "27dba4bfc1943045538d6ea828a9b8c44d353f97dfcc664c5ccca20a0759b9de"
+        },
+        "connector_summary": {
+          "bytes": 1932,
+          "path": "/tmp/g0-frontier-v3-burstgpt-moderate-oracle-b16-r1/parsed/g0_connector_summary.json",
+          "sha256": "6f1acc6fb00c2c55165db3b85168f71de35a3a43c3a652c2d89d154c8e2406be"
+        },
+        "connector_telemetry": {
+          "bytes": 693039,
+          "path": "/tmp/g0-frontier-v3-burstgpt-moderate-oracle-b16-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "a41bafa94c6daae60f52e37f6d37f6dd8255925462a9e03c45b7f423f693d569"
+        },
+        "requests": {
+          "bytes": 32606,
+          "path": "/tmp/g0-frontier-v3-burstgpt-moderate-oracle-b16-r1/benchmark/request_results.jsonl",
+          "sha256": "0b60b876ff1ad2b1d01fca704bcbf115b07accd43d34b83665087863b47933ba"
+        },
+        "resource_samples": {
+          "bytes": 13802,
+          "path": "/tmp/g0-frontier-v3-burstgpt-moderate-oracle-b16-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "d726752b78c22e4c5a7491a1888ad8e9ca28f11dca00ecd35906c4ace99b7446"
+        }
+      },
+      "cell": "burstgpt/moderate",
+      "compute_transfer_overlap": {
+        "chrome_trace": {
+          "bytes": 823189,
+          "path": "/tmp/g0-frontier-v3-burstgpt-moderate-oracle-b16-r1/parsed/chrome_tracing.json",
+          "sha256": "8c534a1d320e10126abae7114229542ebcf732b3582585e506f5d63e839372ae"
+        },
+        "compute_envelope_busy_ms": 3740.471,
+        "compute_intervals": 27,
+        "compute_overlap_ratio": 0.0459545736352454,
+        "definition": "wall-clock intersection of msServiceProfiler modelExec envelopes and connector transfer intervals",
+        "overlap_ms": 171.89175,
+        "transfer_intervals": 243,
+        "transfer_overlap_ratio": 1.0,
+        "transfer_union_busy_ms": 171.89175
+      },
+      "connector_queue_wait_p95_ms": 0.513803,
+      "correctness_rate": 1.0,
+      "goodput_loss_vs_no_control_pct": 4.745679633585775,
+      "goodput_rps": 6.6571337376969675,
+      "label": "burstgpt/moderate/oracle_b16",
+      "layer_ready_wait_p95_ms": 1.832063,
+      "oracle_byte_budget": 127401984,
+      "p95_improvement_vs_no_control_pct": 6.956983912171378,
+      "peak_bytes_in_flight": 4571136,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-frontier-v3-burstgpt-moderate-oracle-b16-r1",
+      "ttft_p95_ms": 584.6780834719539,
+      "ttft_p99_ms": 585.6127279810607
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 270,
+        "layer_ready_waits": 270,
+        "request_ids": 64,
+        "transfer_finishes": 270,
+        "transfer_starts": 270
+      },
+      "arm": "materialization_paced_oracle",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 690,
+          "path": "/tmp/g0-frontier-v3-servegen-high-oracle-b16-r1/benchmark/random-online.json",
+          "sha256": "ad01198a4d374d1c8b48cadf441d42af5c34583274030061da74d97ea3782e6c"
+        },
+        "connector_summary": {
+          "bytes": 1921,
+          "path": "/tmp/g0-frontier-v3-servegen-high-oracle-b16-r1/parsed/g0_connector_summary.json",
+          "sha256": "e98e22cef2205307271c6033d1b6d9383e36ab9899a7f8eddd6105ddcb77ab58"
+        },
+        "connector_telemetry": {
+          "bytes": 725560,
+          "path": "/tmp/g0-frontier-v3-servegen-high-oracle-b16-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "29773b656a464a052a3b351e38d176fee5c4f5593a5894db5ee59bc7a727e828"
+        },
+        "requests": {
+          "bytes": 33525,
+          "path": "/tmp/g0-frontier-v3-servegen-high-oracle-b16-r1/benchmark/request_results.jsonl",
+          "sha256": "804fe9bd2a13be55c1a20c322f496b93bd35386f37b4da36f7f57de0652ce667"
+        },
+        "resource_samples": {
+          "bytes": 13000,
+          "path": "/tmp/g0-frontier-v3-servegen-high-oracle-b16-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "0940128792bc3bfe51c4c68401bc394f8af99bdb33f43383ae504e2dcd08ed4a"
+        }
+      },
+      "cell": "servegen/high",
+      "compute_transfer_overlap": {
+        "chrome_trace": {
+          "bytes": 811698,
+          "path": "/tmp/g0-frontier-v3-servegen-high-oracle-b16-r1/parsed/chrome_tracing.json",
+          "sha256": "8089650a010d08dba0526603c0bdbfa9ab7fc5a7115984b83d5897494ef595f8"
+        },
+        "compute_envelope_busy_ms": 3358.77275,
+        "compute_intervals": 22,
+        "compute_overlap_ratio": 0.05412237252430966,
+        "definition": "wall-clock intersection of msServiceProfiler modelExec envelopes and connector transfer intervals",
+        "overlap_ms": 181.78475,
+        "transfer_intervals": 270,
+        "transfer_overlap_ratio": 1.0,
+        "transfer_union_busy_ms": 181.78475
+      },
+      "connector_queue_wait_p95_ms": 0.453651,
+      "correctness_rate": 1.0,
+      "goodput_loss_vs_no_control_pct": 9.796995649978236,
+      "goodput_rps": 18.27867254205874,
+      "label": "servegen/high/oracle_b16",
+      "layer_ready_wait_p95_ms": 1.818933,
+      "oracle_byte_budget": 127401984,
+      "p95_improvement_vs_no_control_pct": 5.666415826979487,
+      "peak_bytes_in_flight": 4718592,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-frontier-v3-servegen-high-oracle-b16-r1",
+      "ttft_p95_ms": 639.9671885650605,
+      "ttft_p99_ms": 643.3839386235923
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 297,
+        "layer_ready_waits": 297,
+        "request_ids": 64,
+        "transfer_finishes": 297,
+        "transfer_starts": 297
+      },
+      "arm": "materialization_paced_oracle",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 690,
+          "path": "/tmp/g0-frontier-v3-servegen-moderate-oracle-b16-r1/benchmark/random-online.json",
+          "sha256": "ecd4b2babacef1ca25a50f7d9ec02f6f3eb91b034e8092e62ce412f957b4f30e"
+        },
+        "connector_summary": {
+          "bytes": 1935,
+          "path": "/tmp/g0-frontier-v3-servegen-moderate-oracle-b16-r1/parsed/g0_connector_summary.json",
+          "sha256": "669ab5a0b6542053b9ee64ec0326acbcb3f4e4414503c947a5c142700fdbd2b5"
+        },
+        "connector_telemetry": {
+          "bytes": 758115,
+          "path": "/tmp/g0-frontier-v3-servegen-moderate-oracle-b16-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "7c16b79a6ca50d6391efb965a256daf0b5e6c45591049b55ee27e39d51cc450f"
+        },
+        "requests": {
+          "bytes": 33442,
+          "path": "/tmp/g0-frontier-v3-servegen-moderate-oracle-b16-r1/benchmark/request_results.jsonl",
+          "sha256": "32f5f7effbadf7d822c9b3329e0dfe57b4b7b84171494dbaf9e4edd96c7e1ed6"
+        },
+        "resource_samples": {
+          "bytes": 14067,
+          "path": "/tmp/g0-frontier-v3-servegen-moderate-oracle-b16-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "8e6574ffebf676ec9ba97f38d6d3a92844e876ccca692e96ef98a7fae8e1a237"
+        }
+      },
+      "cell": "servegen/moderate",
+      "compute_transfer_overlap": {
+        "chrome_trace": {
+          "bytes": 833724,
+          "path": "/tmp/g0-frontier-v3-servegen-moderate-oracle-b16-r1/parsed/chrome_tracing.json",
+          "sha256": "2d5225c5e54118412f8ecea15544dada93d5a142dae983eb756061666ec5114f"
+        },
+        "compute_envelope_busy_ms": 4406.90475,
+        "compute_intervals": 31,
+        "compute_overlap_ratio": 0.04267070895961616,
+        "definition": "wall-clock intersection of msServiceProfiler modelExec envelopes and connector transfer intervals",
+        "overlap_ms": 188.04575,
+        "transfer_intervals": 297,
+        "transfer_overlap_ratio": 1.0,
+        "transfer_union_busy_ms": 188.04575
+      },
+      "connector_queue_wait_p95_ms": 0.435004,
+      "correctness_rate": 1.0,
+      "goodput_loss_vs_no_control_pct": 5.198119974867909,
+      "goodput_rps": 6.733432054772528,
+      "label": "servegen/moderate/oracle_b16",
+      "layer_ready_wait_p95_ms": 1.589823,
+      "oracle_byte_budget": 127401984,
+      "p95_improvement_vs_no_control_pct": -1.1290008657342865,
+      "peak_bytes_in_flight": 4423680,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-frontier-v3-servegen-moderate-oracle-b16-r1",
+      "ttft_p95_ms": 658.8963217334822,
+      "ttft_p99_ms": 661.3459633756429
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 135,
+        "layer_ready_waits": 135,
+        "request_ids": 64,
+        "transfer_finishes": 135,
+        "transfer_starts": 135
+      },
+      "arm": "materialization_paced_oracle",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 693,
+          "path": "/tmp/g0-frontier-burstgpt-high-oracle-b32-r1/benchmark/random-online.json",
+          "sha256": "8fa203e833563f5142577b98560552de4cec63874f0389ad9c2df3746bd525d2"
+        },
+        "connector_summary": {
+          "bytes": 1914,
+          "path": "/tmp/g0-frontier-burstgpt-high-oracle-b32-r1/parsed/g0_connector_summary.json",
+          "sha256": "1de7905fe0eb41d9efed5b8162e6e0ca75413188c266b03124ca59fae48d9bb5"
+        },
+        "connector_telemetry": {
+          "bytes": 563162,
+          "path": "/tmp/g0-frontier-burstgpt-high-oracle-b32-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "a9f95e2eb53bd3e7191b462d63546ce8e8117de088cbcebd71e327d66ee62b63"
+        },
+        "requests": {
+          "bytes": 32824,
+          "path": "/tmp/g0-frontier-burstgpt-high-oracle-b32-r1/benchmark/request_results.jsonl",
+          "sha256": "a38ac269db5e2e918869cd85daa9137c8c4af485a9f812f0b170bc3f69351c26"
+        },
+        "resource_samples": {
+          "bytes": 12736,
+          "path": "/tmp/g0-frontier-burstgpt-high-oracle-b32-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "1a4fc2645abe6177af9d552a46a79af4e84361b8d0484381cd746eed79d345ea"
+        }
+      },
+      "cell": "burstgpt/high",
+      "compute_transfer_overlap": {
+        "chrome_trace": {
+          "bytes": 806698,
+          "path": "/tmp/g0-frontier-burstgpt-high-oracle-b32-r1/parsed/chrome_tracing.json",
+          "sha256": "2feaf5cd325645a31871fcfff7665d999c30aa79dfe8ef5b147d29d2eb08c759"
+        },
+        "compute_envelope_busy_ms": 2741.76675,
+        "compute_intervals": 21,
+        "compute_overlap_ratio": 0.04861564172079919,
+        "definition": "wall-clock intersection of msServiceProfiler modelExec envelopes and connector transfer intervals",
+        "overlap_ms": 133.29275,
+        "transfer_intervals": 135,
+        "transfer_overlap_ratio": 1.0,
+        "transfer_union_busy_ms": 133.29275
+      },
+      "connector_queue_wait_p95_ms": 0.468854,
+      "correctness_rate": 1.0,
+      "goodput_loss_vs_no_control_pct": -0.8350691965464563,
+      "goodput_rps": 19.955789631406578,
+      "label": "burstgpt/high/oracle_b32",
+      "layer_ready_wait_p95_ms": 2.563611,
+      "oracle_byte_budget": 254803968,
+      "p95_improvement_vs_no_control_pct": -1.209856515143648,
+      "peak_bytes_in_flight": 9289728,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-frontier-burstgpt-high-oracle-b32-r1",
+      "ttft_p95_ms": 635.4500941699371,
+      "ttft_p99_ms": 636.3296501152217
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 135,
+        "layer_ready_waits": 135,
+        "request_ids": 64,
+        "transfer_finishes": 135,
+        "transfer_starts": 135
+      },
+      "arm": "materialization_paced_oracle",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 691,
+          "path": "/tmp/g0-frontier-v3-burstgpt-moderate-oracle-b32-r1/benchmark/random-online.json",
+          "sha256": "92b59a536e0b39e4e1f809d3bd2eabb2f9d5689e1d0e9b7140eeb6b7c152af85"
+        },
+        "connector_summary": {
+          "bytes": 1933,
+          "path": "/tmp/g0-frontier-v3-burstgpt-moderate-oracle-b32-r1/parsed/g0_connector_summary.json",
+          "sha256": "db35b0dfc2c7139bc1b0a175169c044dfa4c1b7f3e835901375f2a4030bd81fc"
+        },
+        "connector_telemetry": {
+          "bytes": 563160,
+          "path": "/tmp/g0-frontier-v3-burstgpt-moderate-oracle-b32-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "0d59b095d6b21864e67d650ae78a206a137157c43aa423e678a7afbf27b68e49"
+        },
+        "requests": {
+          "bytes": 32702,
+          "path": "/tmp/g0-frontier-v3-burstgpt-moderate-oracle-b32-r1/benchmark/request_results.jsonl",
+          "sha256": "29f19dbad424c5fe24e247ebb9151051628f2b5e5c9aad88cf618b5842ca3958"
+        },
+        "resource_samples": {
+          "bytes": 13793,
+          "path": "/tmp/g0-frontier-v3-burstgpt-moderate-oracle-b32-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "1a106415a98f1e7f2e8573249840254649c20b408cea36eaf51d637dbd990776"
+        }
+      },
+      "cell": "burstgpt/moderate",
+      "compute_transfer_overlap": {
+        "chrome_trace": {
+          "bytes": 806686,
+          "path": "/tmp/g0-frontier-v3-burstgpt-moderate-oracle-b32-r1/parsed/chrome_tracing.json",
+          "sha256": "332b6b995b3c0f532b072ca4a0723b47746616ebbbf1dbd1b050470749aec9a5"
+        },
+        "compute_envelope_busy_ms": 2894.89875,
+        "compute_intervals": 21,
+        "compute_overlap_ratio": 0.0473355933432905,
+        "definition": "wall-clock intersection of msServiceProfiler modelExec envelopes and connector transfer intervals",
+        "overlap_ms": 137.03175,
+        "transfer_intervals": 135,
+        "transfer_overlap_ratio": 1.0,
+        "transfer_union_busy_ms": 137.03175
+      },
+      "connector_queue_wait_p95_ms": 0.487084,
+      "correctness_rate": 1.0,
+      "goodput_loss_vs_no_control_pct": 0.34728295303890766,
+      "goodput_rps": 6.964528875483988,
+      "label": "burstgpt/moderate/oracle_b32",
+      "layer_ready_wait_p95_ms": 2.64519,
+      "oracle_byte_budget": 254803968,
+      "p95_improvement_vs_no_control_pct": -5.59055277766507,
+      "peak_bytes_in_flight": 9289728,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-frontier-v3-burstgpt-moderate-oracle-b32-r1",
+      "ttft_p95_ms": 663.5262336349115,
+      "ttft_p99_ms": 664.6175216836855
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 189,
+        "layer_ready_waits": 189,
+        "request_ids": 64,
+        "transfer_finishes": 189,
+        "transfer_starts": 189
+      },
+      "arm": "materialization_paced_oracle",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 694,
+          "path": "/tmp/g0-frontier-v3-servegen-high-oracle-b32-r1/benchmark/random-online.json",
+          "sha256": "5f3001e0946f2ac15112000a2a88a46c23965def9cb5c2090214e07cdcf34f33"
+        },
+        "connector_summary": {
+          "bytes": 1922,
+          "path": "/tmp/g0-frontier-v3-servegen-high-oracle-b32-r1/parsed/g0_connector_summary.json",
+          "sha256": "1ec7241d55e9c5a2256eeb9fd3fd48459c124cc7d291d4c412febd95b20e1517"
+        },
+        "connector_telemetry": {
+          "bytes": 628374,
+          "path": "/tmp/g0-frontier-v3-servegen-high-oracle-b32-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "5e0809220ce5b6d73fa650276f51a6e1d30b56d8b6ffddfa5199ca8a35891667"
+        },
+        "requests": {
+          "bytes": 33582,
+          "path": "/tmp/g0-frontier-v3-servegen-high-oracle-b32-r1/benchmark/request_results.jsonl",
+          "sha256": "c48519fc281b8144424d3fe9a61a3bf1395dae8484b9ef1b1b37e82973de6a24"
+        },
+        "resource_samples": {
+          "bytes": 12737,
+          "path": "/tmp/g0-frontier-v3-servegen-high-oracle-b32-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "8273b8639a22d6b8d0836a086f612398f63a0df27e0db8b45f17c51d7a35e075"
+        }
+      },
+      "cell": "servegen/high",
+      "compute_transfer_overlap": {
+        "chrome_trace": {
+          "bytes": 807950,
+          "path": "/tmp/g0-frontier-v3-servegen-high-oracle-b32-r1/parsed/chrome_tracing.json",
+          "sha256": "c98fe09de3ecc5234a5bbfff3f49474e78a98864c0a369f07b4a503cd7af3823"
+        },
+        "compute_envelope_busy_ms": 3049.22775,
+        "compute_intervals": 21,
+        "compute_overlap_ratio": 0.0490708672056392,
+        "definition": "wall-clock intersection of msServiceProfiler modelExec envelopes and connector transfer intervals",
+        "overlap_ms": 149.62825,
+        "transfer_intervals": 189,
+        "transfer_overlap_ratio": 1.0,
+        "transfer_union_busy_ms": 149.62825
+      },
+      "connector_queue_wait_p95_ms": 0.413846,
+      "correctness_rate": 1.0,
+      "goodput_loss_vs_no_control_pct": 2.911374447511317,
+      "goodput_rps": 19.673969917300976,
+      "label": "servegen/high/oracle_b32",
+      "layer_ready_wait_p95_ms": 2.129401,
+      "oracle_byte_budget": 254803968,
+      "p95_improvement_vs_no_control_pct": -2.916398188095015,
+      "peak_bytes_in_flight": 7520256,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-frontier-v3-servegen-high-oracle-b32-r1",
+      "ttft_p95_ms": 698.1937406817451,
+      "ttft_p99_ms": 700.3312806319445
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 216,
+        "layer_ready_waits": 216,
+        "request_ids": 64,
+        "transfer_finishes": 216,
+        "transfer_starts": 216
+      },
+      "arm": "materialization_paced_oracle",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 690,
+          "path": "/tmp/g0-frontier-v3-servegen-moderate-oracle-b32-r1/benchmark/random-online.json",
+          "sha256": "81f5a80af8fd757a4bb1291238d698b35b336a6f9f84e5712b08c5f3bd5a8976"
+        },
+        "connector_summary": {
+          "bytes": 1933,
+          "path": "/tmp/g0-frontier-v3-servegen-moderate-oracle-b32-r1/parsed/g0_connector_summary.json",
+          "sha256": "28f7b989a78f805032bdc7e4b912739d7e9362439ecde10d197de8c1c43819b2"
+        },
+        "connector_telemetry": {
+          "bytes": 660787,
+          "path": "/tmp/g0-frontier-v3-servegen-moderate-oracle-b32-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "df9dec495a1efdedb4aa3bdf1b7e0acee61f1909f9de30e4b39bdebc5bc1ffd1"
+        },
+        "requests": {
+          "bytes": 33491,
+          "path": "/tmp/g0-frontier-v3-servegen-moderate-oracle-b32-r1/benchmark/request_results.jsonl",
+          "sha256": "70bc014b8623b9f3fee872a191fc8a818e262d511e92d3130f5ef78b21fb22a4"
+        },
+        "resource_samples": {
+          "bytes": 13795,
+          "path": "/tmp/g0-frontier-v3-servegen-moderate-oracle-b32-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "bb0af1b8bce1ae80dbd25ee5a8155cc8a3a5da791f94c3a0c001e6235f12e66d"
+        }
+      },
+      "cell": "servegen/moderate",
+      "compute_transfer_overlap": {
+        "chrome_trace": {
+          "bytes": 827168,
+          "path": "/tmp/g0-frontier-v3-servegen-moderate-oracle-b32-r1/parsed/chrome_tracing.json",
+          "sha256": "9577b4c736fee509346665cee60ef6b3625a006ff60648ae16aa0a566257dafb"
+        },
+        "compute_envelope_busy_ms": 3946.51525,
+        "compute_intervals": 29,
+        "compute_overlap_ratio": 0.041514916228944,
+        "definition": "wall-clock intersection of msServiceProfiler modelExec envelopes and connector transfer intervals",
+        "overlap_ms": 163.83925,
+        "transfer_intervals": 216,
+        "transfer_overlap_ratio": 1.0,
+        "transfer_union_busy_ms": 163.83925
+      },
+      "connector_queue_wait_p95_ms": 0.434893,
+      "correctness_rate": 1.0,
+      "goodput_loss_vs_no_control_pct": 0.08170126058308913,
+      "goodput_rps": 7.096832630449619,
+      "label": "servegen/moderate/oracle_b32",
+      "layer_ready_wait_p95_ms": 2.209789,
+      "oracle_byte_budget": 254803968,
+      "p95_improvement_vs_no_control_pct": -0.040240437615879365,
+      "peak_bytes_in_flight": 7667712,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-frontier-v3-servegen-moderate-oracle-b32-r1",
+      "ttft_p95_ms": 651.8026074161754,
+      "ttft_p99_ms": 666.0782978590578
+    }
+  ],
+  "capacity_frontier_gate": {
+    "all_cells_have_joint_gate_point": false,
+    "cells": [
+      {
+        "best_p95_improvement_within_5pct_goodput_loss": -1.209856515143648,
+        "cell": "burstgpt/high",
+        "joint_gate_points": 0,
+        "points": 4
+      },
+      {
+        "best_p95_improvement_within_5pct_goodput_loss": 6.956983912171378,
+        "cell": "burstgpt/moderate",
+        "joint_gate_points": 0,
+        "points": 4
+      },
+      {
+        "best_p95_improvement_within_5pct_goodput_loss": -2.916398188095015,
+        "cell": "servegen/high",
+        "joint_gate_points": 0,
+        "points": 4
+      },
+      {
+        "best_p95_improvement_within_5pct_goodput_loss": -0.040240437615879365,
+        "cell": "servegen/moderate",
+        "joint_gate_points": 0,
+        "points": 4
+      }
+    ],
+    "goodput_loss_threshold_pct": 5.0,
+    "tail_improvement_threshold_pct": 10.0
+  },
+  "comparisons": [
+    {
+      "cell": "burstgpt/high",
+      "no_control_vs_oracle_ttft_regression_pct": 16.795858706243806,
+      "oracle_vs_no_control_goodput_loss_pct": 62.91345756921558,
+      "token_bucket_vs_oracle_goodput_gap_pct": 2.3081896280013003,
+      "token_bucket_vs_oracle_ttft_gap_pct": 0.939226476525068
+    },
+    {
+      "cell": "burstgpt/moderate",
+      "no_control_vs_oracle_ttft_regression_pct": 13.80599837856793,
+      "oracle_vs_no_control_goodput_loss_pct": 25.702773989056016,
+      "token_bucket_vs_oracle_goodput_gap_pct": 1.3686026817881114,
+      "token_bucket_vs_oracle_ttft_gap_pct": 3.0104976732095112
+    },
+    {
+      "cell": "servegen/high",
+      "no_control_vs_oracle_ttft_regression_pct": 32.26357576257237,
+      "oracle_vs_no_control_goodput_loss_pct": 62.292556790884326,
+      "token_bucket_vs_oracle_goodput_gap_pct": -3.71842656006669,
+      "token_bucket_vs_oracle_ttft_gap_pct": 14.378438450811837
+    },
+    {
+      "cell": "servegen/moderate",
+      "no_control_vs_oracle_ttft_regression_pct": 10.208898107549857,
+      "oracle_vs_no_control_goodput_loss_pct": 23.787386718363013,
+      "token_bucket_vs_oracle_goodput_gap_pct": 1.1988754460390938,
+      "token_bucket_vs_oracle_ttft_gap_pct": 5.097260983249741
+    }
+  ],
+  "low_control_comparisons": [
+    {
+      "arrival_transform": "uniform_one_request_per_second",
+      "cell": "burstgpt/low_control",
+      "no_control_correctness_rate": 1.0,
+      "no_control_vs_oracle_goodput_gap_pct": -0.018237646557228704,
+      "no_control_vs_oracle_ttft_regression_pct": 3.0812478308597457,
+      "oracle_correctness_rate": 1.0
+    },
+    {
+      "arrival_transform": "uniform_one_request_per_second",
+      "cell": "servegen/low_control",
+      "no_control_correctness_rate": 1.0,
+      "no_control_vs_oracle_goodput_gap_pct": -0.09411749590759744,
+      "no_control_vs_oracle_ttft_regression_pct": -3.9165771365744395,
+      "oracle_correctness_rate": 1.0
+    }
+  ],
+  "runs": [
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 108,
+        "layer_ready_waits": 108,
+        "request_ids": 64,
+        "transfer_finishes": 108,
+        "transfer_starts": 108
+      },
+      "arm": "no_control",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 671,
+          "path": "/tmp/g0-formal-pilot-burstgpt-high-nocontrol-r1/benchmark/random-online.json",
+          "sha256": "ed09a7ab54d4f16e023f899f75cd521b232d7bc7c1f4d1765f97cab58ea37336"
+        },
+        "connector_summary": {
+          "bytes": 827,
+          "path": "/tmp/g0-formal-pilot-burstgpt-high-nocontrol-r1/parsed/g0_connector_summary.json",
+          "sha256": "a430d4f19da1bb0cf308d63c87ee6c096b19d18bf056454907121a22915b0e3b"
+        },
+        "connector_telemetry": {
+          "bytes": 227941,
+          "path": "/tmp/g0-formal-pilot-burstgpt-high-nocontrol-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "c090cadd8b750caec6c3180a6d32308e17784be7eb14002d5fc532ef7c8b68b8"
+        },
+        "requests": {
+          "bytes": 32850,
+          "path": "/tmp/g0-formal-pilot-burstgpt-high-nocontrol-r1/benchmark/request_results.jsonl",
+          "sha256": "9683925d63e42bd5709271bb49f347727207f22a82fe032f361810e49bcc749d"
+        }
+      },
+      "compute_transfer_overlap": null,
+      "connector_queue_wait_p95_ms": 0.441987,
+      "correctness_rate": 1.0,
+      "goodput_rps": 19.790525052855372,
+      "label": "burstgpt/high/no_control",
+      "layer_ready_wait_p95_ms": 2.588039,
+      "peak_bytes_in_flight": 9732096,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-formal-pilot-burstgpt-high-nocontrol-r1",
+      "ttft_p95_ms": 627.8539621038362,
+      "ttft_p99_ms": 629.0015040850267
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 864,
+        "layer_ready_waits": 864,
+        "request_ids": 64,
+        "transfer_finishes": 864,
+        "transfer_starts": 864
+      },
+      "arm": "concurrency_cap",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 676,
+          "path": "/tmp/g0-formal-pilot-burstgpt-high-concurrency4-r1/benchmark/random-online.json",
+          "sha256": "3c819e60a2ffef8ea7c2306df1e2cb8c29e835f3a243d54362bca76e6a0aafc0"
+        },
+        "connector_summary": {
+          "bytes": 830,
+          "path": "/tmp/g0-formal-pilot-burstgpt-high-concurrency4-r1/parsed/g0_connector_summary.json",
+          "sha256": "144eda5ed2e3990795bf79bf5aff68827673747b37481662c4961177ab5c8008"
+        },
+        "connector_telemetry": {
+          "bytes": 1256213,
+          "path": "/tmp/g0-formal-pilot-burstgpt-high-concurrency4-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "ae2d6b247363ee83b5799fb1b3792949e20e1eb390a23137986919226e54a143"
+        },
+        "requests": {
+          "bytes": 32623,
+          "path": "/tmp/g0-formal-pilot-burstgpt-high-concurrency4-r1/benchmark/request_results.jsonl",
+          "sha256": "994f6ae3e72dea0156be61d04845c777369be673d8863677662ada16f503636d"
+        },
+        "resource_samples": {
+          "bytes": 4537,
+          "path": "/tmp/g0-formal-pilot-burstgpt-high-concurrency4-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "5714631640801117b17c9ba4650481f2e0c0c8cbbd0a1da5e723ab4e59be84a3"
+        }
+      },
+      "compute_transfer_overlap": null,
+      "connector_queue_wait_p95_ms": 0.486557,
+      "correctness_rate": 1.0,
+      "goodput_rps": 3.3306240078801537,
+      "label": "burstgpt/high/concurrency_cap",
+      "layer_ready_wait_p95_ms": 1.176188,
+      "peak_bytes_in_flight": 1179648,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-formal-pilot-burstgpt-high-concurrency4-r1",
+      "ttft_p95_ms": 555.97795532085,
+      "ttft_p99_ms": 658.6321063758805
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 1107,
+        "layer_ready_waits": 1107,
+        "request_ids": 64,
+        "transfer_finishes": 1107,
+        "transfer_starts": 1107
+      },
+      "arm": "request_token_bucket",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 681,
+          "path": "/tmp/g0-formal-pilot-burstgpt-high-tokenbucket8c4-r1/benchmark/random-online.json",
+          "sha256": "f156bdc91f8d3359d302a380bceef99e1014273efb7a2f25673ac2a96d0f82de"
+        },
+        "connector_summary": {
+          "bytes": 1296,
+          "path": "/tmp/g0-formal-pilot-burstgpt-high-tokenbucket8c4-r1/parsed/g0_connector_summary.json",
+          "sha256": "5f4af1e941a46d54b7b1991aea25b9964b5484053e4027623bdd09a7c8f1aab2"
+        },
+        "connector_telemetry": {
+          "bytes": 1513939,
+          "path": "/tmp/g0-formal-pilot-burstgpt-high-tokenbucket8c4-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "dc31aba6529978afab4f5b561e59012d849ef4109e4770249c7d0faa051a8c04"
+        },
+        "requests": {
+          "bytes": 32642,
+          "path": "/tmp/g0-formal-pilot-burstgpt-high-tokenbucket8c4-r1/benchmark/request_results.jsonl",
+          "sha256": "368ed402aab318449bed53134077f0f366c5389eed4d72cda5eace5c65dcb8b1"
+        },
+        "resource_samples": {
+          "bytes": 13536,
+          "path": "/tmp/g0-formal-pilot-burstgpt-high-tokenbucket8c4-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "61a5c20f4f534aec1aa9851c6a65594be452f21c9e64ebc37befb12a2f0309fa"
+        }
+      },
+      "compute_transfer_overlap": null,
+      "connector_queue_wait_p95_ms": 0.342345,
+      "correctness_rate": 1.0,
+      "goodput_rps": 7.509033852530457,
+      "label": "burstgpt/high/request_token_bucket",
+      "layer_ready_wait_p95_ms": 0.904913,
+      "peak_bytes_in_flight": 1327104,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-formal-pilot-burstgpt-high-tokenbucket8c4-r1",
+      "ttft_p95_ms": 542.6142157521099,
+      "ttft_p99_ms": 588.503321330063
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 756,
+        "layer_ready_waits": 756,
+        "request_ids": 64,
+        "transfer_finishes": 756,
+        "transfer_starts": 756
+      },
+      "arm": "materialization_paced_oracle",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 689,
+          "path": "/tmp/g0-formal-pilot-burstgpt-high-oracle-r1/benchmark/random-online.json",
+          "sha256": "33c7edabf5986a71273c9d6bb75c26cc86f7415bbc2116cdbb982b40d5987789"
+        },
+        "connector_summary": {
+          "bytes": 825,
+          "path": "/tmp/g0-formal-pilot-burstgpt-high-oracle-r1/parsed/g0_connector_summary.json",
+          "sha256": "d47c562bee7a9c9a74f6405f0c605702160c15c1895697315eaf62c55bf2b3f6"
+        },
+        "connector_telemetry": {
+          "bytes": 1143159,
+          "path": "/tmp/g0-formal-pilot-burstgpt-high-oracle-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "2fa39b064ed33ac7a82edd7f9f01bb759a2d70674995ce75db7a7f891bc325f5"
+        },
+        "requests": {
+          "bytes": 32655,
+          "path": "/tmp/g0-formal-pilot-burstgpt-high-oracle-r1/benchmark/request_results.jsonl",
+          "sha256": "35adb0ed05fcf36f1c7001519f9e9c8ded8e76a9a8273c906a43eb49a8c78e41"
+        }
+      },
+      "compute_transfer_overlap": null,
+      "connector_queue_wait_p95_ms": 0.365986,
+      "correctness_rate": 1.0,
+      "goodput_rps": 7.339621471002228,
+      "label": "burstgpt/high/materialization_paced_oracle",
+      "layer_ready_wait_p95_ms": 1.080266,
+      "peak_bytes_in_flight": 1179648,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-formal-pilot-burstgpt-high-oracle-r1",
+      "ttft_p95_ms": 537.5652604969218,
+      "ttft_p99_ms": 540.5199375236407
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 108,
+        "layer_ready_waits": 108,
+        "request_ids": 64,
+        "transfer_finishes": 108,
+        "transfer_starts": 108
+      },
+      "arm": "no_control",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 668,
+          "path": "/tmp/g0-formal-pilot-burstgpt-moderate-nocontrol-r1/benchmark/random-online.json",
+          "sha256": "a22958ff827d4839e54103dd4e248f6a7583463bad74dc730965780674e99210"
+        },
+        "connector_summary": {
+          "bytes": 1932,
+          "path": "/tmp/g0-formal-pilot-burstgpt-moderate-nocontrol-r1/parsed/g0_connector_summary.json",
+          "sha256": "828d886393f070e4281e99ad26900cf8c74fd197278adb1517add73978080cc2"
+        },
+        "connector_telemetry": {
+          "bytes": 530777,
+          "path": "/tmp/g0-formal-pilot-burstgpt-moderate-nocontrol-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "845ed64e424f7cbcdc50e076c654ebbd7f9d9cb84bf0ef43999a3bb962623abf"
+        },
+        "requests": {
+          "bytes": 32745,
+          "path": "/tmp/g0-formal-pilot-burstgpt-moderate-nocontrol-r1/benchmark/request_results.jsonl",
+          "sha256": "1d8eb9f92294f3970756ada067b6947c5c0f26501284f7530600e0729fefa0d0"
+        },
+        "resource_samples": {
+          "bytes": 14063,
+          "path": "/tmp/g0-formal-pilot-burstgpt-moderate-nocontrol-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "c6e14946d44d912bf3cd10cfe5964697e4768cdbe0d82a4105372fb30e1842c7"
+        }
+      },
+      "compute_transfer_overlap": {
+        "chrome_trace": {
+          "bytes": 799091,
+          "path": "/tmp/g0-formal-pilot-burstgpt-moderate-nocontrol-r1/parsed/chrome_tracing.json",
+          "sha256": "52f8838fb9339f796dc17e0b779a176e43b8350c83648ea04311c65f1141f325"
+        },
+        "compute_envelope_busy_ms": 2358.76425,
+        "compute_intervals": 18,
+        "compute_overlap_ratio": 0.054856902295343846,
+        "definition": "wall-clock intersection of msServiceProfiler modelExec envelopes and connector transfer intervals",
+        "overlap_ms": 129.3945,
+        "transfer_intervals": 108,
+        "transfer_overlap_ratio": 1.0,
+        "transfer_union_busy_ms": 129.3945
+      },
+      "connector_queue_wait_p95_ms": 0.471226,
+      "correctness_rate": 1.0,
+      "goodput_rps": 6.988799785761959,
+      "label": "burstgpt/moderate/no_control",
+      "layer_ready_wait_p95_ms": 2.68947,
+      "peak_bytes_in_flight": 9732096,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-formal-pilot-burstgpt-moderate-nocontrol-r1",
+      "ttft_p95_ms": 628.3954541198909,
+      "ttft_p99_ms": 629.4638299103826
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 1080,
+        "layer_ready_waits": 1080,
+        "request_ids": 64,
+        "transfer_finishes": 1080,
+        "transfer_starts": 1080
+      },
+      "arm": "request_token_bucket",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 683,
+          "path": "/tmp/g0-formal-pilot-burstgpt-moderate-tokenbucket8c4-r1/benchmark/random-online.json",
+          "sha256": "f515c845e569351303d35964c9e41008a74224f98378ecd64c7ffb7d693091e6"
+        },
+        "connector_summary": {
+          "bytes": 1955,
+          "path": "/tmp/g0-formal-pilot-burstgpt-moderate-tokenbucket8c4-r1/parsed/g0_connector_summary.json",
+          "sha256": "44e5fc1b8311d71c68c58b427352c177e447cdc7a2c5f35f5f3acf5ca2f4081c"
+        },
+        "connector_telemetry": {
+          "bytes": 1696667,
+          "path": "/tmp/g0-formal-pilot-burstgpt-moderate-tokenbucket8c4-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "401f68ef80d31218ea909058b16c939dd14d16ee6afc45d92c05730d17c1c047"
+        },
+        "requests": {
+          "bytes": 32559,
+          "path": "/tmp/g0-formal-pilot-burstgpt-moderate-tokenbucket8c4-r1/benchmark/request_results.jsonl",
+          "sha256": "8f631b0742f5878a7851a006fb75e4df463da0fc607c3ebb2ba98094dbd3aa5b"
+        },
+        "resource_samples": {
+          "bytes": 13536,
+          "path": "/tmp/g0-formal-pilot-burstgpt-moderate-tokenbucket8c4-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "ad995357c880908885d33b3f2556ba07c5015598cb5e3e1779a6c74e14e09ece"
+        }
+      },
+      "compute_transfer_overlap": {
+        "chrome_trace": {
+          "bytes": 905663,
+          "path": "/tmp/g0-formal-pilot-burstgpt-moderate-tokenbucket8c4-r1/parsed/chrome_tracing.json",
+          "sha256": "0d856ef2af9fc3d4cdf11786ce0e010fa60ab4cc5148a3bbfa1f54ffad0d3f6e"
+        },
+        "compute_envelope_busy_ms": 8774.76625,
+        "compute_intervals": 54,
+        "compute_overlap_ratio": 0.042671250644426,
+        "definition": "wall-clock intersection of msServiceProfiler modelExec envelopes and connector transfer intervals",
+        "overlap_ms": 374.43025,
+        "transfer_intervals": 1080,
+        "transfer_overlap_ratio": 1.0,
+        "transfer_union_busy_ms": 374.43025
+      },
+      "connector_queue_wait_p95_ms": 0.349066,
+      "correctness_rate": 1.0,
+      "goodput_rps": 5.263548852650383,
+      "label": "burstgpt/moderate/request_token_bucket",
+      "layer_ready_wait_p95_ms": 0.932679,
+      "peak_bytes_in_flight": 1032192,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-formal-pilot-burstgpt-moderate-tokenbucket8c4-r1",
+      "ttft_p95_ms": 568.7866139458492,
+      "ttft_p99_ms": 582.2768658772111
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 864,
+        "layer_ready_waits": 864,
+        "request_ids": 64,
+        "transfer_finishes": 864,
+        "transfer_starts": 864
+      },
+      "arm": "materialization_paced_oracle",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 689,
+          "path": "/tmp/g0-formal-pilot-burstgpt-moderate-oracle-r1/benchmark/random-online.json",
+          "sha256": "4f8cf4e52c1283e887fb679aeff69accc92a4d4cc4cc4c7b839d8f1a8ef725bd"
+        },
+        "connector_summary": {
+          "bytes": 1926,
+          "path": "/tmp/g0-formal-pilot-burstgpt-moderate-oracle-r1/parsed/g0_connector_summary.json",
+          "sha256": "282b7caaf7366dda29a25bd37a9054ce1fb72134b589fb81b49a04d2d6efee47"
+        },
+        "connector_telemetry": {
+          "bytes": 1438416,
+          "path": "/tmp/g0-formal-pilot-burstgpt-moderate-oracle-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "c4f1332c97fc89d958a8cf331a17941a25a34e80d9fcfb8adc39001112661dba"
+        },
+        "requests": {
+          "bytes": 32594,
+          "path": "/tmp/g0-formal-pilot-burstgpt-moderate-oracle-r1/benchmark/request_results.jsonl",
+          "sha256": "220ae9c8f2b67da368f5407db04836b1db48a12230970edd4633b3eb1872cb9f"
+        },
+        "resource_samples": {
+          "bytes": 14066,
+          "path": "/tmp/g0-formal-pilot-burstgpt-moderate-oracle-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "f8550e524f987aed8d70eebec61ea0471eba8696e47f313d8cdc493f066a8d67"
+        }
+      },
+      "compute_transfer_overlap": {
+        "chrome_trace": {
+          "bytes": 921413,
+          "path": "/tmp/g0-formal-pilot-burstgpt-moderate-oracle-r1/parsed/chrome_tracing.json",
+          "sha256": "6f24593546f11a6f9033e7965e63ef858c7be6283a176dcd95d4fe521c159baf"
+        },
+        "compute_envelope_busy_ms": 9229.62225,
+        "compute_intervals": 63,
+        "compute_overlap_ratio": 0.03665353151370848,
+        "definition": "wall-clock intersection of msServiceProfiler modelExec envelopes and connector transfer intervals",
+        "overlap_ms": 338.29825,
+        "transfer_intervals": 864,
+        "transfer_overlap_ratio": 1.0,
+        "transfer_union_busy_ms": 338.29825
+      },
+      "connector_queue_wait_p95_ms": 0.376106,
+      "correctness_rate": 1.0,
+      "goodput_rps": 5.192484372279932,
+      "label": "burstgpt/moderate/materialization_paced_oracle",
+      "layer_ready_wait_p95_ms": 1.043836,
+      "peak_bytes_in_flight": 1179648,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-formal-pilot-burstgpt-moderate-oracle-r1",
+      "ttft_p95_ms": 552.1637374768034,
+      "ttft_p99_ms": 559.749429859221
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 1728,
+        "layer_ready_waits": 1728,
+        "request_ids": 64,
+        "transfer_finishes": 1728,
+        "transfer_starts": 1728
+      },
+      "arm": "no_control",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 669,
+          "path": "/tmp/g0-low-control-v2-burstgpt-nocontrol-r1/benchmark/random-online.json",
+          "sha256": "ecfab6d811ba52adfe2ebe35c2a5c1766e215b81d61807b6c4158d91db00b973"
+        },
+        "connector_summary": {
+          "bytes": 1919,
+          "path": "/tmp/g0-low-control-v2-burstgpt-nocontrol-r1/parsed/g0_connector_summary.json",
+          "sha256": "f38d39266da4e2f1b3181ebd4c823f5f453b6030c2573aad6a0cfb5f29f8c5f4"
+        },
+        "connector_telemetry": {
+          "bytes": 2473746,
+          "path": "/tmp/g0-low-control-v2-burstgpt-nocontrol-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "8578765c4d1d15e87ddf7c9852bcee24811cc5612e8761adb34106baa8608cb7"
+        },
+        "requests": {
+          "bytes": 32564,
+          "path": "/tmp/g0-low-control-v2-burstgpt-nocontrol-r1/benchmark/request_results.jsonl",
+          "sha256": "d3c1faba494eaf847fa0c578e5d501042c05cc152e2905d9c804258e10c9b667"
+        },
+        "resource_samples": {
+          "bytes": 20740,
+          "path": "/tmp/g0-low-control-v2-burstgpt-nocontrol-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "9d1cab9d0a8ec40eadb0a01885b031fb24b2832b058aac2d21a8e31e971021c4"
+        }
+      },
+      "compute_transfer_overlap": {
+        "chrome_trace": {
+          "bytes": 2014260,
+          "path": "/tmp/g0-low-control-v2-burstgpt-nocontrol-r1/parsed/chrome_tracing.json",
+          "sha256": "c25e8413fff38b5fddf32f5c7e9856004c5368655caedd4270611218b21f8959"
+        },
+        "compute_envelope_busy_ms": 56653.65425,
+        "compute_intervals": 512,
+        "compute_overlap_ratio": 0.010044453575560839,
+        "definition": "wall-clock intersection of msServiceProfiler modelExec envelopes and connector transfer intervals",
+        "overlap_ms": 569.055,
+        "transfer_intervals": 1728,
+        "transfer_overlap_ratio": 1.0,
+        "transfer_union_busy_ms": 569.055
+      },
+      "connector_queue_wait_p95_ms": 0.405378,
+      "correctness_rate": 1.0,
+      "goodput_rps": 1.0018418224162178,
+      "label": "burstgpt/low_control/no_control",
+      "layer_ready_wait_p95_ms": 0.985979,
+      "peak_bytes_in_flight": 442368,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-low-control-v2-burstgpt-nocontrol-r1",
+      "ttft_p95_ms": 291.625274438411,
+      "ttft_p99_ms": 322.75333472061897
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 1728,
+        "layer_ready_waits": 1728,
+        "request_ids": 64,
+        "transfer_finishes": 1728,
+        "transfer_starts": 1728
+      },
+      "arm": "materialization_paced_oracle",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 687,
+          "path": "/tmp/g0-low-control-v2-burstgpt-oracle-r1/benchmark/random-online.json",
+          "sha256": "9cac8533eee0209e85bcd275be33527e68246701f4317a818fae5f8f17dc076a"
+        },
+        "connector_summary": {
+          "bytes": 1911,
+          "path": "/tmp/g0-low-control-v2-burstgpt-oracle-r1/parsed/g0_connector_summary.json",
+          "sha256": "e93afde07aace08fa9e08b209f700892b9439ec5df3e4f21d4e49bf07e3bfddf"
+        },
+        "connector_telemetry": {
+          "bytes": 2473724,
+          "path": "/tmp/g0-low-control-v2-burstgpt-oracle-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "9d4993ba16bbc6204557a438477acae5cb44126c2a0b4632516bf4cd2620dbde"
+        },
+        "requests": {
+          "bytes": 32491,
+          "path": "/tmp/g0-low-control-v2-burstgpt-oracle-r1/benchmark/request_results.jsonl",
+          "sha256": "8b22be607ce7bbf5dc0536295308229e434b412d3e1599db14b80858157598ca"
+        },
+        "resource_samples": {
+          "bytes": 21259,
+          "path": "/tmp/g0-low-control-v2-burstgpt-oracle-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "a96e566b48c238d2a25cadb5c0dfacebe82eb9a6ad88d23b04c76f5ad006c6e7"
+        }
+      },
+      "compute_transfer_overlap": {
+        "chrome_trace": {
+          "bytes": 2014608,
+          "path": "/tmp/g0-low-control-v2-burstgpt-oracle-r1/parsed/chrome_tracing.json",
+          "sha256": "120176ac281b4f25c593f71b60f3a7ecff98b64c77f252b09b8b681e305f3dbf"
+        },
+        "compute_envelope_busy_ms": 55703.836,
+        "compute_intervals": 512,
+        "compute_overlap_ratio": 0.010289717749420346,
+        "definition": "wall-clock intersection of msServiceProfiler modelExec envelopes and connector transfer intervals",
+        "overlap_ms": 573.17675,
+        "transfer_intervals": 1728,
+        "transfer_overlap_ratio": 1.0,
+        "transfer_union_busy_ms": 573.17675
+      },
+      "connector_queue_wait_p95_ms": 0.383077,
+      "correctness_rate": 1.0,
+      "goodput_rps": 1.0020245681153672,
+      "label": "burstgpt/low_control/materialization_paced_oracle",
+      "layer_ready_wait_p95_ms": 0.945097,
+      "peak_bytes_in_flight": 442368,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-low-control-v2-burstgpt-oracle-r1",
+      "ttft_p95_ms": 282.908172509633,
+      "ttft_p99_ms": 295.0943579524755
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 162,
+        "layer_ready_waits": 162,
+        "request_ids": 64,
+        "transfer_finishes": 162,
+        "transfer_starts": 162
+      },
+      "arm": "no_control",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 672,
+          "path": "/tmp/g0-formal-pilot-servegen-high-nocontrol-r1/benchmark/random-online.json",
+          "sha256": "8d5efcf5ef700e86583b99fb0a4534b871c0a23929df393cee894e5884952a3b"
+        },
+        "connector_summary": {
+          "bytes": 1281,
+          "path": "/tmp/g0-formal-pilot-servegen-high-nocontrol-r1/parsed/g0_connector_summary.json",
+          "sha256": "fc52177ee1441a4fa1d5e668d89dbd9d73be0439cce9a7007aa0d6c2174acdb0"
+        },
+        "connector_telemetry": {
+          "bytes": 511299,
+          "path": "/tmp/g0-formal-pilot-servegen-high-nocontrol-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "02d472b2102e04f8ba9bff2af19a481bd498fccc13b7566d01df1eeb23bb63b0"
+        },
+        "requests": {
+          "bytes": 33671,
+          "path": "/tmp/g0-formal-pilot-servegen-high-nocontrol-r1/benchmark/request_results.jsonl",
+          "sha256": "04edac78163c687ef3680ddbd1c899d40339250dca6ef09ff1269d8f38557447"
+        },
+        "resource_samples": {
+          "bytes": 11934,
+          "path": "/tmp/g0-formal-pilot-servegen-high-nocontrol-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "7289ffc0197361a791bbfa9d8af968758f526858dda37478dbb4b5fce5625abb"
+        }
+      },
+      "compute_transfer_overlap": null,
+      "connector_queue_wait_p95_ms": 0.405296,
+      "correctness_rate": 1.0,
+      "goodput_rps": 20.263928761319942,
+      "label": "servegen/high/no_control",
+      "layer_ready_wait_p95_ms": 1.826958,
+      "peak_bytes_in_flight": 7520256,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-formal-pilot-servegen-high-nocontrol-r1",
+      "ttft_p95_ms": 678.408643300645,
+      "ttft_p99_ms": 680.1979488553479
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 1080,
+        "layer_ready_waits": 1080,
+        "request_ids": 64,
+        "transfer_finishes": 1080,
+        "transfer_starts": 1080
+      },
+      "arm": "request_token_bucket",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 681,
+          "path": "/tmp/g0-formal-pilot-servegen-high-tokenbucket8c4-r1/benchmark/random-online.json",
+          "sha256": "7ed7fe072238e5215f3f7fba1ebce09895cf82a5bd941685372bafb13c7257d3"
+        },
+        "connector_summary": {
+          "bytes": 1295,
+          "path": "/tmp/g0-formal-pilot-servegen-high-tokenbucket8c4-r1/parsed/g0_connector_summary.json",
+          "sha256": "2a8c5b64ff72cc649a1db5d5019f13dc8a68a43072f9ba3ce1b09beed2063b24"
+        },
+        "connector_telemetry": {
+          "bytes": 1485286,
+          "path": "/tmp/g0-formal-pilot-servegen-high-tokenbucket8c4-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "46247260c8caea9c61e3c015730c303caace260c10d800c1f4fc2bd0bbd96206"
+        },
+        "requests": {
+          "bytes": 33437,
+          "path": "/tmp/g0-formal-pilot-servegen-high-tokenbucket8c4-r1/benchmark/request_results.jsonl",
+          "sha256": "8591643c6be2a5bda381d5c01c20a29bf67f6fcf3db6b9e7ec68d29f9f4acb24"
+        },
+        "resource_samples": {
+          "bytes": 12735,
+          "path": "/tmp/g0-formal-pilot-servegen-high-tokenbucket8c4-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "5fb07ecba6dccbec5a21998fffb52b41386aefb42ace97f9fb932f3bb1e8cc2d"
+        }
+      },
+      "compute_transfer_overlap": null,
+      "connector_queue_wait_p95_ms": 0.346285,
+      "correctness_rate": 1.0,
+      "goodput_rps": 7.356884105522541,
+      "label": "servegen/high/request_token_bucket",
+      "layer_ready_wait_p95_ms": 0.919963,
+      "peak_bytes_in_flight": 1179648,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-formal-pilot-servegen-high-tokenbucket8c4-r1",
+      "ttft_p95_ms": 586.6718845674768,
+      "ttft_p99_ms": 601.5656738355756
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 783,
+        "layer_ready_waits": 783,
+        "request_ids": 64,
+        "transfer_finishes": 783,
+        "transfer_starts": 783
+      },
+      "arm": "materialization_paced_oracle",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 690,
+          "path": "/tmp/g0-formal-pilot-servegen-high-oracle-r1/benchmark/random-online.json",
+          "sha256": "4c857dd463a59715d99e8c2f19cb6da622f90e23fc73378b08a6c735b71307ea"
+        },
+        "connector_summary": {
+          "bytes": 1277,
+          "path": "/tmp/g0-formal-pilot-servegen-high-oracle-r1/parsed/g0_connector_summary.json",
+          "sha256": "724b499bdb5037ead556da8a193a278674b7626b3a2d45f39a888b9ab754a0c6"
+        },
+        "connector_telemetry": {
+          "bytes": 1172054,
+          "path": "/tmp/g0-formal-pilot-servegen-high-oracle-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "321123678683277a90380dc4ff7aca3bfeb79687f4c357c888030fdb11be8ec8"
+        },
+        "requests": {
+          "bytes": 33467,
+          "path": "/tmp/g0-formal-pilot-servegen-high-oracle-r1/benchmark/request_results.jsonl",
+          "sha256": "1d7a54f40302cd4d316e4d8b1d38a1d6db48167f2446d245ee95e55f6ddf565e"
+        },
+        "resource_samples": {
+          "bytes": 12737,
+          "path": "/tmp/g0-formal-pilot-servegen-high-oracle-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "ab740a31bc59844b6e5b7da10e4871a3305b0addff4ee73fa6910b1789c30bda"
+        }
+      },
+      "compute_transfer_overlap": null,
+      "connector_queue_wait_p95_ms": 0.344675,
+      "correctness_rate": 1.0,
+      "goodput_rps": 7.641009429610373,
+      "label": "servegen/high/materialization_paced_oracle",
+      "layer_ready_wait_p95_ms": 0.996265,
+      "peak_bytes_in_flight": 1179648,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-formal-pilot-servegen-high-oracle-r1",
+      "ttft_p95_ms": 512.9217468900606,
+      "ttft_p99_ms": 516.3407326582819
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 189,
+        "layer_ready_waits": 189,
+        "request_ids": 64,
+        "transfer_finishes": 189,
+        "transfer_starts": 189
+      },
+      "arm": "no_control",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 671,
+          "path": "/tmp/g0-formal-pilot-servegen-moderate-nocontrol-r1/benchmark/random-online.json",
+          "sha256": "86c5887f702f3590dd00a75276e052cec4729e2e45e8641ce4b2874ced6c5e3e"
+        },
+        "connector_summary": {
+          "bytes": 1933,
+          "path": "/tmp/g0-formal-pilot-servegen-moderate-nocontrol-r1/parsed/g0_connector_summary.json",
+          "sha256": "96a549766ea7ca566afc1a7b52b4a50651cb694aa879f150603bef5cdc43a900"
+        },
+        "connector_telemetry": {
+          "bytes": 628395,
+          "path": "/tmp/g0-formal-pilot-servegen-moderate-nocontrol-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "699ff2b70cad585482882b3240afabc441c444d147124118194f1b67c3464971"
+        },
+        "requests": {
+          "bytes": 33555,
+          "path": "/tmp/g0-formal-pilot-servegen-moderate-nocontrol-r1/benchmark/request_results.jsonl",
+          "sha256": "60a6c3e3aec64486953c11520da22231539756f3053af188c0d89de9f474acc3"
+        },
+        "resource_samples": {
+          "bytes": 14064,
+          "path": "/tmp/g0-formal-pilot-servegen-moderate-nocontrol-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "adb09f213bb3778ba73480d868a9ad6ca8346bfba7f67bd446e436b69ca6f74f"
+        }
+      },
+      "compute_transfer_overlap": {
+        "chrome_trace": {
+          "bytes": 828824,
+          "path": "/tmp/g0-formal-pilot-servegen-moderate-nocontrol-r1/parsed/chrome_tracing.json",
+          "sha256": "b226bc1cef352485126f190d38dc941d842d2a15c687f17d58e8fa789fcb70a5"
+        },
+        "compute_envelope_busy_ms": 3888.78875,
+        "compute_intervals": 30,
+        "compute_overlap_ratio": 0.03839691729204884,
+        "definition": "wall-clock intersection of msServiceProfiler modelExec envelopes and connector transfer intervals",
+        "overlap_ms": 149.3175,
+        "transfer_intervals": 189,
+        "transfer_overlap_ratio": 1.0,
+        "transfer_union_busy_ms": 149.3175
+      },
+      "connector_queue_wait_p95_ms": 0.441887,
+      "correctness_rate": 1.0,
+      "goodput_rps": 7.102635573247585,
+      "label": "servegen/moderate/no_control",
+      "layer_ready_wait_p95_ms": 2.177899,
+      "peak_bytes_in_flight": 7667712,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-formal-pilot-servegen-moderate-nocontrol-r1",
+      "ttft_p95_ms": 651.5404246980326,
+      "ttft_p99_ms": 665.6303531816229
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 1026,
+        "layer_ready_waits": 1026,
+        "request_ids": 64,
+        "transfer_finishes": 1026,
+        "transfer_starts": 1026
+      },
+      "arm": "request_token_bucket",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 683,
+          "path": "/tmp/g0-formal-pilot-servegen-moderate-tokenbucket8c4-r1/benchmark/random-online.json",
+          "sha256": "b848c0034d0957ec83ceeaf121493c35c3f83be39157ac7851840fe3f6254bda"
+        },
+        "connector_summary": {
+          "bytes": 1952,
+          "path": "/tmp/g0-formal-pilot-servegen-moderate-tokenbucket8c4-r1/parsed/g0_connector_summary.json",
+          "sha256": "a2ea3cdfa018fc0d5e55594c15e50c3a8797d3fcd7519a3932877cea0a38cf9d"
+        },
+        "connector_telemetry": {
+          "bytes": 1631776,
+          "path": "/tmp/g0-formal-pilot-servegen-moderate-tokenbucket8c4-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "76a04856f516b5e19425e7d98260666230ea0a7c24def100988b679fb4489e65"
+        },
+        "requests": {
+          "bytes": 33378,
+          "path": "/tmp/g0-formal-pilot-servegen-moderate-tokenbucket8c4-r1/benchmark/request_results.jsonl",
+          "sha256": "656c6ab0954b74fecd67aeed27ed0c0b6bc664779a1a82a77ff3606cd4b69989"
+        },
+        "resource_samples": {
+          "bytes": 14073,
+          "path": "/tmp/g0-formal-pilot-servegen-moderate-tokenbucket8c4-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "9f26bf6cbcd35dc30c6c7e52fded3f801d8d7dc891d7183c7ae33e243767ae77"
+        }
+      },
+      "compute_transfer_overlap": {
+        "chrome_trace": {
+          "bytes": 899724,
+          "path": "/tmp/g0-formal-pilot-servegen-moderate-tokenbucket8c4-r1/parsed/chrome_tracing.json",
+          "sha256": "598bc4b69400806a7e5fa4db6714ad36869c98218f7d0dcb675f21166b487c1a"
+        },
+        "compute_envelope_busy_ms": 8789.619,
+        "compute_intervals": 52,
+        "compute_overlap_ratio": 0.043350229401297145,
+        "definition": "wall-clock intersection of msServiceProfiler modelExec envelopes and connector transfer intervals",
+        "overlap_ms": 381.032,
+        "transfer_intervals": 1026,
+        "transfer_overlap_ratio": 1.0,
+        "transfer_union_busy_ms": 381.032
+      },
+      "connector_queue_wait_p95_ms": 0.362431,
+      "correctness_rate": 1.0,
+      "goodput_rps": 5.4780005591525915,
+      "label": "servegen/moderate/request_token_bucket",
+      "layer_ready_wait_p95_ms": 0.980713,
+      "peak_bytes_in_flight": 1179648,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-formal-pilot-servegen-moderate-tokenbucket8c4-r1",
+      "ttft_p95_ms": 621.3211023015901,
+      "ttft_p99_ms": 632.2088719857857
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 1026,
+        "layer_ready_waits": 1026,
+        "request_ids": 64,
+        "transfer_finishes": 1026,
+        "transfer_starts": 1026
+      },
+      "arm": "materialization_paced_oracle",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 693,
+          "path": "/tmp/g0-formal-pilot-servegen-moderate-oracle-r1/benchmark/random-online.json",
+          "sha256": "eb870c76a29f5208bd817c39da20ddeb78218af1e8206f191c452f4cfd23c99c"
+        },
+        "connector_summary": {
+          "bytes": 1924,
+          "path": "/tmp/g0-formal-pilot-servegen-moderate-oracle-r1/parsed/g0_connector_summary.json",
+          "sha256": "60100246ea3115ae334c8c16ec5e6e99b2651e56086202a35638cb23b3e0c708"
+        },
+        "connector_telemetry": {
+          "bytes": 1631647,
+          "path": "/tmp/g0-formal-pilot-servegen-moderate-oracle-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "562596c40036cab913286d011608b3045ea87200543399e8cab82b5523d2e3ec"
+        },
+        "requests": {
+          "bytes": 33366,
+          "path": "/tmp/g0-formal-pilot-servegen-moderate-oracle-r1/benchmark/request_results.jsonl",
+          "sha256": "98e6ad22a7a1722c25e1bf860367e02816ca85d6f553c8ee30cdd6bd5f9a8c16"
+        },
+        "resource_samples": {
+          "bytes": 14070,
+          "path": "/tmp/g0-formal-pilot-servegen-moderate-oracle-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "8f20a8c64d914e025382ef87801c5a386b5317e8646e8b261844f5d2cc1ec4b9"
+        }
+      },
+      "compute_transfer_overlap": {
+        "chrome_trace": {
+          "bytes": 925260,
+          "path": "/tmp/g0-formal-pilot-servegen-moderate-oracle-r1/parsed/chrome_tracing.json",
+          "sha256": "f1a58505204e66f8acb1b5da5caf319c340409c03348b6b4990b8b521b8aace6"
+        },
+        "compute_envelope_busy_ms": 9825.0875,
+        "compute_intervals": 63,
+        "compute_overlap_ratio": 0.03812019485831551,
+        "definition": "wall-clock intersection of msServiceProfiler modelExec envelopes and connector transfer intervals",
+        "overlap_ms": 374.53425,
+        "transfer_intervals": 1026,
+        "transfer_overlap_ratio": 1.0,
+        "transfer_union_busy_ms": 374.53425
+      },
+      "connector_queue_wait_p95_ms": 0.35588,
+      "correctness_rate": 1.0,
+      "goodput_rps": 5.4131041822431625,
+      "label": "servegen/moderate/materialization_paced_oracle",
+      "layer_ready_wait_p95_ms": 0.974,
+      "peak_bytes_in_flight": 884736,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-formal-pilot-servegen-moderate-oracle-r1",
+      "ttft_p95_ms": 591.1867697490379,
+      "ttft_p99_ms": 595.3905581217259
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 1728,
+        "layer_ready_waits": 1728,
+        "request_ids": 64,
+        "transfer_finishes": 1728,
+        "transfer_starts": 1728
+      },
+      "arm": "no_control",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 669,
+          "path": "/tmp/g0-low-control-v2-servegen-nocontrol-r1/benchmark/random-online.json",
+          "sha256": "d83d364898b7819a6c0aa2eed7c82e181a6d9c36a77318c7c1336cbc13302be6"
+        },
+        "connector_summary": {
+          "bytes": 1921,
+          "path": "/tmp/g0-low-control-v2-servegen-nocontrol-r1/parsed/g0_connector_summary.json",
+          "sha256": "47c2f2e6338f11126dad2c445502c8c6986a1bf9ea0e0ae5d913b1a3fca142ca"
+        },
+        "connector_telemetry": {
+          "bytes": 2473805,
+          "path": "/tmp/g0-low-control-v2-servegen-nocontrol-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "3c60fc36da56e292560eb19c115ab841021cbc2bd5f581f5c9861664e11cbd6f"
+        },
+        "requests": {
+          "bytes": 32552,
+          "path": "/tmp/g0-low-control-v2-servegen-nocontrol-r1/benchmark/request_results.jsonl",
+          "sha256": "7a03ecca443a672f114b07e9616fbedf088b5d7aacc655c961116194feae8fe9"
+        },
+        "resource_samples": {
+          "bytes": 20721,
+          "path": "/tmp/g0-low-control-v2-servegen-nocontrol-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "db52dd094cbe4dc1311b96ff0a1f5834b35c437181fd5b214e358793eb949ddb"
+        }
+      },
+      "compute_transfer_overlap": {
+        "chrome_trace": {
+          "bytes": 2014366,
+          "path": "/tmp/g0-low-control-v2-servegen-nocontrol-r1/parsed/chrome_tracing.json",
+          "sha256": "9faf2ada95978339b0f351b8e9e6a2d0bac19885b3982f999edd0d0ac8604256"
+        },
+        "compute_envelope_busy_ms": 55203.0465,
+        "compute_intervals": 512,
+        "compute_overlap_ratio": 0.011390118659483766,
+        "definition": "wall-clock intersection of msServiceProfiler modelExec envelopes and connector transfer intervals",
+        "overlap_ms": 628.76925,
+        "transfer_intervals": 1728,
+        "transfer_overlap_ratio": 1.0,
+        "transfer_union_busy_ms": 628.76925
+      },
+      "connector_queue_wait_p95_ms": 0.391966,
+      "correctness_rate": 1.0,
+      "goodput_rps": 1.001219896944378,
+      "label": "servegen/low_control/no_control",
+      "layer_ready_wait_p95_ms": 1.055117,
+      "peak_bytes_in_flight": 442368,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-low-control-v2-servegen-nocontrol-r1",
+      "ttft_p95_ms": 276.4830667292699,
+      "ttft_p99_ms": 289.22511461656535
+    },
+    {
+      "activation": {
+        "all_transfer_results_ok": true,
+        "enqueue_events": 1728,
+        "layer_ready_waits": 1728,
+        "request_ids": 64,
+        "transfer_finishes": 1728,
+        "transfer_starts": 1728
+      },
+      "arm": "materialization_paced_oracle",
+      "artifacts": {
+        "benchmark": {
+          "bytes": 691,
+          "path": "/tmp/g0-low-control-v2-servegen-oracle-r1/benchmark/random-online.json",
+          "sha256": "aa6e8cd2b7c319b1704bd26d0200b178d2b05d2e90519e3f6e43df2d15c1e41b"
+        },
+        "connector_summary": {
+          "bytes": 1909,
+          "path": "/tmp/g0-low-control-v2-servegen-oracle-r1/parsed/g0_connector_summary.json",
+          "sha256": "0e35a9d9d70defd479ab8c0ab84a3e56aae35caf10642da139f99d53f3ac91f0"
+        },
+        "connector_telemetry": {
+          "bytes": 2473681,
+          "path": "/tmp/g0-low-control-v2-servegen-oracle-r1/raw/g0_connector_telemetry.jsonl",
+          "sha256": "a7fdf0c54f049f48c3b5dd6b8d992000258ffdf97ae5e8f91f36bfac182e5d93"
+        },
+        "requests": {
+          "bytes": 32495,
+          "path": "/tmp/g0-low-control-v2-servegen-oracle-r1/benchmark/request_results.jsonl",
+          "sha256": "e15fd693b011d5cb3aeba83576ee76b7e077281f6445fb0c79a4cb02ce7ec38a"
+        },
+        "resource_samples": {
+          "bytes": 21250,
+          "path": "/tmp/g0-low-control-v2-servegen-oracle-r1/raw/g0_resource_samples.jsonl",
+          "sha256": "ac720f0bd548f6976261a17628cbe684f0904d542c882e96e21e33d11779d323"
+        }
+      },
+      "compute_transfer_overlap": {
+        "chrome_trace": {
+          "bytes": 2014039,
+          "path": "/tmp/g0-low-control-v2-servegen-oracle-r1/parsed/chrome_tracing.json",
+          "sha256": "5883bfad73a4026d4dd5f4f5aac1c411f90acecb225dbcef8471f08511561518"
+        },
+        "compute_envelope_busy_ms": 55497.6565,
+        "compute_intervals": 512,
+        "compute_overlap_ratio": 0.009910116655105968,
+        "definition": "wall-clock intersection of msServiceProfiler modelExec envelopes and connector transfer intervals",
+        "overlap_ms": 549.98825,
+        "transfer_intervals": 1728,
+        "transfer_overlap_ratio": 1.0,
+        "transfer_union_busy_ms": 549.98825
+      },
+      "connector_queue_wait_p95_ms": 0.391437,
+      "correctness_rate": 1.0,
+      "goodput_rps": 1.0021631077663173,
+      "label": "servegen/low_control/materialization_paced_oracle",
+      "layer_ready_wait_p95_ms": 0.914215,
+      "peak_bytes_in_flight": 442368,
+      "realized_materialization_bytes": 505626624,
+      "requested_materialization_bytes": 505626624,
+      "requests": 64,
+      "run_dir": "/tmp/g0-low-control-v2-servegen-oracle-r1",
+      "ttft_p95_ms": 287.75314043741673,
+      "ttft_p99_ms": 326.68159229215235
+    }
+  ],
+  "schema_version": 1,
+  "status": "incomplete_no_verdict"
+}

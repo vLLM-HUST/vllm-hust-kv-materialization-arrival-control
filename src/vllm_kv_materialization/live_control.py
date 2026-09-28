@@ -28,6 +28,7 @@ REQUEST_HEADERS: contextvars.ContextVar[dict[str, str]] = contextvars.ContextVar
 )
 
 _ANCHOR_SEEN_COUNTS: dict[str, int] = {}
+_SESSION_HISTORY: dict[str, tuple[int, int, int]] = {}
 _ANCHOR_LOCK = threading.Lock()
 _LOG_LOCK = threading.Lock()
 
@@ -41,6 +42,7 @@ HEADER_WORKLOAD_CASE = "x-kv-workload-case"
 HEADER_WORKLOAD_FAMILY = "x-kv-workload-family"
 HEADER_TURN_INDEX = "x-kv-turn-index"
 HEADER_HOME_RANK = "x-kv-home-rank"
+HEADER_CORRELATION_ID = "x-correlation-id"
 
 DEFAULT_BYTES_PER_TOKEN = 16 * 1024
 DEFAULT_TRANSFER_BANDWIDTH_GBPS = 25.0
@@ -189,11 +191,20 @@ def _default_reuse_confidence(
 
 
 def estimate_reusable_prefix_tokens(
-    headers: Mapping[str, str], prompt_tokens: int
+    headers: Mapping[str, str],
+    prompt_tokens: int,
+    previous_prompt_tokens: int = 0,
+    previous_output_tokens: int = 0,
 ) -> int:
     explicit = _header_int(headers, HEADER_SHARED_PREFIX_TOKENS, -1)
     if explicit >= 0:
         return min(explicit, max(prompt_tokens, 0))
+
+    if previous_prompt_tokens > 0:
+        return min(
+            previous_prompt_tokens + max(previous_output_tokens, 0),
+            max(prompt_tokens, 0),
+        )
 
     primary_anchor_id = headers.get(HEADER_PRIMARY_ANCHOR, "").strip()
     if not primary_anchor_id or prompt_tokens <= 0:
@@ -208,17 +219,43 @@ def estimate_reusable_prefix_tokens(
 def estimate_signals(
     headers: Mapping[str, str], prompt_tokens: int, output_tokens: int
 ) -> tuple[MaterializationSignals, dict[str, Any]]:
-    del output_tokens
-
     primary_anchor_id = headers.get(HEADER_PRIMARY_ANCHOR, "").strip()
-    reusable_prefix_tokens = estimate_reusable_prefix_tokens(headers, prompt_tokens)
-    turn_index = _header_int(headers, HEADER_TURN_INDEX, 0)
+    if not primary_anchor_id:
+        primary_anchor_id = headers.get(HEADER_CORRELATION_ID, "").strip()
 
     anchor_seen_count = 0
+    previous_prompt_tokens = 0
+    previous_output_tokens = 0
+    previous_turn_index = -1
     if primary_anchor_id:
         with _ANCHOR_LOCK:
             anchor_seen_count = _ANCHOR_SEEN_COUNTS.get(primary_anchor_id, 0)
             _ANCHOR_SEEN_COUNTS[primary_anchor_id] = anchor_seen_count + 1
+            previous = _SESSION_HISTORY.get(primary_anchor_id)
+            if previous is not None:
+                previous_prompt_tokens, previous_output_tokens, previous_turn_index = (
+                    previous
+                )
+
+    turn_index = _header_int(
+        headers,
+        HEADER_TURN_INDEX,
+        previous_turn_index + 1,
+    )
+    reusable_prefix_tokens = estimate_reusable_prefix_tokens(
+        headers,
+        prompt_tokens,
+        previous_prompt_tokens,
+        previous_output_tokens,
+    )
+
+    if primary_anchor_id:
+        with _ANCHOR_LOCK:
+            _SESSION_HISTORY[primary_anchor_id] = (
+                max(prompt_tokens, 0),
+                max(output_tokens, 0),
+                turn_index,
+            )
 
     reuse_confidence = _header_float(
         headers,

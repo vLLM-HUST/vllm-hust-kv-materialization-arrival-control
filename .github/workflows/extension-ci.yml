@@ -21,7 +21,7 @@ jobs:
       - run: >-
           python -m pip install build pytest ruff
           "vllm-hust-ext @
-          git+https://github.com/vLLM-HUST/extension-manager.git@cf1ea71e3e2cb81ab06267ef05eddb3e580ea20b"
+          git+https://github.com/vLLM-HUST/extension-manager.git@a78dc3b66a908c588a7ee562edb6a250fa86c9ba"
       - run: python -m build
       - run: python -m pip install --no-deps --force-reinstall dist/*.whl
       - run: >-
@@ -29,15 +29,18 @@ jobs:
           src/vllm_kv_materialization/plugin.py
           src/vllm_kv_materialization/live_control.py
           src/vllm_kv_materialization/launcher.py tests/test_manifest.py
-          tests/test_plugin.py tests/test_launcher.py
+          tests/test_plugin.py tests/test_plugin_host_contract.py
+          tests/test_plugin_registration.py tests/test_launcher.py
       - run: >-
           ruff format --check src/vllm_kv_materialization/__init__.py
           src/vllm_kv_materialization/plugin.py
           src/vllm_kv_materialization/live_control.py
           src/vllm_kv_materialization/launcher.py tests/test_manifest.py
-          tests/test_plugin.py tests/test_launcher.py
+          tests/test_plugin.py tests/test_plugin_host_contract.py
+          tests/test_plugin_registration.py tests/test_launcher.py
       - run: >-
           pytest -q -c /dev/null tests/test_manifest.py tests/test_plugin.py
+          tests/test_plugin_host_contract.py tests/test_plugin_registration.py
           tests/test_launcher.py
       - run: >-
           vllm-hust-ext extension inspect

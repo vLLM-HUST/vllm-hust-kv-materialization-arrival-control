@@ -267,7 +267,7 @@ Manifest 0.2 descriptor, then explicitly enable the extension:
 
 ```bash
 uv pip install \
-  "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git@782e7a03a30eab6b04bbdbb2c3fc86fdf6e32ee6"
+  "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git@a78dc3b66a908c588a7ee562edb6a250fa86c9ba"
 uv pip install .
 vllm-hust-ext extension inspect \
   org.vllm-hust.kv-materialization-arrival-control

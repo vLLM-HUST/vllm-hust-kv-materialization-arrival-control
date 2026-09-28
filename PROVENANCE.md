@@ -18,10 +18,10 @@ authors recorded in the repository's Git history and paper artifacts.
 
 `vendor/vllm` is a Git submodule sourced from
 [`vLLM-HUST/vllm-hust`](https://github.com/vLLM-HUST/vllm-hust). The
-materialization runtime contract is based on current vLLM-HUST `main` at
-`d14cd5cc6ff205652429dc93feeb9700c6623108` and implemented by carrier commit
-`8c018264e994e8147d7f2dc5aafc613fa0218aec`. The previous 0.23 carrier line
-ended at request-processing hook commit
+materialization runtime contract is based on vLLM-HUST `main` at
+`55d6c601da6ae2ed61ce9b7b3d5e3607a6402023` and reconciled with the versioned
+plugin carrier at `4c1593c1bf9dfa3e7d4e11a29aec8d9f5a7dec3b` (PR #20). The
+previous 0.23 carrier line ended at request-processing hook commit
 `363794235231c032de407fbe759d693962ced81a` and is retained only as historical
 evidence; it is not the supported plugin carrier.
 
