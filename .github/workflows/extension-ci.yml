@@ -39,7 +39,8 @@ jobs:
           tests/test_plugin.py tests/test_plugin_host_contract.py
           tests/test_plugin_registration.py tests/test_launcher.py
       - run: >-
-          pytest -q -c /dev/null tests/test_manifest.py tests/test_plugin.py
+          PYTHONPATH=src:vendor/vllm pytest -q -c /dev/null
+          tests/test_manifest.py tests/test_plugin.py
           tests/test_plugin_host_contract.py tests/test_plugin_registration.py
           tests/test_launcher.py
       - run: >-
