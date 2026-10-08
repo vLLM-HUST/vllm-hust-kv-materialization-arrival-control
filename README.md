@@ -401,3 +401,11 @@ reuse, segmented hashing, and cache commit paths.
 
 
 Run A/B with only plugin-owned environment variables changed between baseline and experiment. Record command shape, devices, model, graph config, prompt, max tokens, output length, TTFT, TPOT, throughput, result paths, confirmed facts, hypotheses, rejected directions, and the next experiment. If startup fails, stop through the same manager and record the failure; do not switch to manual Docker startup.
+
+## Canonical MOD metadata
+
+Repository identity, directly responsible maintainers, advisor status, default-off
+activation, rollback, scope, and evidence qualification are recorded in
+[`MOD_METADATA.json`](MOD_METADATA.json). `advisor_status: unknown` is not the
+same as confirmed `none`. Performance statements remain limited to the workloads
+and evidence labels recorded there; they are not general online claims.
