@@ -1,0 +1,39 @@
+{
+  "canonical_repository": "https://github.com/vLLM-HUST/vllm-hust-kv-materialization-arrival-control",
+  "display_name": "KV Materialization Arrival Control",
+  "evidence": {
+    "index": "https://github.com/vLLM-HUST/vllm-hust-kv-materialization-arrival-control",
+    "latest_result": "https://github.com/vLLM-HUST/vllm-hust-kv-materialization-arrival-control",
+    "performance_claims": [],
+    "qualification": "unqualified"
+  },
+  "lifecycle": {
+    "activation_contract": "See the extension manifest and README; discovery alone does not enable this MOD.",
+    "default_enabled": false,
+    "rollback_contract": "Disable the MOD and return to the unmodified host path.",
+    "status": "incubating"
+  },
+  "metadata_source": {
+    "commit": "7df1647048ac5f05fcc502ce4bea94f26d0f5362",
+    "repository": "vLLM-HUST/vllm-hust-website"
+  },
+  "mod_id": "kv-materialization-arrival-control",
+  "repository": "vllm-hust-kv-materialization-arrival-control",
+  "responsibility": {
+    "advisor_status": "unknown",
+    "advisors": [],
+    "maintainers": [
+      {
+        "github": "healer-positive",
+        "name": "何维"
+      }
+    ],
+    "organization": "vLLM-HUST"
+  },
+  "schema_version": "vllm-hust-mod-metadata-v1",
+  "scope": {
+    "mechanism": "kv_materialization_policy",
+    "out_of_scope": [],
+    "supported_workloads": []
+  }
+}
