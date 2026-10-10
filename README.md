@@ -263,11 +263,11 @@ make build
 
 The supported host is the vLLM-HUST runtime pinned by the `vendor/vllm`
 submodule. Install the Extension Manager and this package, inspect the static
-experimental Manifest 0.3 descriptor, then explicitly enable the extension:
+stable Manifest 0.3 descriptor, then explicitly enable the extension:
 
 ```bash
 uv pip install \
-  "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git@2dffcf7fdea3cad36bc24c0c4174394bcc06d796"
+  "vllm-hust-ext @ git+https://github.com/vLLM-HUST/extension-manager.git@7d29b4e9eb2e3d9e4b0b50d2da7c478c6e42d7d8"
 uv pip install .
 vllm-hust-ext extension inspect \
   org.vllm-hust.kv-materialization-arrival-control
@@ -296,12 +296,17 @@ launch, vLLM loads the `kv_materialization` general plugin, which registers a
 request processor through the versioned public host hook and registers a
 runtime observer through the typed KV-materialization hook. That native path
 does not rewrite `OpenAIServing`, request protocol, renderer, or sampling
-methods. The ECPA manifest accepts only the pinned vLLM-HUST 0.29 host line and
+methods. The ECPA manifest accepts only the pinned vLLM-HUST 0.31 host line and
 requires request-processing hook API `1.x` plus KV-materialization API `1.x`;
 unknown or incompatible APIs are rejected. A deliberately version-scoped
 adapter remains available for historical vLLM 0.23 experiments, but that
 adapter is not the current native host contract and its earlier smoke/NPU
-results are not evidence that this 0.29 path has completed NPU qualification.
+results are not evidence that this 0.31 path has completed NPU qualification.
+At the current pins, vLLM-HUST requires torch 2.13 while
+vLLM-Ascend-HUST main requires torch and torch-npu 2.10. ECPA therefore keeps
+native NPU launch fail closed until the platform owners publish a compatible
+matrix; this is tracked in
+[vLLM-Ascend-HUST #45](https://github.com/vLLM-HUST/vllm-ascend-hust/issues/45).
 Installation alone is inert: registration requires either Extension Manager
 enablement or explicit selection through `VLLM_PLUGINS=kv_materialization`.
 The Extension Manager preserves existing plugin selections (for example
@@ -369,9 +374,9 @@ The runtime-boundary live path writes endpoint summaries under
 submodule (not a symlink) with:
 
 - URL: `https://github.com/vLLM-HUST/vllm-hust.git`
-- branch: `feature/kv-materialization-runtime-plugin-v2`
-- pinned carrier commit: `8c018264e994e8147d7f2dc5aafc613fa0218aec`
-- base: vLLM-HUST `main` at `d14cd5cc6ff205652429dc93feeb9700c6623108`
+- branch: `main`
+- pinned carrier commit: `b44ea22917a0225c3bf0c1db7ebb88ed6e1dee18`
+- base: vLLM-HUST `main` at the same commit
 - public request-processing hook API: `1.0`
 - public KV-materialization runtime-control API: `1.0`
 

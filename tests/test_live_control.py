@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import hashlib
-from types import SimpleNamespace
+import sys
+from types import ModuleType, SimpleNamespace
 
 from vllm_kv_materialization.live_control import (
     HEADER_CORRELATION_ID,
@@ -34,6 +35,12 @@ class _RecordingCoordinator:
 
     def cache_blocks(self, request: object, num_computed_tokens: int) -> None:
         self.calls.append((request, num_computed_tokens))
+
+
+def _isolate_optional_triton_import(monkeypatch) -> None:
+    triton_utils = ModuleType("vllm.triton_utils")
+    triton_utils.HAS_TRITON = False
+    monkeypatch.setitem(sys.modules, "vllm.triton_utils", triton_utils)
 
 
 def _runtime_control_payload(
@@ -379,7 +386,8 @@ def test_compute_runtime_control_realigns_unusable_partial_to_full_reuse(
     assert plan.fallback_reason == PARTIAL_REUSE_RUNTIME_REALIGN_TO_FULL_REUSE
 
 
-def test_partial_reuse_caps_cacheable_tokens_to_reuse_boundary() -> None:
+def test_partial_reuse_caps_cacheable_tokens_to_reuse_boundary(monkeypatch) -> None:
+    _isolate_optional_triton_import(monkeypatch)
     from vllm.sampling_params import SamplingParams
     from vllm.v1.core.kv_cache_manager import KVCacheManager
     from vllm.v1.request import Request
@@ -441,7 +449,8 @@ def test_partial_reuse_exports_segmented_tail_salt(monkeypatch) -> None:
     )
 
 
-def test_partial_reuse_resets_tail_hash_chain_at_boundary() -> None:
+def test_partial_reuse_resets_tail_hash_chain_at_boundary(monkeypatch) -> None:
+    _isolate_optional_triton_import(monkeypatch)
     from vllm.sampling_params import SamplingParams
     from vllm.v1.core.kv_cache_utils import get_request_block_hasher, init_none_hash
     from vllm.v1.request import Request
@@ -483,7 +492,8 @@ def test_partial_reuse_resets_tail_hash_chain_at_boundary() -> None:
     assert request_a.block_hashes[2:] == request_b.block_hashes[2:]
 
 
-def test_full_reuse_keeps_cacheable_tokens_uncapped() -> None:
+def test_full_reuse_keeps_cacheable_tokens_uncapped(monkeypatch) -> None:
+    _isolate_optional_triton_import(monkeypatch)
     from vllm.sampling_params import SamplingParams
     from vllm.v1.core.kv_cache_manager import KVCacheManager
     from vllm.v1.request import Request

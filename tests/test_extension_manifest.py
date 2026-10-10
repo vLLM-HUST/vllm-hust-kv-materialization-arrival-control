@@ -12,7 +12,8 @@ def test_extension_manifest_activates_registered_plugin_without_machine_paths() 
         "org.vllm-hust.kv-materialization-arrival-control"
     )
     assert payload["host"]["provider"] == "vllm"
-    assert payload["schema_version"] == "0.3-experimental"
+    assert payload["schema_version"] == "0.3"
+    assert payload["host"]["version_range"] == ">=0.31,<0.32"
     assert payload["resource_claims"] == [
         {
             "resource": "vllm.kv-materialization.policy",

@@ -33,7 +33,8 @@ def test_manifest_matches_package_registration() -> None:
     assert manifest.bundle_id == EXTENSION_ID
     assert manifest.bundle_version == project["version"]
     assert manifest.kind == "in_process_plugin"
-    assert manifest.schema_version == "0.3-experimental"
+    assert manifest.schema_version == "0.3"
+    assert str(manifest.host.version_range) == ">=0.31,<0.32"
     assert manifest.lifecycle_owner == "vllm"
     assert registrations["vllm_hust.extension_bundles"][EXTENSION_ID] == (
         "vllm_kv_materialization"
