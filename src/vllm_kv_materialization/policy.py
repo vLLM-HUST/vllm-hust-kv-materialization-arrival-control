@@ -49,7 +49,10 @@ def estimate_confident_reuse_tokens(
         confident_ratio += 0.05
     confident_ratio -= 0.06 * max(signals.queue_pressure - 0.5, 0.0)
     confident_ratio = max(floor_ratio, min(confident_ratio, 0.92))
-    return min(total_tokens, max(partial_reuse_floor_tokens, round(total_tokens * confident_ratio)))
+    return min(
+        total_tokens,
+        max(partial_reuse_floor_tokens, round(total_tokens * confident_ratio)),
+    )
 
 
 def estimate_materialization_ttft_ms(
@@ -88,14 +91,18 @@ def estimate_materialization_ttft_ms(
     transfer_component_ms = signals.transfer_time_ms * transfer_ratio
     recompute_component_ms = signals.recompute_time_ms * (1.0 - effective_reuse_ratio)
     tail_penalty_ms = (
-        (signals.recompute_time_ms * 0.25) + (signals.transfer_time_ms * 0.1)
-    ) * uncertain_ratio * (1.0 - _clamp01(signals.reuse_confidence))
+        ((signals.recompute_time_ms * 0.25) + (signals.transfer_time_ms * 0.1))
+        * uncertain_ratio
+        * (1.0 - _clamp01(signals.reuse_confidence))
+    )
 
     if decision is MaterializationDecision.FULL_REUSE:
         control_overhead_ms = 0.8
     else:
-        control_overhead_ms = 0.6 + (0.25 if signals.ttft_sensitive else 0.0) + (
-            0.15 * signals.queue_pressure
+        control_overhead_ms = (
+            0.6
+            + (0.25 if signals.ttft_sensitive else 0.0)
+            + (0.15 * signals.queue_pressure)
         )
 
     return round(
@@ -232,7 +239,8 @@ class MaterializationPolicy:
             partial_rationale = "partial_reuse_balances_transfer_and_recompute"
             if (
                 adjusted_signals.reuse_confidence < self.low_confidence_cutoff
-                and partial_tokens <= confident_tokens + max(64, self.partial_reuse_floor_tokens // 2)
+                and partial_tokens
+                <= confident_tokens + max(64, self.partial_reuse_floor_tokens // 2)
             ):
                 partial_rationale = "partial_reuse_trims_low_confidence_tail"
             candidate_outcomes.append(

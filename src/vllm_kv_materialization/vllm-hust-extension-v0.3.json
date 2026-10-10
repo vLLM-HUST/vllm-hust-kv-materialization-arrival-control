@@ -1,12 +1,12 @@
 {
-  "schema_version": "0.3-experimental",
+  "schema_version": "0.3",
   "extension_id": "org.vllm-hust.kv-materialization-arrival-control",
   "extension_version": "0.1.0",
   "kind": "in_process_plugin",
   "host": {
     "provider": "vllm",
     "name": "vllm",
-    "version_range": ">=0.29,<0.30"
+    "version_range": ">=0.31,<0.32"
   },
   "runtime": {
     "type": "python",

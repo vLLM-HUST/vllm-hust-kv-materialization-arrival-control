@@ -21,7 +21,7 @@ jobs:
       - run: >-
           python -m pip install build pytest ruff
           "vllm-hust-ext @
-          git+https://github.com/vLLM-HUST/extension-manager.git@2dffcf7fdea3cad36bc24c0c4174394bcc06d796"
+          git+https://github.com/vLLM-HUST/extension-manager.git@b724e1abb5fa3389e508edac20b762e398298405"
       - run: python -m build
       - run: python -m pip install --no-deps --force-reinstall dist/*.whl
       - run: >-

@@ -6,9 +6,7 @@ import unittest
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-MODULE_PATH = (
-    REPO_ROOT / "src" / "vllm_kv_materialization" / "wavemat_seam_gate.py"
-)
+MODULE_PATH = REPO_ROOT / "src" / "vllm_kv_materialization" / "wavemat_seam_gate.py"
 
 
 def _load_gate_module():

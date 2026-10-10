@@ -8,6 +8,9 @@ from types import ModuleType
 
 import pytest
 
+from vllm_kv_materialization import plugin
+from vllm_kv_materialization.live_control import RUNTIME_KV_TRANSFER_CONTROL_KEY
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -25,10 +28,6 @@ def _load_pinned_host_contract(
     monkeypatch.setitem(sys.modules, module_name, module)
     spec.loader.exec_module(module)
     return module
-
-
-from vllm_kv_materialization import plugin
-from vllm_kv_materialization.live_control import RUNTIME_KV_TRANSFER_CONTROL_KEY
 
 
 @pytest.fixture
