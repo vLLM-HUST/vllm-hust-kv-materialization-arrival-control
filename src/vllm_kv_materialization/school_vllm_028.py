@@ -9,8 +9,8 @@ from __future__ import annotations
 import functools
 import hashlib
 import inspect
-from pathlib import Path
 import uuid
+from pathlib import Path
 
 from .live_control import (
     apply_runtime_control,
@@ -95,7 +95,9 @@ def register_school_vllm_028_adapter():
                     "request_id": self.request_id,
                     "cache_salt_sha256": hashlib.sha256(salt.encode()).hexdigest(),
                     "prompt_tokens": len(self.prompt_token_ids or []),
-                    "scope": "salt admission, not cache-hit or avoided-compute measurement",
+                    "scope": (
+                        "salt admission, not cache-hit or avoided-compute measurement"
+                    ),
                 }
             )
 

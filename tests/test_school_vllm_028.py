@@ -1,9 +1,10 @@
+import pytest
+
 from vllm_kv_materialization.live_control import (
     bind_request_headers,
     reset_request_headers,
 )
 from vllm_kv_materialization.school_vllm_028 import controlled_prompt
-import pytest
 
 
 def test_unanchored_controller_changes_only_cache_namespace(monkeypatch):
@@ -41,6 +42,7 @@ def test_unsupported_input_rejected():
 def test_source_mismatch_fails_before_installing_hooks(monkeypatch, tmp_path):
     import sys
     import types
+
     from vllm_kv_materialization import school_vllm_028 as adapter
 
     class Chat:
