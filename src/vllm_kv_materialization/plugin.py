@@ -32,6 +32,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 EXTENSION_ID = "org.vllm-hust.kv-materialization-arrival-control"
+SCHOOL_EXTENSION_ID = "org.vllm-hust.kv-materialization-school028-recompute"
 PLUGIN_NAME = "kv_materialization"
 REQUIRED_REQUEST_PROCESSING_API = "1.0"
 REQUIRED_KV_MATERIALIZATION_API = "1.0"
@@ -92,7 +93,10 @@ def _activation_requested() -> bool:
     raw = os.getenv(_ENABLED_BUNDLES_ENV)
     if raw is not None:
         enabled = {item.strip() for item in raw.split(",") if item.strip()}
-        return EXTENSION_ID in enabled
+        return EXTENSION_ID in enabled or (
+            SCHOOL_EXTENSION_ID in enabled
+            and os.getenv("VLLM_KV_ENABLE_SCHOOL_028") == "1"
+        )
 
     allowed_plugins = {
         item.strip()

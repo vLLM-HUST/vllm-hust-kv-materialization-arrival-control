@@ -29,6 +29,7 @@ kv_materialization = "vllm_kv_materialization.plugin:register_plugin"
 
 [project.entry-points."vllm_hust.extension_bundles"]
 "org.vllm-hust.kv-materialization-arrival-control" = "vllm_kv_materialization"
+"org.vllm-hust.kv-materialization-school028-recompute" = "vllm_kv_materialization.school_bundle"
 
 [project.optional-dependencies]
 experiments = [
@@ -51,6 +52,7 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 vllm_kv_materialization = ["vllm-hust-extension-v0.3.json"]
+"vllm_kv_materialization.school_bundle" = ["vllm-hust-extension-v0.3.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
