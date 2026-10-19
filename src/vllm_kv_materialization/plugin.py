@@ -156,7 +156,8 @@ def register_plugin() -> None:
             )
             _REGISTERED = True
             print(
-                "KV_MATERIALIZATION_PLUGIN_REGISTERED host_api=school028-recompute-only",
+                "KV_MATERIALIZATION_PLUGIN_REGISTERED "
+                "host_api=school028-recompute-only",
                 flush=True,
             )
             return
