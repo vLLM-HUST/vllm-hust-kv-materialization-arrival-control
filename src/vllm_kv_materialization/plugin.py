@@ -138,6 +138,29 @@ def register_plugin() -> None:
             register_kv_materialization_runtime_observer,
         )
     except ImportError as error:
+        if os.getenv("VLLM_KV_ENABLE_SCHOOL_028") == "1":
+            from vllm import __version__ as host_version
+
+            if not str(host_version).startswith("0.28.1.post1.dev143+gf18cf803c"):
+                raise RuntimeError(
+                    "School adapter requires the pinned 0.28 host"
+                ) from error
+            from vllm_kv_materialization.school_vllm_028 import (
+                register_school_vllm_028_adapter,
+            )
+
+            register_school_vllm_028_adapter()
+            os.environ["VLLM_KV_MATERIALIZATION_PLUGIN_LOADED"] = "1"
+            os.environ["VLLM_KV_MATERIALIZATION_PLUGIN_MODE"] = (
+                "school028-recompute-only"
+            )
+            _REGISTERED = True
+            print(
+                "KV_MATERIALIZATION_PLUGIN_REGISTERED "
+                "host_api=school028-recompute-only",
+                flush=True,
+            )
+            return
         if not _legacy_vllm_023_available():
             raise RuntimeError(
                 "KV materialization requires the versioned vLLM-HUST "
