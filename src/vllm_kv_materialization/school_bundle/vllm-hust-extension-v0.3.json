@@ -1,0 +1,22 @@
+{
+  "schema_version": "0.3",
+  "extension_id": "org.vllm-hust.kv-materialization-school028-recompute",
+  "extension_version": "0.1.0",
+  "kind": "in_process_plugin",
+  "host": {"provider": "vllm", "name": "vllm", "version_range": "==0.28.1.post1.dev143", "api_range": ">=1,<2"},
+  "runtime": {"type": "python", "process_scope": "vllm-processes", "isolation": "trusted_in_process"},
+  "lifecycle_owner": "vllm",
+  "protocols": [{"name": "vllm.general-plugin", "version_range": null}],
+  "implementation": [{"type": "python_entry_point", "group": "vllm.general_plugins", "name": "kv_materialization"}],
+  "requires_services": [],
+  "resource_claims": [
+    {"resource": "vllm.kv-materialization.policy", "scope": "vllm-process", "mode": "exclusive"},
+    {"resource": "vllm.runtime.observer", "scope": "vllm-process", "mode": "shared"}
+  ],
+  "components": [{"component_id": "school028-recompute", "contracts": ["vllm.general-plugin.experimental"], "execution_planes": ["api", "scheduler"], "isolation": "trusted_in_process", "implementation_ref": "vllm_kv_materialization.school_vllm_028:register_school_vllm_028_adapter", "permissions": ["filesystem_write"]}],
+  "activation": {
+    "entry_points": [{"group": "vllm.general_plugins", "name": "kv_materialization"}],
+    "environment": {"VLLM_KV_ENABLE_SCHOOL_028": "1", "VLLM_KV_POLICY_MODE": "controller"},
+    "additional_config": {}
+  }
+}
