@@ -23,3 +23,24 @@ request. It does not prove cache reuse, avoided computation or performance
 improvement. This experiment does not exercise partial reuse or transfer.
 Same-workload measurements and correctness checks are required before selecting
 any result as B1. The adapter alone is not qualification evidence.
+
+## Measured MMLU-Pro screen
+
+The 2026-10-19 school-host screen is archived in the
+[benchmark midterm report](https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/84f0443be92c658bb658b281fcb4241eb5a9fb97/reports/vllm-hust-midterm-20261019/README.md).
+Its `b1-kvmat-screen-evidence.tar.gz` contains the raw requests, policy and engine
+receipts, source pins, device samples and clean exit/release evidence. The
+`b1-kvmat-screen.json` summary is verified from that archive.
+
+The measured installed Python sources exactly match commit
+`b1680f2365f3468a062a0530bd50dba3d8f80046`. The later CI correction changes the
+unsupported-prompt exception from `ValueError` to `TypeError`; it does not alter
+the measured text/recompute path. The running isolated payload was not edited.
+The native Extension Manager manifest remains incompatible with this 0.28 host;
+the measurement explicitly opted into the bounded adapter instead.
+
+All 200 measured requests completed. Policy and engine cache-salt digests match
+for all 200 requests and 282,265 input tokens. All decisions were recompute;
+no reuse anchors were added and partial reuse was not exercised. The result is
+a single-run service-performance screen, not a task-accuracy or statistical
+significance claim.
