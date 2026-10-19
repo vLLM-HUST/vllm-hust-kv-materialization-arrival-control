@@ -35,7 +35,7 @@ def test_non_recompute_is_not_silently_accepted(monkeypatch):
 
 
 def test_unsupported_input_rejected():
-    with pytest.raises(ValueError, match="text token"):
+    with pytest.raises(TypeError, match="text token"):
         controlled_prompt({"prompt": "text"}, "a", 256)
 
 

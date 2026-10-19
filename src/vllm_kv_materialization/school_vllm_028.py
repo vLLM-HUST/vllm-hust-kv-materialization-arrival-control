@@ -30,7 +30,7 @@ def controlled_prompt(prompt, request_id, max_tokens):
     if not isinstance(prompt, dict) or not isinstance(
         prompt.get("prompt_token_ids"), list
     ):
-        raise ValueError("School 0.28 adapter requires a text token prompt")
+        raise TypeError("School 0.28 adapter requires a text token prompt")
     if prompt.get("multi_modal_data") or prompt.get("multi_modal_inputs"):
         raise ValueError("School 0.28 adapter does not qualify multimodal requests")
     observation, plan = compute_runtime_control(
