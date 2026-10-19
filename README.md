@@ -5,6 +5,14 @@ This repository is a vLLM-HUST MOD registered through both the
 `vllm_hust.extension_bundles` discovery interface and the
 `vllm.general_plugins` runtime interface.
 
+The separate experimental Bundle
+`org.vllm-hust.kv-materialization-school028-recompute` exposes the existing
+source-pinned school 0.28 adapter through Extension Manager. It only supports
+recompute request salts, not partial KV reuse or the native 0.31 host API.
+Enable this Bundle explicitly when composing it with another managed MOD;
+an import or `VLLM_PLUGINS` entry alone does not override Manager's enabled list.
+The original native Bundle's version range remains unchanged.
+
 This repository studies the request-arrival decision among full reuse,
 block-aligned partial reuse, and recomputation. It is distinct from
 `intellistream/kv-materialization-scheduling`, which studies cross-request
