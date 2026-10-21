@@ -20,12 +20,12 @@ from typing import Any
 RELEASE_TAG = "g0-issue17-stop-20260901-v2"
 ARCHIVE_NAME = "g0-formal-stop-v2.tar.gz"
 ARCHIVE_URL = (
-    "https://github.com/intellistream/kv-materialization-arrival-control/"
+    "https://github.com/vLLM-HUST/vllm-hust-benchmark/"
     f"releases/download/{RELEASE_TAG}/{ARCHIVE_NAME}"
 )
 ASSET_API_URL = (
-    "https://api.github.com/repos/intellistream/kv-materialization-arrival-control/"
-    "releases/assets/539131048"
+    "https://api.github.com/repos/vLLM-HUST/vllm-hust-benchmark/"
+    "releases/assets/662133494"
 )
 EXPECTED_SHA256 = {
     ARCHIVE_NAME: "6474d718f65aeee3824e25897934922672c2a51e92f6c218be6f5b16a7f0ad4a",
@@ -98,8 +98,8 @@ def download_archive(destination: Path) -> None:
                 [
                     gh,
                     "api",
-                    "repos/intellistream/kv-materialization-arrival-control/"
-                    "releases/assets/539131048",
+                    "repos/vLLM-HUST/vllm-hust-benchmark/"
+                    "releases/assets/662133494",
                     "-H",
                     "Accept: application/octet-stream",
                 ],
