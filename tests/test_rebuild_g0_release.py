@@ -13,6 +13,14 @@ assert SPEC.loader is not None
 SPEC.loader.exec_module(release)
 
 
+def test_canonical_benchmark_source_preserves_original_digest() -> None:
+    assert "vLLM-HUST/vllm-hust-benchmark/" in release.ARCHIVE_URL
+    assert release.ASSET_API_URL.endswith("/662133494")
+    assert release.EXPECTED_SHA256[release.ARCHIVE_NAME] == (
+        "6474d718f65aeee3824e25897934922672c2a51e92f6c218be6f5b16a7f0ad4a"
+    )
+
+
 def test_portable_report_removes_only_location_fields() -> None:
     report = {
         "verdict": "stop",

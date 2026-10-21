@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import Any
 
 from summarize_wavemat_m0_device_trace import summarize as summarize_device
+from canonical_evidence import canonical_asset_url
 from summarize_wavemat_m0_gate_trace import parse as summarize_gate
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -59,7 +60,7 @@ def get_asset(url: str, destination: Path, local_asset_dir: Path | None) -> None
     if not token:
         raise RuntimeError("GITHUB_TOKEN is required unless --asset-dir is supplied")
     request = urllib.request.Request(
-        url,
+        canonical_asset_url(url),
         headers={
             "Accept": "application/octet-stream",
             "Authorization": f"Bearer {token}",

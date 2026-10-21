@@ -1,0 +1,125 @@
+{
+  "schema": "canonical-evidence-sources/v1",
+  "repository": "vLLM-HUST/vllm-hust-benchmark",
+  "assets": [
+    {
+      "source_id": 539132675,
+      "destination_id": 662132682,
+      "name": "CUSTODY-v2.json",
+      "digest": "sha256:15cbe694ab737376a4e55b09477b0289ccb387ac4183ec813dbe6e2f8e185f8c",
+      "bytes": 2662
+    },
+    {
+      "source_id": 539137839,
+      "destination_id": 662132965,
+      "name": "EXTERNAL_PR_CLEANUP.json",
+      "digest": "sha256:4781c19ee3b2ab912f9143dde2f5ae01562b63c2f8d320564f8cdc229f763fbd",
+      "bytes": 1211
+    },
+    {
+      "source_id": 539131048,
+      "destination_id": 662133494,
+      "name": "g0-formal-stop-v2.tar.gz",
+      "digest": "sha256:6474d718f65aeee3824e25897934922672c2a51e92f6c218be6f5b16a7f0ad4a",
+      "bytes": 16033682
+    },
+    {
+      "source_id": 539132682,
+      "destination_id": 662134125,
+      "name": "g0_formal_report.json",
+      "digest": "sha256:1cc9244ce1b11cc6ae642080f94e419786bee9bfd29b5755a3be1a9b6bf06698",
+      "bytes": 341630
+    },
+    {
+      "source_id": 539132678,
+      "destination_id": 662134436,
+      "name": "g0_formal_report.md",
+      "digest": "sha256:7ee0c26105d57c1ff3f7bfd2ca0cccae715791257b9e255a2b88c32a54d4f597",
+      "bytes": 1003
+    },
+    {
+      "source_id": 539132679,
+      "destination_id": 662134756,
+      "name": "g0_pathology.csv",
+      "digest": "sha256:8b7153120900fb485d7687c4cac7b830feec2ee54fe5084e1c77cff4ffd23d51",
+      "bytes": 1721
+    },
+    {
+      "source_id": 539132717,
+      "destination_id": 662135104,
+      "name": "g0_pathology.svg",
+      "digest": "sha256:0c25aa7bc5c21e161c6433b636203f5894cb5c9b2230c2fb58087ace0a9685c6",
+      "bytes": 4350
+    },
+    {
+      "source_id": 539132673,
+      "destination_id": 662135516,
+      "name": "raw_manifest_v2.json",
+      "digest": "sha256:7847e2cbfd12858e09bc0ade41e55dc31219110f33f223e156428ee17781a2a4",
+      "bytes": 297064
+    },
+    {
+      "source_id": 509750628,
+      "destination_id": 662136065,
+      "name": "m2_raw_bundles_39_lifecycles.tar.gz",
+      "digest": "sha256:56803f152b19e7f30aba6195bacba25eb2adb1de9db9e42369752ccb9fae37c4",
+      "bytes": 10767560
+    },
+    {
+      "source_id": 527271427,
+      "destination_id": 662136619,
+      "name": "m0_tp1_eager_p1_trace_view.json.gz",
+      "digest": "sha256:e3cb82f4d1385e93020cb92e6098461cdf1098865861a25502f99033a26fd47d",
+      "bytes": 18699274
+    },
+    {
+      "source_id": 527272591,
+      "destination_id": 662137249,
+      "name": "m0_tp1_eager_p2_gate.log.gz",
+      "digest": "sha256:b35bf61e334eee813da6edc8c49272f5fd3290b512cec44acce6714a888d3fed",
+      "bytes": 10992
+    },
+    {
+      "source_id": 527271836,
+      "destination_id": 662137589,
+      "name": "m0_tp1_eager_p2_trace_view.json.gz",
+      "digest": "sha256:385f88b94704a2741669d40874ae70648e7d2ad97a5c8a9f2920ec2ec7573fdb",
+      "bytes": 18677027
+    },
+    {
+      "source_id": 527272399,
+      "destination_id": 662141572,
+      "name": "m0_tp1_eager_p4_trace_view.json.gz",
+      "digest": "sha256:6f80e2ea2caa518e3ae60f94907e8725f66bcc034fb2f4c0ac536f60ce5ee5eb",
+      "bytes": 18646197
+    },
+    {
+      "source_id": 527271237,
+      "destination_id": 662142614,
+      "name": "m0_tp1_graph_p1_trace_view.json.gz",
+      "digest": "sha256:ac660ae6c73f1a76bf9f5be3ea7fffecc83d0c8cca19b831956695a8b41c7b6f",
+      "bytes": 18696268
+    },
+    {
+      "source_id": 527272532,
+      "destination_id": 662143299,
+      "name": "m0_tp1_graph_p2_gate.log.gz",
+      "digest": "sha256:b49a6a36d8b0f0809e0d1d3bb59a347eaf3a327aaddde63ec5971519f0d47bee",
+      "bytes": 11832
+    },
+    {
+      "source_id": 527271682,
+      "destination_id": 662145225,
+      "name": "m0_tp1_graph_p2_trace_view.json.gz",
+      "digest": "sha256:95ed6af3dcea3e48fe909e051e139d69a3f6aa2c541c05d59b5cc55d9e2c8868",
+      "bytes": 18714324
+    },
+    {
+      "source_id": 527272135,
+      "destination_id": 662146324,
+      "name": "m0_tp1_graph_p4_trace_view.json.gz",
+      "digest": "sha256:436174983164b1208d75ac22eb97dcc620fdaa57d76581a9de9169cce57acbc5",
+      "bytes": 18690755
+    }
+  ]
+}
