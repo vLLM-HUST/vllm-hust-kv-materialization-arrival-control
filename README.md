@@ -376,6 +376,10 @@ The decision-study pipeline emits paper-facing summaries under
 The runtime-boundary live path writes endpoint summaries under
 `paper/kv_materialization_control/experiments/results/live/`.
 
+Previously committed early live results now reside in the fixed benchmark archive;
+see [canonical data and verified download](EVIDENCE.md). The path above is for new
+local output, not an implicit historical input or a location to commit measurements.
+
 ## Reproducible Runtime Carrier
 
 `vendor/vllm` is the only runtime carrier. It is a regular, in-repository
