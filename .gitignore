@@ -36,3 +36,6 @@ tmp/
 /paper/kv_materialization_control/experiments/results/latest/offline_decision_mix_figure.tex
 /paper/kv_materialization_control/experiments/results/latest/offline_workload_key_table.tex
 /paper/kv_materialization_control/kv_materialization_control.pdf
+
+# Historical originals live in benchmark (issue 326).
+/.benchmarks/results/
