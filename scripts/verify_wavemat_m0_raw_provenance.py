@@ -21,12 +21,20 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
-from summarize_wavemat_m0_device_trace import summarize as summarize_device
 from canonical_evidence import canonical_asset_url
+from summarize_wavemat_m0_device_trace import summarize as summarize_device
 from summarize_wavemat_m0_gate_trace import parse as summarize_gate
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_MANIFEST = ROOT / "docs/wavemat/results/m0_raw_provenance_20260824_v1.json"
+
+
+def evidence_root() -> Path:
+    root = Path(os.environ["BENCHMARK_COLLECTION_ROOT"])
+    if not root.is_absolute() or root.resolve().is_relative_to(ROOT):
+        raise ValueError(
+            "Set BENCHMARK_COLLECTION_ROOT to the verified external capsule"
+        )
+    return root
 
 
 def sha256(path: Path) -> str:
@@ -71,7 +79,9 @@ def get_asset(url: str, destination: Path, local_asset_dir: Path | None) -> None
         shutil.copyfileobj(response, output)
 
 
-def check_asset(item: dict[str, Any], kind: str, workdir: Path, asset_dir: Path | None) -> Path:
+def check_asset(
+    item: dict[str, Any], kind: str, workdir: Path, asset_dir: Path | None
+) -> Path:
     raw = item.get("raw", item)
     asset = workdir / f"{item['id']}.gz"
     get_asset(raw["url"], asset, asset_dir)
@@ -87,17 +97,29 @@ def check_asset(item: dict[str, Any], kind: str, workdir: Path, asset_dir: Path 
 
 
 def expected_summary(path: str) -> dict[str, Any]:
-    return json.loads((ROOT / path).read_text(encoding="utf-8"))
+    return json.loads((evidence_root() / path).read_text(encoding="utf-8"))
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
-    parser.add_argument("--asset-dir", type=Path, help="Directory containing <arm-or-gate-id>.gz files")
-    parser.add_argument("--output", type=Path, help="Write machine-readable result JSON")
+    parser.add_argument("--manifest", type=Path)
+    parser.add_argument(
+        "--asset-dir", type=Path, help="Directory containing <arm-or-gate-id>.gz files"
+    )
+    parser.add_argument(
+        "--output", type=Path, help="Write machine-readable result JSON"
+    )
     args = parser.parse_args()
-    manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
-    results: dict[str, Any] = {"assets": [], "device_summaries": [], "gate_summaries": []}
+    manifest_path = (
+        args.manifest
+        or evidence_root() / "docs/wavemat/results/m0_raw_provenance_20260824_v1.json"
+    )
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    results: dict[str, Any] = {
+        "assets": [],
+        "device_summaries": [],
+        "gate_summaries": [],
+    }
     with tempfile.TemporaryDirectory(prefix="wavemat-m0-provenance-") as directory:
         workdir = Path(directory)
         for arm in manifest["arms"]:
@@ -118,7 +140,12 @@ def main() -> None:
                 shutil.copyfileobj(source, output)
             actual = canonical(summarize_gate(log), "log")
             stem = gate["id"].removesuffix("_gate")
-            expected = canonical(expected_summary(f"docs/wavemat/results/m0_gate_{stem.removeprefix('tp1_')}_summary.json"), "log")
+            expected = canonical(
+                expected_summary(
+                    f"docs/wavemat/results/m0_gate_{stem.removeprefix('tp1_')}_summary.json"
+                ),
+                "log",
+            )
             if actual != expected:
                 raise ValueError(f"{gate['id']}: rebuilt gate summary differs")
             results["assets"].append(gate["id"])
@@ -133,6 +160,12 @@ def main() -> None:
 if __name__ == "__main__":
     try:
         main()
-    except (FileNotFoundError, RuntimeError, ValueError, OSError, urllib.error.URLError) as error:
+    except (
+        FileNotFoundError,
+        RuntimeError,
+        ValueError,
+        OSError,
+        urllib.error.URLError,
+    ) as error:
         print(f"provenance verification failed: {error}", file=sys.stderr)
         raise SystemExit(1)

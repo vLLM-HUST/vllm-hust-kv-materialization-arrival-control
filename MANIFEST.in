@@ -1,2 +1,5 @@
 prune paper/kv_materialization_control/experiments/results/live
 prune .benchmarks/results
+prune paper/kv_materialization_control/experiments/results
+prune docs/g0
+prune docs/wavemat
