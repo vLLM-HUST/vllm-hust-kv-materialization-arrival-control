@@ -1,6 +1,8 @@
 import importlib.util
 import json
+import os
 from pathlib import Path
+
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -13,7 +15,10 @@ spec.loader.exec_module(canonical)
 
 def test_all_wavemat_original_ids_resolve_without_rewriting_attestation():
     manifest = json.loads(
-        (ROOT / "docs/wavemat/results/m0_raw_provenance_20260824_v1.json").read_text()
+        (
+            Path(os.environ["BENCHMARK_COLLECTION_ROOT"])
+            / "docs/wavemat/results/m0_raw_provenance_20260824_v1.json"
+        ).read_text()
     )
     assets = [a["raw"] for a in manifest["arms"]] + manifest["gate_trace_analyzer"][
         "assets"

@@ -5,6 +5,8 @@ on:
     branches: [main]
 permissions:
   contents: read
+env:
+  BENCHMARK_COLLECTION_ROOT: ${{ github.workspace }}/../benchmark-collection
 jobs:
   rebuild-g0:
     runs-on: ubuntu-latest
@@ -17,6 +19,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install pytest
+      - run: python scripts/fetch_mod_consumer_evidence.py --config BENCHMARK_COLLECTION.json --destination "$BENCHMARK_COLLECTION_ROOT"
       - run: python -m pytest -q -c /dev/null tests/test_rebuild_g0_release.py tests/test_canonical_evidence.py
       - name: Verify central archive and reproduce published outputs
         env:
@@ -35,4 +38,6 @@ jobs:
       - name: Rebuild summaries from canonical raw bytes and original attestations
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: python scripts/verify_wavemat_m0_raw_provenance.py
+        run: |
+          python scripts/fetch_mod_consumer_evidence.py --config BENCHMARK_COLLECTION.json --destination "$BENCHMARK_COLLECTION_ROOT"
+          python scripts/verify_wavemat_m0_raw_provenance.py

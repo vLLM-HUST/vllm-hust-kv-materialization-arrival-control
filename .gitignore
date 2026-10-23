@@ -39,3 +39,8 @@ tmp/
 
 # Historical originals live in benchmark (issue 326).
 /.benchmarks/results/
+
+# Migrated collection originals. Retained tracked code/docs are reviewed explicitly.
+/paper/kv_materialization_control/experiments/results/
+/docs/g0/
+/docs/wavemat/

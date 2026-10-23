@@ -1,17 +1,6 @@
-# M2 anchor-topology candidate pilot
+# Historical collection in benchmark
 
-This exploratory real-online suite tests whether a shared secondary scaffold
-anchor creates a positive controller region that fixed primary-anchor full
-reuse cannot reach.
-
-- matrix: 2 workloads x 3 policies x 1 independent pilot lifecycle;
-- completion: 6/6 bundles valid, 456/456 requests completed;
-- promoted: `shared_shared_prefix_multi_tenant_assistant`;
-- not promoted: `shared_session_continuation_maintenance`.
-
-For the promoted workload, controller mean TTFT was 145.910 ms versus 151.443
-ms for `always_full_reuse` and 274.357 ms for `always_recompute`: a 3.65%
-pilot improvement over the best fixed policy. E2E changed by +0.31% and
-throughput by -0.25%. This is screening evidence only and is excluded from the
-three-round confirmation estimate.
-
+The unchanged original `paper/kv_materialization_control/experiments/results/m2_anchor_pilot_20260803/README.md` is preserved in the
+[canonical member manifest](https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/87651130e720d3e41225c16823642508d4857cd4/archive/mod-collections-20261023/kv-arrival/manifest.json).
+See the repository EVIDENCE.md for verified retrieval into an external directory.
+Historical failures and missing capture limitations remain unchanged; no new experiment is implied.
