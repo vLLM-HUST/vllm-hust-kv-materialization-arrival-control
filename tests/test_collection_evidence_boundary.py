@@ -22,16 +22,6 @@ RETAINED = [
     "docs/wavemat/configs/mmc-local-tp4.conf",
     "docs/wavemat/configs/mmc-local.conf",
     "docs/wavemat/configs/mmc-meta.conf",
-    "paper/kv_materialization_control/experiments/results/m1_formal/README.md",
-    "paper/kv_materialization_control/experiments/results/m1_formal_approved_complete_20260801/FACTORIAL_ANALYSIS.md",
-    "paper/kv_materialization_control/experiments/results/m1_formal_approved_complete_20260801/README.md",
-    "paper/kv_materialization_control/experiments/results/m1_formal_engine_accounted_complete_20260731/README.md",
-    "paper/kv_materialization_control/experiments/results/m1_paired_dry_20260801T021223Z_f2ddea6/README.md",
-    "paper/kv_materialization_control/experiments/results/m2_anchor_confirmation_20260803/README.md",
-    "paper/kv_materialization_control/experiments/results/m2_anchor_pilot_20260803/README.md",
-    "paper/kv_materialization_control/experiments/results/m2_candidate_pilot_20260803/README.md",
-    "paper/kv_materialization_control/experiments/results/m2_catalog_closure_20260803/README.md",
-    "paper/kv_materialization_control/experiments/results/m2_online_boundary_20260803/README.md",
 ]
 
 
