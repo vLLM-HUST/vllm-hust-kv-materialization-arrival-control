@@ -13,6 +13,7 @@ def test_migrated_directory_has_no_tracked_copies():
             str(root),
             "ls-files",
             "--",
+            ".benchmarks/results/",
             "paper/kv_materialization_control/experiments/results/live/",
         ]
     )
