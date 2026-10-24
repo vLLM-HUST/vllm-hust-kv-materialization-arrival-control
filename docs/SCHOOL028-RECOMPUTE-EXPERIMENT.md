@@ -26,7 +26,7 @@ any result as B1. The adapter alone is not qualification evidence.
 
 ## Measured MMLU-Pro screen
 
-[Complete unchanged historical narrative](https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/d8a370e9135ee5231707d8f1e3afa723851f1966/archive/mod-targeted-20261023/kv-school-document/snapshot/docs/SCHOOL028-RECOMPUTE-EXPERIMENT.md) preserves the source
+[Complete unchanged historical narrative](https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/86d99669ef6e57c1144b2206d7ee9911e480a4e0/archive/mod-targeted-20261023/kv-school-document/snapshot/docs/SCHOOL028-RECOMPUTE-EXPERIMENT.md) preserves the source
 identity, compatibility correction and observed request/salt counts.
 
 - [Raw requests, policy/engine receipts and environment archive](https://raw.githubusercontent.com/vLLM-HUST/vllm-hust-benchmark/b354f203cabb4cfeba72a74e4eefb29dee85776b/reports/vllm-hust-midterm-20261019/b1-kvmat-screen-evidence.tar.gz)

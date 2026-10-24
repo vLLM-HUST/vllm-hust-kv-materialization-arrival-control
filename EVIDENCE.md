@@ -59,7 +59,7 @@ Current forwarding documents, configuration and imported code remain; exact reta
 
 ## School recompute mixed document
 
-[Original manifest](https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/d8a370e9135ee5231707d8f1e3afa723851f1966/archive/mod-targeted-20261023/kv-school-document/manifest.json) preserves the complete adapter/screen
+[Original manifest](https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/86d99669ef6e57c1144b2206d7ee9911e480a4e0/archive/mod-targeted-20261023/kv-school-document/manifest.json) preserves the complete adapter/screen
 narrative. The maintained document keeps implementation guidance and directly
 links the existing benchmark raw screen archive and summary. This is custody,
 not a new experiment or B1 qualification. Ignored live-log gaps in other batches

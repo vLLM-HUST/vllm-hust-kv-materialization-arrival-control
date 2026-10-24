@@ -1,10 +1,10 @@
 {
-  "manifest_url": "https://raw.githubusercontent.com/vLLM-HUST/vllm-hust-benchmark/d8a370e9135ee5231707d8f1e3afa723851f1966/archive/mod-targeted-20261023/kv-school-document/manifest.json",
+  "manifest_url": "https://raw.githubusercontent.com/vLLM-HUST/vllm-hust-benchmark/86d99669ef6e57c1144b2206d7ee9911e480a4e0/archive/mod-targeted-20261023/kv-school-document/manifest.json",
   "manifest_sha256": "1b38063d6eac4e17fbe7ec0f85f2e60b20e7535d999413173c8faa580a31afd0",
   "document_projections": [
     {
       "path": "docs/SCHOOL028-RECOMPUTE-EXPERIMENT.md",
-      "original_url": "https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/d8a370e9135ee5231707d8f1e3afa723851f1966/archive/mod-targeted-20261023/kv-school-document/snapshot/docs/SCHOOL028-RECOMPUTE-EXPERIMENT.md"
+      "original_url": "https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/86d99669ef6e57c1144b2206d7ee9911e480a4e0/archive/mod-targeted-20261023/kv-school-document/snapshot/docs/SCHOOL028-RECOMPUTE-EXPERIMENT.md"
     }
   ],
   "raw_files": [
