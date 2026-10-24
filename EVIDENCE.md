@@ -56,3 +56,19 @@ All paths below are archive-relative; generation commands may still produce igno
 - `docs/wavemat/`
 
 Current forwarding documents, configuration and imported code remain; exact retained paths are tested in tests/test_collection_evidence_boundary.py.
+
+## School recompute mixed document
+
+[Original manifest](https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/d8a370e9135ee5231707d8f1e3afa723851f1966/archive/mod-targeted-20261023/kv-school-document/manifest.json) preserves the complete adapter/screen
+narrative. The maintained document keeps implementation guidance and directly
+links the existing benchmark raw screen archive and summary. This is custody,
+not a new experiment or B1 qualification. Ignored live-log gaps in other batches
+remain unresolved.
+
+```sh
+python scripts/fetch_mod_consumer_evidence.py --config BENCHMARK_DOCUMENTS.json \
+  --destination /absolute/new/external/school-document
+```
+
+The screen raw inputs are separately length/SHA checked in consumer CI. Installation
+source pins are unchanged; historical Release pages are not current package sources.

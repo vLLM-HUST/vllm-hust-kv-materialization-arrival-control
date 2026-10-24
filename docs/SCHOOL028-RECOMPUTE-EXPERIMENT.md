@@ -26,21 +26,20 @@ any result as B1. The adapter alone is not qualification evidence.
 
 ## Measured MMLU-Pro screen
 
-The 2026-10-19 school-host screen is archived in the
-[benchmark midterm report](https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/84f0443be92c658bb658b281fcb4241eb5a9fb97/reports/vllm-hust-midterm-20261019/README.md).
-Its `b1-kvmat-screen-evidence.tar.gz` contains the raw requests, policy and engine
-receipts, source pins, device samples and clean exit/release evidence. The
-`b1-kvmat-screen.json` summary is verified from that archive.
+[Complete unchanged historical narrative](https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/d8a370e9135ee5231707d8f1e3afa723851f1966/archive/mod-targeted-20261023/kv-school-document/snapshot/docs/SCHOOL028-RECOMPUTE-EXPERIMENT.md) preserves the source
+identity, compatibility correction and observed request/salt counts.
 
-The measured installed Python sources exactly match commit
-`b1680f2365f3468a062a0530bd50dba3d8f80046`. The later CI correction changes the
-unsupported-prompt exception from `ValueError` to `TypeError`; it does not alter
-the measured text/recompute path. The running isolated payload was not edited.
-The native Extension Manager manifest remains incompatible with this 0.28 host;
-the measurement explicitly opted into the bounded adapter instead.
+- [Raw requests, policy/engine receipts and environment archive](https://raw.githubusercontent.com/vLLM-HUST/vllm-hust-benchmark/b354f203cabb4cfeba72a74e4eefb29dee85776b/reports/vllm-hust-midterm-20261019/b1-kvmat-screen-evidence.tar.gz)
+- [Canonical screen summary JSON](https://raw.githubusercontent.com/vLLM-HUST/vllm-hust-benchmark/b354f203cabb4cfeba72a74e4eefb29dee85776b/reports/vllm-hust-midterm-20261019/b1-kvmat-screen.json)
 
-All 200 measured requests completed. Policy and engine cache-salt digests match
-for all 200 requests and 282,265 input tokens. All decisions were recompute;
-no reuse anchors were added and partial reuse was not exercised. The result is
-a single-run service-performance screen, not a task-accuracy or statistical
-significance claim.
+This was a school-host recompute-only candidate screen, not the fixed
+vLLM 0.18 / Ascend 0.18 B0. The canonical record is **not selected as B1** and
+**quality was not rescored**. Request salt admission is not evidence of partial
+reuse, avoided computation, task accuracy or statistical significance.
+The native Manager manifest's compatibility restriction and bounded opt-in
+adapter remain distinct. Do not rewrite historical labels or promote this screen
+to a qualified current best configuration.
+
+`BENCHMARK_DOCUMENTS.json` pins the original narrative and both existing raw
+inputs by immutable commit, length and SHA256. CI downloads and verifies them;
+it does not execute archived code or rerun inference. See [custody](../EVIDENCE.md).
