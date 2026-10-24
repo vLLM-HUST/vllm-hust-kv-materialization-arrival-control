@@ -1,0 +1,22 @@
+{
+  "manifest_url": "https://raw.githubusercontent.com/vLLM-HUST/vllm-hust-benchmark/86d99669ef6e57c1144b2206d7ee9911e480a4e0/archive/mod-targeted-20261023/kv-school-document/manifest.json",
+  "manifest_sha256": "1b38063d6eac4e17fbe7ec0f85f2e60b20e7535d999413173c8faa580a31afd0",
+  "document_projections": [
+    {
+      "path": "docs/SCHOOL028-RECOMPUTE-EXPERIMENT.md",
+      "original_url": "https://github.com/vLLM-HUST/vllm-hust-benchmark/blob/86d99669ef6e57c1144b2206d7ee9911e480a4e0/archive/mod-targeted-20261023/kv-school-document/snapshot/docs/SCHOOL028-RECOMPUTE-EXPERIMENT.md"
+    }
+  ],
+  "raw_files": [
+    {
+      "url": "https://raw.githubusercontent.com/vLLM-HUST/vllm-hust-benchmark/b354f203cabb4cfeba72a74e4eefb29dee85776b/reports/vllm-hust-midterm-20261019/b1-kvmat-screen-evidence.tar.gz",
+      "bytes": 432053,
+      "sha256": "90650cc6f57472278d2109a0969dbcdc211661e6ecc57649bd2d25616d5459c4"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/vLLM-HUST/vllm-hust-benchmark/b354f203cabb4cfeba72a74e4eefb29dee85776b/reports/vllm-hust-midterm-20261019/b1-kvmat-screen.json",
+      "bytes": 11340,
+      "sha256": "da9c056e5dd7c865bca8ab93190329744b0fc5987e14ebc7630565c4ee42e0ad"
+    }
+  ]
+}

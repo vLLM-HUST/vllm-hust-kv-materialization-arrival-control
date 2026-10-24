@@ -24,3 +24,9 @@ jobs:
         run: python scripts/fetch_mod_consumer_evidence.py --config BENCHMARK_HISTORY.json --destination "$RUNNER_TEMP/history-evidence"
       - name: Verify remaining collection and every original member
         run: python scripts/fetch_mod_consumer_evidence.py --config BENCHMARK_COLLECTION.json --destination "$RUNNER_TEMP/collection-evidence"
+      - name: Verify mixed document original
+        run: python scripts/fetch_mod_consumer_evidence.py --config BENCHMARK_DOCUMENTS.json --destination "$RUNNER_TEMP/document-evidence"
+      - name: Verify raw screen data and qualification boundary
+        env:
+          VERIFY_SCHOOL_SCREEN: '1'
+        run: python -m pytest -q -c /dev/null tests/test_school_evidence_links.py
