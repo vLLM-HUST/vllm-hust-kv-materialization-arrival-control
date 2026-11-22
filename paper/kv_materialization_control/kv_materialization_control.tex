@@ -5,7 +5,7 @@
 \usepackage{cite}
 \usepackage{graphicx}
 \usepackage{array}
-\title{KV Materialization at Arrival: An Evidence-Bounded Negative Result}
+\title{KV Materialization at Arrival: Load-Dependent Gains and a Fixed-Policy Boundary}
 \author{\IEEEauthorblockN{Anonymous Artifact Draft}}
 \begin{document}
 \maketitle
@@ -14,21 +14,23 @@ KV reuse can avoid prompt computation, but retrieving, aligning, and committing
 state also costs time. We evaluated an arrival-time controller that selects full
 reuse, block-aligned segmented reuse, or recomputation, and instrumented the
 serving path to distinguish requested, effective, and engine-realized actions.
-This paper reports a boundary, rather than a new controller: in a
-preregistered, graph-mode repeated online matrix, the controller improves over
-recomputation but loses to the best fixed policy. Mean matched TTFT regresses
-by 9.24\% and 6.60\% on the two tested workloads, and
-\texttt{always\_full\_reuse} wins all six rounds. A separate paired Ascend
-graph/eager diagnostic finds no repeatable graph-only overlap gap. We retain a
-block-aligned segmented-tail carrier with realized-action accounting, this
-negative online boundary, and a provenance boundary. Of 141 completed
-controller lifecycles, 39 have retained per-request raw bundles; 102 are
-aggregate-only supporting evidence. Offline cost-model results are model
-analysis, never online benefit. This is a candidate artifact, not
-submission-ready.
+We report two deliberately separate online protocols. In a five-point,
+900-second Qwen3.5-35B-A3B/Ascend observation, the controller-enabled runtime
+has a 7.13\% geometric-mean output-throughput gain over the exact published
+Native series. The gain is load dependent: $-1.04\%$ at concurrency 1 and
+$+9.22\%$, $+11.90\%$, and $+15.16\%$ at concurrency 4, 8, and 16. Controller
+and scheduler telemetry show that recompute and reuse paths ran, but all 30
+proposed partial actions fell back because available full reuse dominated; the
+observation therefore does not establish a partial-materialization benefit. In
+a separate preregistered Qwen2.5-7B-Instruct repeated matrix, the controller
+loses to the best fixed policy by 9.24\% and 6.60\% mean TTFT, and full reuse
+wins all six rounds plus 20 catalog-confirmation rounds. Together, the results
+show a positive high-load operating region and a fixed-policy boundary, while
+requested, effective, and engine-realized actions remain distinct. We retain
+the 39-raw/102-aggregate provenance boundary of the repeated M2 study.
 \end{abstract}
 \begin{IEEEkeywords}
-LLM serving, KV cache, prefix reuse, negative result, reproducibility
+LLM serving, KV cache, prefix reuse, runtime control, reproducibility
 \end{IEEEkeywords}
 \section{Introduction}
 Prefix caching makes reusable KV state available, but availability is not a
@@ -46,17 +48,19 @@ That is not a positive novelty claim: LMCache can skip a small retrieval for
 recomputation~\cite{lmcache}, KVPR jointly plans partial transfer and
 recomputation~\cite{kvpr2025}, and eLLM adapts partial-token caching and
 recomputation~\cite{ellm2026}. Our knowledge increment is an evidence-bounded
-systems result: on this carrier and matched serving setup, the tested controller
-does not beat full reuse.
+systems result across two non-transferable protocols: the unified Qwen3.5
+runtime shows a positive throughput observation that grows with concurrency,
+while the matched Qwen2.5 M2 study shows that arrival-time selection cannot beat
+cheap local full reuse in its tested regime.
 
 The retained contributions are deliberately narrow:
 \begin{enumerate}[leftmargin=1.5em]
 \item A block-aligned segmented-tail carrier and scheduler accounting that
 separate requested, effective, and engine-realized actions.
-\item A preregistered repeated real-online comparison establishing a negative
-benefit boundary for the present controller.
-\item A paired graph/eager diagnostic with no independent graph-only overlap
-gap, plus a raw-versus-aggregate provenance boundary.
+\item A five-point real-online scaling observation with a 7.13\% geometric-mean
+throughput gain and a negative-to-positive transition as concurrency increases.
+\item A preregistered repeated real-online comparison establishing the separate
+fixed-policy boundary, plus an explicit raw-versus-aggregate provenance limit.
 \end{enumerate}
 We do not claim a KV store, transfer system, admission/eviction policy,
 multi-granularity index, arbitrary token-level materialization, or universal
@@ -76,6 +80,26 @@ is the action after alignment and dominance checks; and realized is the engine
 counter. It also records lookup, alignment, cache commit, tail isolation,
 recomputed-tail tokens, and fallback reasons. A requested partial action is
 therefore never reported as realized reuse.
+
+\subsection{Physical break-even boundary}
+Let $C_F$ be the cost of full reuse, $C_R$ the cost of recomputing the entire
+prompt, and
+\begin{equation}
+C_P(b)=L_b+A_b+K_b+R_{\mathrm{tail}}(b)+I_b
+\end{equation}
+the cost of partial reuse at aligned boundary $b$: lookup, alignment, cache
+commit, tail recomputation, and isolation. If the selector itself costs $D$,
+then choosing action $a$ can beat full reuse only when
+\begin{equation}
+C_F-C_a > D.
+\end{equation}
+This inequality is the paper's mechanism test, not a fitted performance model.
+The available headroom is regime dependent. In the Qwen2.5 M2 carrier, full
+reuse avoids the recomputed tail while partial reuse still pays alignment and
+commit costs; the offline ranking selects full reuse in all six main rounds,
+matching the online winner. In the unified Qwen3.5 observation, the advantage
+appears only as concurrency rises, but the protocol does not isolate which
+runtime-path interaction supplies that advantage.
 
 \section{Closest Work and Non-Claims}
 Table~\ref{tab:comparison} records the closest mechanisms. Serving evidence
@@ -102,7 +126,7 @@ eLLM~\cite{ellm2026} & Fine-grained partial-token KV; elastic cache & Cached/rec
 CacheBlend~\cite{cacheblend2025} / CacheSlide~\cite{cacheslide2026} & Non-prefix chunks / position-aware segments & Attention or positional correction & Selective recompute, correction, layer work & Prompt construction / runtime & Yes & Solve semantic/positional reuse, not our aligned prefix seam \\
 DistServe~\cite{distserve2024} / Mooncake~\cite{mooncake2025} & KV across prefill/decode or tiers & Transfer and placement protocol & Network/storage bandwidth, SLO, cluster load & Cluster schedule & Yes & Storage/transfer architectures, not proposed here \\
 Admission / eviction~\cite{h2o2023} & Retained KV / attention state & Retention approximation criterion & Capacity and eviction score & Cache lifecycle & No (inference study) & Orthogonal: a candidate already exists at arrival \\
-This artifact & Prefix KV plus aligned segmented tail & Engine counters and aligned boundary & Lookup, alignment, commit, tail tokens, cache use & Arrival & Yes, repeated matrix & Accounting plus a negative controller boundary \\
+This artifact & Prefix KV plus aligned segmented tail & Engine counters and aligned boundary & Lookup, alignment, commit, tail tokens, cache use & Arrival & Yes, two online protocols & Load-dependent observation plus a fixed-policy boundary \\
 \bottomrule
 \end{tabular}
 \end{table*}
@@ -115,11 +139,20 @@ service lifecycles through the live path. Derived artifacts are tables and
 verdicts rebuilt from those data. A model-selected partial action is never
 promoted to realized reuse or online speedup.
 
-The retained online bundles and generated reconstruction are under
-\url{experiments/results/m2_online_boundary_20260803/}; the independent
-graph/eager traces and custody manifest are under \url{docs/wavemat/}.
-These repository sources are the evidence for the carrier, online, and
-diagnostic statements below.
+The unified Qwen3.5 observation is pinned by the public Frontier evidence record
+and its per-run manifest hashes in \texttt{vllm-hust-benchmark}. The retained M2
+online bundles and generated reconstruction are in the benchmark evidence
+collection pinned by \texttt{PAPER\_INPUTS.json}; the independent graph/eager
+traces and custody manifest are under \url{docs/wavemat/}. These sources support
+different protocols and are never pooled into one estimator.
+
+The Qwen3.5 protocol uses Qwen3.5-35B-A3B in BF16 on two Ascend 910B2 chips,
+TP2, FULL\_AND\_PIECEWISE graph mode, and a fixed SWE prefix-reuse workload.
+Each concurrency point 1/2/4/8/16 is a 900-second real-online window. The
+candidate is compared with the exact published Native series; no MOD-specific
+Native rerun or matched repetition was performed. Prompt identity, token usage,
+completion markers, output budgets, source revisions, clean release, and
+controller/scheduler activity were checked for each point.
 
 The primary online study uses Qwen2.5-7B-Instruct, graph mode, block size 128,
 two existing workloads, three temporally blocked rounds per workload, and a
@@ -128,6 +161,39 @@ recompute, always full reuse, and the current controller. The lifecycle, not an
 individual request, is the statistical unit. All 18/18 retained raw bundles
 validate, containing 576/576 successful requests. Earlier single-run
 descriptive matrices are not used as online performance evidence.
+
+\section{Evaluation: Unified Qwen3.5 Scaling Observation}
+Table~\ref{tab:qwen35} reports the five public points. The geometric mean of
+candidate/Native throughput ratios is $+7.13\%$. The candidate is slightly
+slower at C1, nearly neutral at C2, and increasingly faster at C4--C16. This is
+a real-online performance observation, but not a matched-repetition estimate or
+a causal decomposition of the controller.
+
+\begin{table}[t]
+\centering
+\caption{Qwen3.5 900-second output-throughput observation.}
+\label{tab:qwen35}
+\scriptsize
+\begin{tabular}{rrrrr}
+\toprule
+Concurrency & Candidate tok/s & Native tok/s & Gain & Completed \\
+\midrule
+1  & 90.59  & 91.55  & $-1.04\%$ & 147 \\
+2  & 154.73 & 152.72 & $+1.31\%$ & 222 \\
+4  & 237.52 & 217.48 & $+9.22\%$ & 349 \\
+8  & 325.75 & 291.11 & $+11.90\%$ & 474 \\
+16 & 414.29 & 359.75 & $+15.16\%$ & 622 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The controller was invoked 1,845 times: 1,745 full-reuse, 30 partial-reuse, and
+70 recompute decisions were observed. All recompute requests exercised
+request-scoped prefix-cache bypass, and full reuse exercised anchor-scoped APC.
+Every partial proposal was conservatively mapped to full reuse because the
+available full prefix dominated the block-aligned proposal. Scheduler-owned
+telemetry independently records 38,883,328 reused tokens. Thus the mechanism is
+exercised, but the positive observation cannot be attributed to partial reuse.
 
 \section{Evaluation: Repeated Online Negative Boundary}
 Table~\ref{tab:m2-mechanism} is rebuilt from retained online raw bundles and
@@ -144,9 +210,9 @@ not requested actions, define avoided prefill and recomputed tail. Positive
 latency deltas and negative RPS deltas are regressions.}
 \label{tab:m2-mechanism}
 \scriptsize
-\resizebox{\textwidth}{!}{\input{experiments/results/m2_online_boundary_20260803/generated/m2_mechanism_table.tex}}
+\resizebox{\textwidth}{!}{\input{tables/generated/m2_mechanism_table.tex}}
 \par\smallskip
-\resizebox{0.78\textwidth}{!}{\input{experiments/results/m2_online_boundary_20260803/generated/m2_action_table.tex}}
+\resizebox{0.78\textwidth}{!}{\input{tables/generated/m2_action_table.tex}}
 \end{table*}
 
 The controller loses to the best fixed policy in both workloads: matched mean
@@ -156,11 +222,30 @@ Always full reuse wins all six matched rounds. End-to-end latency
 that finding. The offline cost model identifies the same winner in 6/6 rounds,
 but this validates only the ranking for this experiment, not an online proof.
 
-Catalog closure is aggregate-only supporting evidence: across four promoted
-workloads and 20 confirmation rounds, always full reuse again wins every round,
-with no preregistered $\geq 5\%$ controller gain. The corresponding raw bundles
-are not retained, so this result is not presented as independently
-per-request-auditable evidence.
+Catalog closure is aggregate-only supporting evidence. Table~\ref{tab:confirmation}
+shows the independently confirmed candidates. Across 20 confirmation rounds,
+always full reuse wins every round and no workload reaches the preregistered
+$\geq 5\%$ controller gain. The corresponding raw bundles are not retained, so
+this result is not presented as independently per-request-auditable evidence.
+
+\begin{table}[t]
+\centering
+\caption{Controller TTFT relative to the best fixed policy in independent
+confirmation (negative is better). These rows are aggregate-only evidence.}
+\label{tab:confirmation}
+\scriptsize
+\begin{tabular}{lrrl}
+\toprule
+Workload & TTFT $\Delta$ & One-sided 95\% upper & Gate \\
+\midrule
+Multi-tenant assistant & $-0.90\%$ & --- & below 5\% \\
+Code evaluation & $+0.87\%$ & $+2.13\%$ & no gain \\
+Structured JSON & $+0.87\%$ & $+2.95\%$ & no gain \\
+Bursty session & $+2.29\%$ & $+3.89\%$ & no gain \\
+Long-context analysis & $+3.70\%$ & $+6.19\%$ & no gain \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \section{Graph/Eager Diagnostic Boundary}
 The separate graph/eager diagnostic tests an upstream layerwise KV path on a
@@ -179,19 +264,27 @@ lifecycles. The remaining 102 have per-run aggregates and verdicts only because
 their raw bundles were not preserved; they are aggregate-only supporting
 evidence. The graph/eager diagnostic separately retains 8/8 raw trace assets with checksums.
 Generated tables are derived artifacts, not another evidence class.
+The two compact tables consumed directly by this manuscript are checked in and
+content-addressed in \texttt{PAPER\_INPUTS.json}, which also pins the benchmark
+collection manifest and release archive used to restore them.
 
-The result is bounded to the tested Qwen2.5-7B-Instruct/Ascend carrier,
-workload catalog, policy, and repeated protocol. It does not prove an
-arrival-time policy cannot help under another candidate source, storage system,
-or arrival pattern. It does not turn block alignment into token-level
-materialization. Partial reuse remains workload-dependent in the offline model
-and did not establish an online benefit here.
+The positive observation is bounded to Qwen3.5-35B-A3B, its pinned Ascend TP2
+runtime, five single 900-second candidate windows, and the exact previously
+published Native series. It has no MOD-specific matched repetitions and does
+not isolate the gain among controller logic, APC/bypass outcomes, or runtime
+interactions. The negative result is separately bounded to the tested
+Qwen2.5-7B-Instruct carrier, workload catalog, policy, and repeated protocol.
+Neither protocol transfers its sign to the other. Neither turns block alignment
+into token-level materialization; partial proposals established no independent
+online benefit in either study.
 
-The verdict is \texttt{stop\_mechanism\_direction}: the present controller is
-closed as a negative result without per-workload retuning or post-hoc workload
-search. The burst-arrival question is a separate candidate hypothesis, not a
-paper contribution. Until a target venue is selected and checked, this remains
-a candidate artifact draft, not a submission-ready manuscript.
+The M2 verdict remains \texttt{stop\_mechanism\_direction}: that fixed-policy
+search is closed without per-workload retuning or post-hoc workload search. It
+does not erase the separate Qwen3.5 load-dependent observation. The combined
+paper claim is conditional: the controller-enabled runtime scales positively
+at C4--C16, while cheap local full reuse leaves no measured action-selection
+headroom in M2. Matched replication of the positive series, venue formatting,
+author approval, and a pinned PDF build remain before external submission.
 \bibliographystyle{IEEEtran}
 \bibliography{kv_materialization_control}
 \end{document}
