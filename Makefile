@@ -63,7 +63,7 @@ help:
 		'  make g0-release-rebuild  Download, relocate-verify, and rebuild the immutable G0 Stop release' \
 		'  make shared-workloads-live MODEL=<model> [WORKLOAD_CASE=<case>]  Compatibility alias of make runtime-boundary-live' \
 		'  make optimization-live MODEL=<model> [WORKLOAD_CASE=<case>]  Compatibility alias of make runtime-boundary-live' \
-		'  make pdf          Build the paper PDF after refreshing latest offline-study results' \
+		'  make pdf          Build the PDF from the standalone paper checkout' \
 		'  make evidence     Print the latest study summary paths' \
 		'  make lint         Run ruff checks' \
 		'  make format       Run ruff formatting' \
@@ -243,7 +243,7 @@ g0-pilot-report:
 pdf: paper-pdf
 
 paper-pdf:
-	$(MAKE) -C $(PAPER_DIR) pdf TECTONIC='$(TECTONIC)' PYTHON='$(PYTHON)'
+	$(MAKE) -C $(PAPER_DIR) pdf
 
 evidence:
 	$(MAKE) -C $(PAPER_DIR) evidence-bundle

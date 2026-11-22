@@ -3,13 +3,9 @@ TECTONIC ?= tectonic
 PDFLATEX ?= pdflatex
 BIBTEX ?= bibtex
 ROOT_DIR := $(abspath ../..)
-LLM_OPTIMIZATIONS_ROOT ?= $(abspath $(ROOT_DIR)/../llm-optimizations)
-LLM_OPTIMIZATIONS_PDF_DIR ?= $(LLM_OPTIMIZATIONS_ROOT)/docs/papers
-LLM_OPTIMIZATIONS_PDF_NAME ?= kv-materialization__kv_materialization_control.pdf
+PAPER_REPO_DIR ?= $(abspath $(ROOT_DIR)/../kv-materialization-arrival-control-paper)
 EXPERIMENT_DIR := $(CURDIR)/experiments
 RESULT_DIR := $(EXPERIMENT_DIR)/results/latest
-PAPER_TEX := kv_materialization_control.tex
-PAPER_PDF := kv_materialization_control.pdf
 
 .DEFAULT_GOAL := help
 
@@ -23,7 +19,7 @@ help:
 		'  make runtime-boundary-live Run a shared-workload live runtime-boundary benchmark against a vLLM endpoint' \
 		'  make live-benchmark      Compatibility alias of make runtime-boundary-live' \
 		'  make optimization-live   Compatibility alias of make runtime-boundary-live' \
-		'  make pdf             Build the paper PDF with tectonic or pdflatex' \
+		'  make pdf             Build the PDF from the standalone paper checkout' \
 		'  make evidence-bundle Show the latest generated evidence files' \
 		'  make submission-plan Print the paper submission plan note'
 
@@ -52,32 +48,15 @@ live-benchmark: runtime-boundary-live
 optimization-live: runtime-boundary-live
 
 pdf:
-	@if command -v '$(TECTONIC)' >/dev/null 2>&1; then \
-		cd '$(CURDIR)' && '$(TECTONIC)' --keep-logs '$(PAPER_TEX)'; \
-	elif command -v '$(PDFLATEX)' >/dev/null 2>&1 && command -v '$(BIBTEX)' >/dev/null 2>&1; then \
-		cd '$(CURDIR)' && '$(PDFLATEX)' -interaction=nonstopmode -halt-on-error '$(PAPER_TEX)' && \
-		'$(BIBTEX)' '$(basename $(PAPER_TEX))' && \
-		'$(PDFLATEX)' -interaction=nonstopmode -halt-on-error '$(PAPER_TEX)' && \
-		'$(PDFLATEX)' -interaction=nonstopmode -halt-on-error '$(PAPER_TEX)'; \
-	else \
-		echo 'Install tectonic, or install both pdflatex and bibtex.' >&2; \
-		exit 2; \
-	fi
-	@if [ -d "$(LLM_OPTIMIZATIONS_ROOT)" ] && [ -f "$(PAPER_PDF)" ]; then \
-		python3 "$(LLM_OPTIMIZATIONS_ROOT)/scripts/export_paper_pdf.py" \
-			--workspace-file "$(LLM_OPTIMIZATIONS_ROOT)/llm-optimizations.code-workspace" \
-			--repo-root "$(ROOT_DIR)" \
-			--source-pdf "$(PAPER_PDF)" \
-			--output-name "$(LLM_OPTIMIZATIONS_PDF_NAME)" \
-			--destination-dir "$(LLM_OPTIMIZATIONS_PDF_DIR)"; \
-	fi
+	@test -f '$(PAPER_REPO_DIR)/Makefile' || { echo 'Clone intellistream/kv-materialization-arrival-control-paper beside this repository or set PAPER_REPO_DIR.' >&2; exit 2; }
+	$(MAKE) -C '$(PAPER_REPO_DIR)' pdf
 
 submission-plan:
-	@cat $(EXPERIMENT_DIR)/submission_plan.md
+	@printf '%s\n' 'https://github.com/intellistream/kv-materialization-arrival-control-paper/blob/main/paper/kv_materialization_control/experiments/submission_plan.md'
 
 evidence-bundle:
 	@printf 'Latest results in %s\n' '$(RESULT_DIR)'
 	@find $(RESULT_DIR) -maxdepth 1 -type f | sort
 
 clean:
-	rm -f $(CURDIR)/*.aux $(CURDIR)/*.log $(CURDIR)/*.out $(CURDIR)/*.toc $(CURDIR)/$(PAPER_PDF)
+	rm -f $(CURDIR)/*.aux $(CURDIR)/*.log $(CURDIR)/*.out $(CURDIR)/*.toc
