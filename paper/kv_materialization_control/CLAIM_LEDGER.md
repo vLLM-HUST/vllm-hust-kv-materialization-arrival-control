@@ -3,8 +3,6 @@
 | Claim | Evidence class | Status | Rebuild source |
 |---|---|---|---|
 | M1 的三轮独立重启矩阵支持 non-randomized、temporally blocked 的描述性 seam 分析 | real-online | supported；不支持稳定的一般 seam 性能收益 | `experiments/results/m1_formal_approved_complete_20260801/` |
-| Qwen3.5 unified 五点吞吐观察 | real-online observation | positive and load-dependent：C1/C2/C4/C8/C16 相对精确 published Native series 为 -1.04%/+1.31%/+9.22%/+11.90%/+15.16%，五点几何平均 +7.13%；没有 MOD-specific matched repetition，不写成 controller-only 因果收益 | `PAPER_INPUTS.json` 固定的 Frontier public record 与 dev-hub findings |
-| Qwen3.5 mechanism exercised | real-online telemetry | supported：controller 1,845 次调用，观察到 1,745 full / 30 partial / 70 recompute；recompute 与 reuse runtime path 均执行；30 次 partial proposal 全部回退 full reuse，故不支持 partial-materialization 收益归因 | 同上 |
 | M2 三动作控制器相对最佳固定策略的在线收益边界 | real-online | negative：两个 workload 的 controller TTFT 分别比最佳固定策略回退 9.24% 和 6.60% | `experiments/results/m2_online_boundary_20260803/generated/m2_benefit_boundary.csv` |
 | observed/effective/realized action、fallback 原因和物理开销分解 | real-online | supported：18 个独立 lifecycle、576/576 请求完成，全部 raw validation 通过 | raw observations/events → `m2_online_runs.csv` |
 | 当前 cost model 的策略排序与在线排序一致 | simulation/model | supported：6/6 matched rounds 的 winner 均为 `always_full_reuse` | `m2_cost_model_agreement.csv` |
@@ -19,7 +17,6 @@
 | M2 扩展 workload 的 cost-model 排序 | simulation/model | supported at confirmation boundary：离线模型未预测任何 >=5% 收益，且 4 个晋级 workload 的五轮在线最佳固定策略均为 full reuse；不进行逐 workload 参数校准 | offline study → four confirmation verdicts |
 | M2 现有 catalog 显著正收益结论 | derived-artifact | negative/stop：14 个新 canonical workload 完成 pilot，4 个晋级者全部完成五轮确认；102/102 lifecycle、6192/6192 请求有效，未发现 >=5% 且单侧 95% 上界低于 0 的 workload；停止 post-hoc 搜索和调参。证据边界：该 102/102 lifecycle 为 aggregate-only supporting evidence（逐 run 聚合 + verdict，raw bundle 原存执行机 /tmp、现已不可取回），不参与 fresh-clone 逐请求复核声明 | `experiments/results/m2_catalog_closure_20260803/README.md`, `mechanism_breakdown.csv` |
 | M2 issue #3 完整闭合：20 个 workload 的收益边界总账与继续/停止判断 | derived-artifact | negative/stop（verdict 固定为 `stop_mechanism_direction`）：2 个主矩阵 workload 均 fallback_or_no_gain；18 个扩展 workload 中晋级者五轮确认全部为负；141/141 lifecycle、8208/8208 请求。证据边界：39/141 lifecycle 仓内 raw 可逐请求复核（并归档于 release `m2-issue3-closure-evidence-20260811`），102/141 为 aggregate-only supporting evidence，39/102 口径在 102 个 raw bundle 归档前保持不变 | `experiments/M2_ISSUE_CLOSURE.md` + 各 `results/m2_*/` 生成物 + `experiments/RELEASE_MANIFEST.md` |
-| 本地 full-reuse carrier 的物理 break-even 边界 | mechanism interpretation | supported at tested boundary：partial action 仍支付 lookup/alignment/commit/tail/isolation，主矩阵 cost model 与在线排序 6/6 均选择 full reuse；只解释当前 carrier，不外推 remote/capacity-constrained source | `m2_cost_model_agreement.csv`, `m2_mechanism_table.tex`, `m2_action_table.tex` |
 
 生成的 `claim_ledger.json` 是该轮结果的机器可读 ledger。requested action 仍不得写成
 realized reuse；例如 tool controller 的 lifecycle 中位 applied mix 是 8/8/16
