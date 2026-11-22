@@ -5,7 +5,7 @@
 \usepackage{cite}
 \usepackage{graphicx}
 \usepackage{array}
-\title{KV Materialization at Arrival: An Evidence-Bounded Negative Result}
+\title{When Arrival-Time KV Choice Has No Headroom: An Evidence-Bounded Negative Result}
 \author{\IEEEauthorblockN{Anonymous Artifact Draft}}
 \begin{document}
 \maketitle
@@ -14,18 +14,22 @@ KV reuse can avoid prompt computation, but retrieving, aligning, and committing
 state also costs time. We evaluated an arrival-time controller that selects full
 reuse, block-aligned segmented reuse, or recomputation, and instrumented the
 serving path to distinguish requested, effective, and engine-realized actions.
-This paper reports a boundary, rather than a new controller: in a
+This paper reports a systems boundary, rather than a new controller: in a
 preregistered, graph-mode repeated online matrix, the controller improves over
 recomputation but loses to the best fixed policy. Mean matched TTFT regresses
 by 9.24\% and 6.60\% on the two tested workloads, and
-\texttt{always\_full\_reuse} wins all six rounds. A separate paired Ascend
+\texttt{always\_full\_reuse} wins all six rounds. Across four subsequently
+promoted workloads it also wins all 20 confirmation rounds; none reaches the
+preregistered 5\% benefit threshold. The physical explanation is simple: when
+local full reuse is already cheap, decision, alignment, commit, and recomputed
+tail costs leave no measured headroom for the tested selector. A separate paired Ascend
 graph/eager diagnostic finds no repeatable graph-only overlap gap. We retain a
 block-aligned segmented-tail carrier with realized-action accounting, this
 negative online boundary, and a provenance boundary. Of 141 completed
 controller lifecycles, 39 have retained per-request raw bundles; 102 are
 aggregate-only supporting evidence. Offline cost-model results are model
-analysis, never online benefit. This is a candidate artifact, not
-submission-ready.
+analysis, never online benefit. The result supports a bounded short-paper claim,
+not a positive controller-speedup claim.
 \end{abstract}
 \begin{IEEEkeywords}
 LLM serving, KV cache, prefix reuse, negative result, reproducibility
@@ -55,8 +59,9 @@ The retained contributions are deliberately narrow:
 separate requested, effective, and engine-realized actions.
 \item A preregistered repeated real-online comparison establishing a negative
 benefit boundary for the present controller.
-\item A paired graph/eager diagnostic with no independent graph-only overlap
-gap, plus a raw-versus-aggregate provenance boundary.
+\item A physical break-even account explaining why the tested local-prefix
+carrier has no measured selection headroom, plus an explicit raw-versus-aggregate
+provenance boundary.
 \end{enumerate}
 We do not claim a KV store, transfer system, admission/eviction policy,
 multi-granularity index, arbitrary token-level materialization, or universal
@@ -76,6 +81,25 @@ is the action after alignment and dominance checks; and realized is the engine
 counter. It also records lookup, alignment, cache commit, tail isolation,
 recomputed-tail tokens, and fallback reasons. A requested partial action is
 therefore never reported as realized reuse.
+
+\subsection{Physical break-even boundary}
+Let $C_F$ be the cost of full reuse, $C_R$ the cost of recomputing the entire
+prompt, and
+\begin{equation}
+C_P(b)=L_b+A_b+K_b+R_{\mathrm{tail}}(b)+I_b
+\end{equation}
+the cost of partial reuse at aligned boundary $b$: lookup, alignment, cache
+commit, tail recomputation, and isolation. If the selector itself costs $D$,
+then choosing action $a$ can beat full reuse only when
+\begin{equation}
+C_F-C_a > D.
+\end{equation}
+This inequality is the paper's mechanism test, not a fitted performance model.
+On the tested local-prefix carrier, full reuse avoids the recomputed tail while
+partial reuse still pays alignment and commit costs; the offline ranking selects
+full reuse in all six main rounds, matching the online winner. The experiment
+therefore finds no measured economic headroom for action selection. A remote or
+capacity-constrained source could change $C_F$, but is outside this result.
 
 \section{Closest Work and Non-Claims}
 Table~\ref{tab:comparison} records the closest mechanisms. Serving evidence
@@ -144,9 +168,9 @@ not requested actions, define avoided prefill and recomputed tail. Positive
 latency deltas and negative RPS deltas are regressions.}
 \label{tab:m2-mechanism}
 \scriptsize
-\resizebox{\textwidth}{!}{\input{experiments/results/m2_online_boundary_20260803/generated/m2_mechanism_table.tex}}
+\resizebox{\textwidth}{!}{\input{tables/generated/m2_mechanism_table.tex}}
 \par\smallskip
-\resizebox{0.78\textwidth}{!}{\input{experiments/results/m2_online_boundary_20260803/generated/m2_action_table.tex}}
+\resizebox{0.78\textwidth}{!}{\input{tables/generated/m2_action_table.tex}}
 \end{table*}
 
 The controller loses to the best fixed policy in both workloads: matched mean
@@ -156,11 +180,30 @@ Always full reuse wins all six matched rounds. End-to-end latency
 that finding. The offline cost model identifies the same winner in 6/6 rounds,
 but this validates only the ranking for this experiment, not an online proof.
 
-Catalog closure is aggregate-only supporting evidence: across four promoted
-workloads and 20 confirmation rounds, always full reuse again wins every round,
-with no preregistered $\geq 5\%$ controller gain. The corresponding raw bundles
-are not retained, so this result is not presented as independently
-per-request-auditable evidence.
+Catalog closure is aggregate-only supporting evidence. Table~\ref{tab:confirmation}
+shows the independently confirmed candidates. Across 20 confirmation rounds,
+always full reuse wins every round and no workload reaches the preregistered
+$\geq 5\%$ controller gain. The corresponding raw bundles are not retained, so
+this result is not presented as independently per-request-auditable evidence.
+
+\begin{table}[t]
+\centering
+\caption{Controller TTFT relative to the best fixed policy in independent
+confirmation (negative is better). These rows are aggregate-only evidence.}
+\label{tab:confirmation}
+\scriptsize
+\begin{tabular}{lrrl}
+\toprule
+Workload & TTFT $\Delta$ & One-sided 95\% upper & Gate \\
+\midrule
+Multi-tenant assistant & $-0.90\%$ & --- & below 5\% \\
+Code evaluation & $+0.87\%$ & $+2.13\%$ & no gain \\
+Structured JSON & $+0.87\%$ & $+2.95\%$ & no gain \\
+Bursty session & $+2.29\%$ & $+3.89\%$ & no gain \\
+Long-context analysis & $+3.70\%$ & $+6.19\%$ & no gain \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \section{Graph/Eager Diagnostic Boundary}
 The separate graph/eager diagnostic tests an upstream layerwise KV path on a
@@ -179,6 +222,9 @@ lifecycles. The remaining 102 have per-run aggregates and verdicts only because
 their raw bundles were not preserved; they are aggregate-only supporting
 evidence. The graph/eager diagnostic separately retains 8/8 raw trace assets with checksums.
 Generated tables are derived artifacts, not another evidence class.
+The two compact tables consumed directly by this manuscript are checked in and
+content-addressed in \texttt{PAPER\_INPUTS.json}, which also pins the benchmark
+collection manifest and release archive used to restore them.
 
 The result is bounded to the tested Qwen2.5-7B-Instruct/Ascend carrier,
 workload catalog, policy, and repeated protocol. It does not prove an
@@ -190,8 +236,9 @@ and did not establish an online benefit here.
 The verdict is \texttt{stop\_mechanism\_direction}: the present controller is
 closed as a negative result without per-workload retuning or post-hoc workload
 search. The burst-arrival question is a separate candidate hypothesis, not a
-paper contribution. Until a target venue is selected and checked, this remains
-a candidate artifact draft, not a submission-ready manuscript.
+paper contribution. The evidence is sufficient to converge a bounded short
+paper; venue formatting, author approval, and a pinned PDF build remain before
+external submission.
 \bibliographystyle{IEEEtran}
 \bibliography{kv_materialization_control}
 \end{document}

@@ -10,6 +10,11 @@ The paper's core question is:
 
 The paper should stay focused on that three-action surface.
 
+`PAPER_READINESS.md` records the current go/no-go decision. The paper is a
+short negative-result candidate: it explains why the tested local-prefix
+carrier leaves no measured action-selection headroom. It is not a positive
+controller-speedup paper.
+
 ## Evidence Layers
 
 This directory keeps three evidence layers separate.
@@ -37,6 +42,11 @@ asset `m2_raw_bundles_39_lifecycles.tar.gz`). The remaining 102 lifecycles are
 aggregate-only supporting evidence, so the 39/102 reproducibility boundary is
 retained until those raw bundles are archived to a persistent,
 content-addressed location.
+
+The compact LaTeX tables consumed directly by the manuscript are checked in
+under `tables/generated/` and pinned by
+hash in `PAPER_INPUTS.json`. This keeps a fresh checkout buildable without
+re-importing the full evidence archive.
 
 ## Local Workflow
 

@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "purpose": "Content-addressed custody for the compact evidence inputs consumed directly by the manuscript.",
+  "source_repository": "vLLM-HUST/vllm-hust-kv-materialization-arrival-control",
+  "source_commit": "8b59cdabceadab43a6d2487b5e51699f4f1f1cb6",
+  "evidence_collection": {
+    "repository": "vLLM-HUST/vllm-hust-benchmark",
+    "commit": "812ef01ae992475d4ce6a3bb6a6ce4bda43b5f12",
+    "manifest_path": "archive/mod-collections-20261023/kv-arrival/manifest.json",
+    "manifest_sha256": "cb80da0807542b8b93fa2cf66dc03d90a70614cad0b7be818925cfe783e3b5ca",
+    "release_tag": "evidence-mod-collections-20261023-v1",
+    "release_asset": "kv-arrival.tar.gz",
+    "release_asset_id": 668881884,
+    "release_asset_sha256": "76e225d7cc30e675dd00a60b91fc413b542778144bca8077db904a10b8d90ad6"
+  },
+  "manuscript_inputs": [
+    {
+      "path": "tables/generated/m2_action_table.tex",
+      "sha256": "4a53364a204b380719711354053792d16501097686ae2c7529d633037965f367"
+    },
+    {
+      "path": "tables/generated/m2_mechanism_table.tex",
+      "sha256": "44f41f6079573fdf6a380d8aeae2c3d49509faec4c0057814c342fe2f0ad20b5"
+    }
+  ],
+  "evidence_boundary": {
+    "completed_lifecycles": 141,
+    "raw_bundle_lifecycles": 39,
+    "aggregate_only_lifecycles": 102
+  }
+}
