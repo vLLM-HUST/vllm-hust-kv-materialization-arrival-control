@@ -371,9 +371,13 @@ forwards `OPENAI_API_KEY` plus `OPENAI_HTTP_USER_AGENT` when present.
 
 ## Paper And Experiments
 
-Paper assets live under:
+The manuscript and submission materials are maintained in
+[kv-materialization-arrival-control-paper](https://github.com/intellistream/kv-materialization-arrival-control-paper).
+The [replication and submission issue](https://github.com/vLLM-HUST/vllm-hust-kv-materialization-arrival-control/issues/41)
+remains here.
 
-- `paper/kv_materialization_control/`
+The experiment tooling and reference archive live under:
+
 - `paper/kv_materialization_control/experiments/`
 - `paper/related_works/`
 

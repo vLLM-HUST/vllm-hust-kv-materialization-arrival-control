@@ -1,64 +1,13 @@
-# KV Materialization Control Paper Workspace
+# KV Materialization Control Experiments
 
-This paper workspace is for a decision artifact, not a generic state-management
-paper.
+The [standalone paper repository](https://github.com/intellistream/kv-materialization-arrival-control-paper)
+holds the editable manuscript and submission plan. This directory retains the
+experiment drivers and protocols. See the [M2 closure](experiments/M2_ISSUE_CLOSURE.md),
+the [claim ledger](CLAIM_LEDGER.md), and the [benchmark custody guide](../../EVIDENCE.md).
 
-The paper's core question is:
+[Issue #41](https://github.com/vLLM-HUST/vllm-hust-kv-materialization-arrival-control/issues/41)
+tracks the follow-up replication and submission preparation.
 
-- at request arrival, when reusable state already exists,
-- should the system choose `full_reuse`, `partial_reuse`, or `recompute`?
-
-The paper should stay focused on that three-action surface.
-
-`PAPER_READINESS.md` records the current go/no-go decision. The paper combines
-the positive, load-dependent Qwen3.5 observation with the separate negative M2
-fixed-policy boundary. It does not attribute the positive result to partial
-materialization, because every Qwen3.5 partial proposal fell back to full reuse.
-
-## Evidence Layers
-
-This directory keeps three evidence layers separate.
-
-- `decision-study`: workload-grounded offline analysis of the arrival-time
-	decision surface
-- `runtime-boundary-live`: live execution against a vLLM-compatible endpoint to
-	document which actions the current runtime seam actually realizes
-- `m2-online-boundary`: matched real-online comparison against
-	`always_recompute` and `always_full_reuse`
-
-The manuscript should not blur those layers into a single end-to-end claim.
-The completed M2 result is negative. After the original matrix, the existing
-catalog was closed with 14 additional canonical-workload pilots and four
-five-round confirmations. None confirmed a meaningful significant gain, and
-`always_full_reuse` won all 20 added confirmation rounds. The current mechanism
-direction stops without per-workload retuning or post-hoc workload search; the
-final verdict is fixed as `stop_mechanism_direction` in the issue closure
-summary and this paper's boundary.
-
-The 39 in-repo raw-bundle lifecycles are archived in release
-`m2-issue3-closure-evidence-20260811`
-(<https://github.com/intellistream/kv-materialization-arrival-control/releases/tag/m2-issue3-closure-evidence-20260811>,
-asset `m2_raw_bundles_39_lifecycles.tar.gz`). The remaining 102 lifecycles are
-aggregate-only supporting evidence, so the 39/102 reproducibility boundary is
-retained until those raw bundles are archived to a persistent,
-content-addressed location.
-
-The compact LaTeX tables consumed directly by the manuscript are checked in
-under `tables/generated/` and pinned by
-hash in `PAPER_INPUTS.json`. This keeps a fresh checkout buildable without
-re-importing the full evidence archive.
-
-## Local Workflow
-
-From the repository root:
-
-```bash
-make decision-study
-make m2-online-rebuild
-make pdf
-```
-
-The decision-study target refreshes `experiments/results/latest/` and emits the
-JSON, Markdown, and LaTeX-friendly summaries consumed by the draft.
-
-For live runtime-boundary runs, see `experiments/LIVE_EXPERIMENTS.md`.
+Run `make decision-study` or `make m2-online-rebuild` from the project root
+for the corresponding experiment workflows. Run `make pdf` in the paper checkout
+to build the manuscript.

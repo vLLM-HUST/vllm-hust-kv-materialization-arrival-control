@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Moved manuscript editing and PDF builds to the standalone
+  `intellistream/kv-materialization-arrival-control-paper` repository.
+  The replication issue and experiment tooling remain in this repository.
 - Added the vLLM-HUST Extension Manifest 0.2 descriptor, Extension Manager
   discovery registration, packaged-manifest checks, and extension lifecycle
   documentation.
