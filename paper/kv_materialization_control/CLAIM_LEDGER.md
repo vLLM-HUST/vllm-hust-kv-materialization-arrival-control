@@ -3,6 +3,8 @@
 | Claim | Evidence class | Status | Rebuild source |
 |---|---|---|---|
 | M1 的三轮独立重启矩阵支持 non-randomized、temporally blocked 的描述性 seam 分析 | real-online | supported；不支持稳定的一般 seam 性能收益 | `experiments/results/m1_formal_approved_complete_20260801/` |
+| Qwen3.5 unified 五点吞吐观察 | real-online observation | positive and load-dependent：C1/C2/C4/C8/C16 相对精确 published Native series 为 -1.04%/+1.31%/+9.22%/+11.90%/+15.16%，五点几何平均 +7.13%；没有 MOD-specific matched repetition，不写成 controller-only 因果收益 | `PAPER_INPUTS.json` 固定的 Frontier public record 与 dev-hub findings |
+| Qwen3.5 mechanism exercised | real-online telemetry | supported：controller 1,845 次调用，观察到 1,745 full / 30 partial / 70 recompute；recompute 与 reuse runtime path 均执行；30 次 partial proposal 全部回退 full reuse，故不支持 partial-materialization 收益归因 | 同上 |
 | M2 三动作控制器相对最佳固定策略的在线收益边界 | real-online | negative：两个 workload 的 controller TTFT 分别比最佳固定策略回退 9.24% 和 6.60% | `experiments/results/m2_online_boundary_20260803/generated/m2_benefit_boundary.csv` |
 | observed/effective/realized action、fallback 原因和物理开销分解 | real-online | supported：18 个独立 lifecycle、576/576 请求完成，全部 raw validation 通过 | raw observations/events → `m2_online_runs.csv` |
 | 当前 cost model 的策略排序与在线排序一致 | simulation/model | supported：6/6 matched rounds 的 winner 均为 `always_full_reuse` | `m2_cost_model_agreement.csv` |

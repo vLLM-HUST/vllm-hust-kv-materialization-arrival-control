@@ -10,10 +10,10 @@ The paper's core question is:
 
 The paper should stay focused on that three-action surface.
 
-`PAPER_READINESS.md` records the current go/no-go decision. The paper is a
-short negative-result candidate: it explains why the tested local-prefix
-carrier leaves no measured action-selection headroom. It is not a positive
-controller-speedup paper.
+`PAPER_READINESS.md` records the current go/no-go decision. The paper combines
+the positive, load-dependent Qwen3.5 observation with the separate negative M2
+fixed-policy boundary. It does not attribute the positive result to partial
+materialization, because every Qwen3.5 partial proposal fell back to full reuse.
 
 ## Evidence Layers
 

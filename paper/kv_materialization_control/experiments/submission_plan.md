@@ -2,11 +2,11 @@
 
 ## Positioning
 
-Push this work as a short negative-result / systems-boundary paper. The paper's
-claim is not that the controller accelerates serving. It is that, on the tested
-local-prefix carrier, `always_full_reuse` leaves too little economic headroom
-for arrival-time action selection, while requested, effective, and realized
-partial reuse frequently diverge.
+Push this work as a load-dependent systems paper with two separate protocols:
+the positive Qwen3.5 C1--C16 scaling observation and the negative Qwen2.5 M2
+fixed-policy boundary. The current Qwen3.5 evidence supports an observation,
+not a causal controller-only acceleration claim. Requested, effective, and
+realized partial reuse must remain distinct.
 
 The current verdict remains `stop_mechanism_direction`. Do not add per-workload
 tuning, post-hoc workload search, or another same-carrier hardware campaign to
@@ -18,11 +18,13 @@ P0 gates before external submission:
 
 1. Keep all manuscript-consumed tables content-addressed in `PAPER_INPUTS.json`
    and verify that a fresh checkout has no missing `\input` files.
-2. Select a short-paper / negative-results venue and apply its current template,
+2. Independently replicate the Qwen3.5 C1--C16 series with matched ordering and
+   pinned MOD-specific Native runs; preserve the current series unchanged.
+3. Select a systems venue and apply its current template,
    page limit, anonymity, and artifact rules.
-3. Complete author order, affiliations, acknowledgements, and an author claim
+4. Complete author order, affiliations, acknowledgements, and an author claim
    review against `CLAIM_LEDGER.md`.
-4. Build the PDF in a pinned TeX environment and archive the source/PDF pair.
+5. Build the PDF in a pinned TeX environment and archive the source/PDF pair.
 
 P1, only if a selected venue requires broader external validity:
 
@@ -32,7 +34,7 @@ P1, only if a selected venue requires broader external validity:
 
 ## Current Decision
 
-- **GO:** internal paper convergence and venue selection as a bounded short paper.
-- **NO-GO:** positive controller-speedup framing or full-paper submission on the
-  current evidence alone.
-- **No new experiments are authorized by this plan.**
+- **GO:** paper convergence around load-dependent gains plus a fixed-policy boundary.
+- **CONDITIONAL GO:** a full-paper push after matched Qwen3.5 replication.
+- **NO-GO:** attributing the positive result to partial materialization; all 30
+  partial proposals fell back to full reuse.
