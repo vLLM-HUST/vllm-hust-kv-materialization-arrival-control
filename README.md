@@ -167,6 +167,13 @@ all six matched rounds. Cost-model and online winners agreed in `6/6` rounds.
 The preregistered verdict is therefore `stop_mechanism_direction`; the project
 does not continue per-workload controller tuning.
 
+Separately, the organization benchmark records a positive, load-dependent
+Qwen3.5 unified-runtime observation for this MOD. That Frontier observation and
+the Qwen2.5 M2 fixed-policy study are different protocols: neither result
+overwrites or transfers to the other. The benchmark publication remains the
+canonical custody location for the Qwen3.5 measurements, while the paper uses
+them as a separately labeled performance observation.
+
 The verdict is fixed in the M2 issue #3 closure summary and the paper boundary.
 The 39 in-repo raw-bundle lifecycles are also archived in release
 `m2-issue3-closure-evidence-20260811`
