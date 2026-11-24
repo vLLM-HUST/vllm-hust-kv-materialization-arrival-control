@@ -15,6 +15,11 @@ class OnlineAdmissionMixin:
         config = vllm_config.kv_transfer_config.kv_connector_extra_config
         self.default_policy = config.get("admission_policy", "full")
         self.minimum_external = int(config.get("minimum_external_tokens", 2048))
+        self.reference_peer_tpot_ms = config.get("reference_peer_tpot_ms")
+        if self.default_policy == "peer" and (
+            self.reference_peer_tpot_ms is None or self.reference_peer_tpot_ms <= 0
+        ):
+            raise ValueError("peer admission needs a positive calibrated reference_peer_tpot_ms")
         self.pending_reads = {}
         self.prefills = deque()
         self.ms_per_read_token = 0.010
@@ -76,12 +81,12 @@ class OnlineAdmissionMixin:
         local_rounds = rounds(local_work, maximum)
         full = ready + 0.05 * residual + 12 * full_rounds
         local_cost = 0.05 * local_work + 12 * local_rounds
-        if policy == "online":
+        if policy in ("online", "peer"):
             if residual > next_budget:
                 full += 0.05 * competing
             full += 12 * (rounds(residual, next_budget) - full_rounds)
             local_cost += 12 * (rounds(local_work, budget) - local_rounds)
-        if policy in ("online", "readiness"):
+        if policy in ("online", "readiness", "peer"):
             keep = full <= local_cost
         elif policy == "gate":
             keep = external >= minimum
@@ -89,10 +94,31 @@ class OnlineAdmissionMixin:
             keep = policy == "full"
         else:
             raise ValueError(f"Unknown admission policy {policy!r}")
+        peer_cost = {}
+        if policy == "peer":
+            # One additional mixed prefill round exposes incumbent decoders
+            # to the extra compute work on the resident-only path.
+            extra_rounds = max(0, rounds(local_work, budget) - full_rounds)
+            decoders = [peer for peer in running
+                        if peer.num_computed_tokens >= peer.num_prompt_tokens
+                        and peer.max_tokens > 1]
+            exposed_ms = (0.05 * external + 12 * extra_rounds) if extra_rounds else 0.0
+            # A peer's mean TPOT uses its whole generated stream. max_tokens
+            # is the declared output budget, exact for the fixed-length replay.
+            worst_tpot_ms = max(
+                (exposed_ms / (peer.max_tokens - 1) for peer in decoders),
+                default=0.0,
+            )
+            guard = worst_tpot_ms > 0.05 * self.reference_peer_tpot_ms
+            peer_cost = dict(decode_peers=len(decoders), extra_rounds=extra_rounds,
+                             estimated_peer_tpot_delta_ms=worst_tpot_ms,
+                             allowed_peer_tpot_delta_ms=0.05*self.reference_peer_tpot_ms,
+                             target_only_used=external if keep else 0, peer_guard=guard)
+            keep = keep or guard
         self._record_admission(
             request=request.request_id, policy=policy, local=local, verified=external,
             used=external if keep else 0, budget=budget, next_budget=next_budget,
-            ready_ms=ready, full_cost_ms=full, local_cost_ms=local_cost,
+            ready_ms=ready, full_cost_ms=full, local_cost_ms=local_cost, **peer_cost,
         )
         return keep
 
