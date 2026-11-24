@@ -1,0 +1,33 @@
+--- a/vllm_ascend/worker/model_runner_v1.py
++++ b/vllm_ascend/worker/model_runner_v1.py
+@@ -2158,6 +2158,30 @@
+ 
+                 sample_hidden_states = hidden_states[logits_indices]
+                 logits = self.model.compute_logits(sample_hidden_states)
++                from kvdiag import inspect_kv
++                inspect_kv(self, scheduler_output)
++                # Capture copies on device; transfer after the last token to
++                # avoid synchronizing the host in the middle of the replay.
++                if get_tp_group().rank_in_group == 0 and logits is not None:
++                    import os as _os
++                    for _idx, _rid in enumerate(self.input_batch.req_ids):
++                        if not _rid.startswith("cmpl-kv41-target-"):
++                            continue
++                        _end = int(self.input_batch.num_computed_tokens_cpu[_idx]) + scheduler_output.num_scheduled_tokens[_rid]
++                        _step = _end - 7742 + 1
++                        if 1 <= _step <= 32:
++                            if not hasattr(self, "_kv30_buf"):
++                                self._kv30_buf = {}
++                            _hist = self._kv30_buf.setdefault(_rid, [])
++                            _hist.append((_step, sample_hidden_states[_idx].detach().clone(),
++                                          logits[_idx].detach().clone()))
++                            if _step == 32:
++                                _steps, _hs, _ls = zip(*_hist)
++                                torch.save(dict(steps=_steps, hidden=torch.stack(_hs).cpu(),
++                                                logits=torch.stack(_ls).cpu()),
++                                           _os.path.join(_os.environ["KV41_CONTENTION_DIR"], _rid+".pt"))
++                                del self._kv30_buf[_rid]
++
+             else:
+                 # Rare case.
+                 assert not self.is_pooling_model

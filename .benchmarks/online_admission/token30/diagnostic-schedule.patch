@@ -1,0 +1,57 @@
+--- a/vllm/v1/core/sched/scheduler.py
++++ b/vllm/v1/core/sched/scheduler.py
+@@ -409,6 +409,8 @@
+ 
+     def schedule(self, throttle_prefills: bool = False) -> SchedulerOutput:
+         self.current_step += 1
++        from trace_lock import prepare, advance, rid_role
++        replay_plan = prepare(self)
+         # NOTE(woosuk) on the scheduling algorithm:
+         # There's no "decoding phase" nor "prefill phase" in the scheduler.
+         # Each request just has the num_computed_tokens and
+@@ -455,6 +457,9 @@
+         req_index = 0
+         while req_index < len(self.running) and token_budget > 0:
+             request = self.running[req_index]
++            if replay_plan is not None and rid_role(request.request_id) not in replay_plan:
++                req_index += 1
++                continue
+             if not self._is_batch_eligible(request.request_id):
+                 req_index += 1
+                 continue
+@@ -495,6 +500,10 @@
+             if 0 < self.scheduler_config.long_prefill_token_threshold < num_new_tokens:
+                 num_new_tokens = self.scheduler_config.long_prefill_token_threshold
+             num_new_tokens = min(num_new_tokens, token_budget)
++            if replay_plan is not None:
++                start, limit = replay_plan[rid_role(request.request_id)]
++                assert request.num_computed_tokens == start
++                num_new_tokens = min(num_new_tokens, limit)
+ 
+             # Make sure the input position does not exceed the max model len.
+             # This is necessary when using spec decoding.
+@@ -903,6 +912,16 @@
+                     if num_new_tokens == 0:
+                         break
+ 
++                if replay_plan is not None and not load_kv_async:
++                    replay_entry = replay_plan.get(rid_role(request.request_id))
++                    if replay_entry is None:
++                        request_queue.pop_request()
++                        step_skipped_waiting.prepend_request(request)
++                        continue
++                    start, limit = replay_entry
++                    assert num_computed_tokens == start
++                    num_new_tokens = min(num_new_tokens, limit)
++
+                 # During async KV load, no forward pass is run yet.
+                 # Allocate speculative lookahead slots later to avoid
+                 # mismatching local and remote block counts.
+@@ -1055,6 +1074,7 @@
+                 self.prefill_capacity_bound = bool(self.waiting)
+ 
+         # Check if the scheduling constraints are satisfied.
++        advance(self, num_scheduled_tokens, replay_plan)
+         total_num_scheduled_tokens = sum(num_scheduled_tokens.values())
+         assert total_num_scheduled_tokens <= self.max_num_scheduled_tokens
+ 
